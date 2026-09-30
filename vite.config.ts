@@ -16,6 +16,16 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: emitSourcemaps ? 'inline' : false,
       minify: !emitSourcemaps,
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              { name: 'react-vendor', test: /node_modules\/.*(?:react-dom|react|scheduler)\//, priority: 20 },
+              { name: 'chart-vendor', test: /node_modules\/.*(?:recharts|d3-|victory-vendor)/, priority: 10 },
+            ],
+          },
+        },
+      },
     },
     plugins: [
 react(),
