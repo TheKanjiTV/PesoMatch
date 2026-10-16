@@ -1,0 +1,58 @@
+[
+  {
+    "source_key": "e14a59dcdf5f25f494a9429f4caf992a8031343fe4fbff1916aef0dc89662fd2",
+    "source_reference": "JFC-DORFO-019-2026-1027",
+    "title": "PESO Maco Job Fair",
+    "type": "Job fair",
+    "location": "Municipal Gymnasium, Maco, Davao de Oro",
+    "event_date": "2026-10-27",
+    "status": "published",
+    "description": "Official calendar reference. Confirm changes and opening hours with the organizer; no attendance or hiring outcome is implied.",
+    "source_url": "https://ro11.dole.gov.ph/job-fair-schedules/",
+    "source_name": "DOLE XI · 2026 Job Fair Schedules",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00",
+    "verification_method": "Official indexed schedule reviewed; direct automated retrieval returned HTTP 403."
+  },
+  {
+    "source_key": "d3a0e7268528111cc01a65d2f30d593d2141d72f7242573c718b0be408f1b2d3",
+    "source_reference": "JFCDCFO-1013-14-2026-046",
+    "title": "PESO Davao and DICT employment fair",
+    "type": "Job fair",
+    "location": "SM City Davao Annex Event Center, Ecoland, Davao City",
+    "event_date": "2026-10-13",
+    "status": "published",
+    "description": "Official calendar reference. Confirm changes and opening hours with the organizer; no attendance or hiring outcome is implied.",
+    "source_url": "https://ro11.dole.gov.ph/job-fair-schedules/",
+    "source_name": "DOLE XI · 2026 Job Fair Schedules",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00",
+    "verification_method": "Official indexed schedule reviewed; direct automated retrieval returned HTTP 403."
+  },
+  {
+    "source_key": "1ab47e1e71dd017368ceb93bad6c21a854967655e8496bf238c4dcc50bc0ac50",
+    "source_reference": "2026-10-02-sta-cruz",
+    "title": "PESO Sta. Cruz Job Fair",
+    "type": "Job fair",
+    "location": "New Municipal Gymnasium, Escandor Road, Zone III, Sta. Cruz, Davao del Sur",
+    "event_date": "2026-10-02",
+    "status": "completed",
+    "description": "Official calendar reference. Confirm changes and opening hours with the organizer; no attendance or hiring outcome is implied.",
+    "source_url": "https://ro11.dole.gov.ph/job-fair-schedules/",
+    "source_name": "DOLE XI · 2026 Job Fair Schedules",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00",
+    "verification_method": "Official indexed schedule reviewed; direct automated retrieval returned HTTP 403."
+  },
+  {
+    "source_key": "3dbadd565b446b3ebb680453baf4382293a0f2075d3422f0f2b4d3476e09de3b",
+    "source_reference": "2026-09-14-digos",
+    "title": "Handog ng Pangulo Job Fair — Digos",
+    "type": "Job fair",
+    "location": "Tablizo Gym, Digos City",
+    "event_date": "2026-09-14",
+    "status": "completed",
+    "description": "Official calendar reference. Confirm changes and opening hours with the organizer; no attendance or hiring outcome is implied.",
+    "source_url": "https://ro11.dole.gov.ph/job-fair-schedules/",
+    "source_name": "DOLE XI · 2026 Job Fair Schedules",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00",
+    "verification_method": "Official indexed schedule reviewed; direct automated retrieval returned HTTP 403."
+  }
+]

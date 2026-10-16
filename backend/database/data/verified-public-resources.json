@@ -1,0 +1,33 @@
+[
+  {
+    "title": "Philippine labor force indicators — August 2026",
+    "publisher": "Philippine Statistics Authority · OpenSTAT",
+    "source_url": "https://openstat.psa.gov.ph/PXWeb/pxweb/en/DB/DB__1B__LFS/0021B3FKEI2.px/",
+    "reference_period": "August 2026",
+    "scope": "Philippines · both sexes · age 15 and over",
+    "indicators": [
+      {
+        "label": "Labor Force Participation Rate",
+        "value": 64.016,
+        "unit": "percent"
+      },
+      {
+        "label": "Employment Rate",
+        "value": 94.731,
+        "unit": "percent"
+      },
+      {
+        "label": "Unemployment Rate",
+        "value": 5.269,
+        "unit": "percent"
+      },
+      {
+        "label": "Underemployment Rate",
+        "value": 11.859,
+        "unit": "percent"
+      }
+    ],
+    "notes": "Preliminary PSA Labor Force Survey estimates; may be revised. Rounded display values are national survey statistics, separate from PesoMatch platform records.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  }
+]

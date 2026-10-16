@@ -1,16 +1,119 @@
 @import './styles/fonts.css';
 @import 'tailwindcss';
 @import './styles/theme.css';
+@import './styles/facilitation.css';
 
 @layer base {
   html { scroll-behavior: smooth; scroll-padding-top: 96px; }
-  body { font-family: 'Inter', sans-serif; color: var(--foreground); background: var(--background); }
+  body { font-family: var(--font-sans); color: var(--foreground); background: var(--background); }
   button, a, input, select, summary { -webkit-tap-highlight-color: transparent; }
   button:not(:disabled), summary { cursor: pointer; }
-  :focus-visible { outline: 3px solid #1246a3; outline-offset: 4px; }
-  ::selection { background: #eaf2ff; color: #0a2f6f; }
+  :focus-visible { outline: 3px solid #245441; outline-offset: 4px; }
+  ::selection { background: #dbe5cd; color: #173c30; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
   }
+}
+
+/* Only account navigation uses directional page transitions. Section links scroll normally. */
+@keyframes page-exit-left { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-24px); } }
+@keyframes page-enter-left { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes page-exit-right { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(24px); } }
+@keyframes page-enter-right { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: translateX(0); } }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+html[data-page-transition="forward"]::view-transition-old(root) { animation: page-exit-left 400ms cubic-bezier(.22,1,.36,1) both; }
+html[data-page-transition="forward"]::view-transition-new(root) { animation: page-enter-left 400ms cubic-bezier(.22,1,.36,1) both; }
+html[data-page-transition="back"]::view-transition-old(root) { animation: page-exit-right 400ms cubic-bezier(.22,1,.36,1) both; }
+html[data-page-transition="back"]::view-transition-new(root) { animation: page-enter-right 400ms cubic-bezier(.22,1,.36,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-page-transition]::view-transition-old(root), html[data-page-transition]::view-transition-new(root) { animation: none; }
+}
+
+/* Short account-to-workspace entrance; pairs with the 180ms panel exit. */
+@keyframes auth-flow-enter {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.auth-flow-enter { animation: auth-flow-enter 220ms cubic-bezier(.22,1,.36,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .auth-flow-enter { animation: none; }
+}
+
+/* Step navigation keeps the shell steady; only the form changes direction. */
+@keyframes onboarding-enter-back {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.onboarding-flow-back { animation: onboarding-enter-back 220ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes profile-ready-check {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+.profile-ready-check { animation: profile-ready-check 350ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-flow-back, .profile-ready-check { animation: none; }
+}
+
+/* Employment navigation animates the content region while keeping the toolbar steady. */
+::view-transition-group(workspace) { animation: none; }
+::view-transition-old(workspace), ::view-transition-new(workspace) { animation: none; }
+html[data-page-transition="journey-forward"]::view-transition-old(workspace) { animation: page-exit-left 400ms cubic-bezier(.22,1,.36,1) both; }
+html[data-page-transition="journey-forward"]::view-transition-new(workspace) { animation: page-enter-left 400ms cubic-bezier(.22,1,.36,1) both; }
+html[data-page-transition="journey-back"]::view-transition-old(workspace) { animation: page-exit-right 400ms cubic-bezier(.22,1,.36,1) both; }
+html[data-page-transition="journey-back"]::view-transition-new(workspace) { animation: page-enter-right 400ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes tab-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.tab-enter { animation: tab-enter 160ms cubic-bezier(.22,1,.36,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .tab-enter { animation: none; }
+  html[data-page-transition]::view-transition-old(workspace), html[data-page-transition]::view-transition-new(workspace) { animation: none; }
+}
+
+/* Keep the app password toggle without a duplicate Edge reveal icon. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear { display: none; }
+@keyframes surface-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes surface-exit { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-8px); } }
+@keyframes conversation-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.presence-enter > * { animation: surface-enter 200ms cubic-bezier(.22,1,.36,1) both; }
+.presence-exit > * { animation: surface-exit 200ms cubic-bezier(.22,1,.36,1) both; pointer-events: none; }
+.conversation-enter { animation: conversation-enter 220ms cubic-bezier(.22,1,.36,1) both; }
+@media (prefers-reduced-motion: reduce) { .presence-enter > *, .presence-exit > *, .conversation-enter { animation: none; } }
+.workspace-width { width: 100%; max-width: 1280px; margin-inline: auto; }
+.workspace-readable { --text-xs: 0.8125rem; --text-sm: 0.9375rem; --muted-foreground: #596176; }
+.workspace-readable [class~="text-[9px]"], .workspace-readable [class~="text-[10px]"] { font-size: 0.75rem; }
+.workspace-readable [class~="text-[11px]"] { font-size: 0.8125rem; }
+@keyframes guide-focus {
+  0%, 12% { opacity: 0; }
+  22%, 82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes guide-pointer {
+  0%, 12% { transform: translate(26px, 20px); }
+  32%, 58% { transform: translate(0, 0); }
+  65% { transform: translate(0, 0) scale(.85); }
+  74%, 100% { transform: translate(0, 0); }
+}
+.guide-focus { animation: guide-focus 7s ease-in-out infinite; }
+.guide-pointer { animation: guide-pointer 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .guide-focus, .guide-pointer { animation: none; }
+}
+@keyframes toast-enter { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toast-exit { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(48px); } }
+@keyframes notice-exit { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(24px); } }
+.toast-enter > * { animation: toast-enter 200ms ease-out both; }
+.toast-exit > * { animation: toast-exit 200ms ease-in both; pointer-events: none; }
+.notice-enter > * { animation: conversation-enter 200ms ease-out both; }
+.notice-exit > * { animation: notice-exit 200ms ease-in both; pointer-events: none; }
+@media(prefers-reduced-motion: reduce) { .toast-enter > *, .toast-exit > *, .notice-enter > *, .notice-exit > * { animation: none; } }
+
+@layer base {
+ :focus-visible { outline-color: var(--primary); }
+ ::selection { background: #dbe5cd; color: #173c30; }
+ input, textarea { caret-color: var(--primary); }
+ ::placeholder { color: #69786e; opacity: 1; }
+ html { scrollbar-color: #a7b7a0 #f1f2e9; }
+ h1, h2 { text-wrap: balance; }
+ td, dd { overflow-wrap: anywhere; }
 }

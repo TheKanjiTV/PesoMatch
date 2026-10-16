@@ -1,0 +1,15 @@
+{
+  "id": "/", "name": "PESO Employment Services", "short_name": "PESO",
+  "description": "Employment facilitation, skills development and continued PESO support.",
+  "start_url": "/dashboard?source=installed", "scope": "/", "display": "standalone",
+  "background_color": "#edf4f0", "theme_color": "#123d35", "lang": "en-PH",
+  "icons": [
+    { "src": "/icons/peso-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/peso-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Find vacancies", "url": "/jobs" },
+    { "name": "Training enrollment", "url": "/enrollments" },
+    { "name": "My employment outcomes", "url": "/outcomes" }
+  ]
+}

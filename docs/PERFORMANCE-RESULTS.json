@@ -1,0 +1,641 @@
+{
+  "date": "2026-10-13",
+  "lighthouseVersion": "13.5.0",
+  "origin": "http://127.0.0.1:8443/dashboard",
+  "throttling": {
+    "rttMs": 150,
+    "throughputKbps": 1638.4,
+    "requestLatencyMs": 562.5,
+    "downloadThroughputKbps": 1474.5600000000002,
+    "uploadThroughputKbps": 675,
+    "cpuSlowdownMultiplier": 4
+  },
+  "formFactor": "mobile",
+  "screenEmulation": {
+    "mobile": true,
+    "width": 412,
+    "height": 823,
+    "deviceScaleFactor": 1.75,
+    "disabled": false
+  },
+  "before": {
+    "runs": [
+      {
+        "performance": 93,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "SEO": 63,
+        "FCP": 2315.1367,
+        "LCP": 2772.20505,
+        "TBT": 38,
+        "CLS": 0.0004382827997700333,
+        "pageJSTransferBytes": 146106,
+        "pageJSRequests": 1,
+        "pageImageTransferBytes": 0,
+        "api": [
+          {
+            "path": "/api/auth/user",
+            "durationMs": 575
+          },
+          {
+            "path": "/api/platform/summary?page=1",
+            "durationMs": 512
+          },
+          {
+            "path": "/api/platform/events?page=1",
+            "durationMs": 892
+          }
+        ]
+      },
+      {
+        "performance": 93,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "SEO": 63,
+        "FCP": 2347.8637,
+        "LCP": 2810.29555,
+        "TBT": 36.5,
+        "CLS": 0.0004382827997700333,
+        "pageJSTransferBytes": 146106,
+        "pageJSRequests": 1,
+        "pageImageTransferBytes": 0,
+        "api": [
+          {
+            "path": "/api/auth/user",
+            "durationMs": 516
+          },
+          {
+            "path": "/api/platform/summary?page=1",
+            "durationMs": 363
+          },
+          {
+            "path": "/api/platform/events?page=1",
+            "durationMs": 655
+          }
+        ]
+      },
+      {
+        "performance": 95,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "SEO": 63,
+        "FCP": 1732.3479,
+        "LCP": 2797.02185,
+        "TBT": 57,
+        "CLS": 0.0004382827997700333,
+        "pageJSTransferBytes": 146106,
+        "pageJSRequests": 1,
+        "pageImageTransferBytes": 0,
+        "api": [
+          {
+            "path": "/api/auth/user",
+            "durationMs": 532
+          },
+          {
+            "path": "/api/platform/summary?page=1",
+            "durationMs": 374
+          },
+          {
+            "path": "/api/platform/events?page=1",
+            "durationMs": 661
+          }
+        ]
+      }
+    ],
+    "medians": {
+      "performance": 93,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "SEO": 63,
+      "FCP": 2315.1367,
+      "LCP": 2797.02185,
+      "TBT": 38,
+      "CLS": 0.0004382827997700333,
+      "pageJSTransferBytes": 146106,
+      "pageJSRequests": 1,
+      "pageImageTransferBytes": 0
+    },
+    "network": {
+      "origin": "http://127.0.0.1:8443",
+      "responses": [
+        {
+          "path": "/dashboard",
+          "worker": false,
+          "bytes": 696,
+          "status": 200
+        },
+        {
+          "path": "/assets/index-Wt-FUbnC.css",
+          "worker": false,
+          "bytes": 22655,
+          "status": 200
+        },
+        {
+          "path": "/assets/index-FtLCG9Ft.js",
+          "worker": false,
+          "bytes": 145751,
+          "status": 200
+        },
+        {
+          "path": "/sw.js",
+          "worker": true,
+          "bytes": 0,
+          "status": 200
+        },
+        {
+          "path": "/favicon.svg",
+          "worker": false,
+          "bytes": 211,
+          "status": 200
+        },
+        {
+          "path": "/offline.html",
+          "worker": true,
+          "bytes": 1001,
+          "status": 200
+        },
+        {
+          "path": "/icons/peso-192.png",
+          "worker": true,
+          "bytes": 2250,
+          "status": 200
+        },
+        {
+          "path": "/icons/peso-512.png",
+          "worker": true,
+          "bytes": 7072,
+          "status": 200
+        },
+        {
+          "path": "/assets/index-FtLCG9Ft.js",
+          "worker": true,
+          "bytes": 0,
+          "status": 200
+        },
+        {
+          "path": "/assets/index-Wt-FUbnC.css",
+          "worker": true,
+          "bytes": 0,
+          "status": 200
+        },
+        {
+          "path": "/assets/PhoneScene-uvj_pUFQ.js",
+          "worker": true,
+          "bytes": 2498,
+          "status": 200
+        },
+        {
+          "path": "/assets/PathwayScene-DUxy9hT0.js",
+          "worker": true,
+          "bytes": 3347,
+          "status": 200
+        },
+        {
+          "path": "/fonts/inter-latin-variable.woff2",
+          "worker": true,
+          "bytes": 48256,
+          "status": 200
+        },
+        {
+          "path": "/fonts/Lora-OFL.txt",
+          "worker": true,
+          "bytes": 2002,
+          "status": 200
+        },
+        {
+          "path": "/fonts/lora.ttf",
+          "worker": true,
+          "bytes": 212196,
+          "status": 200
+        },
+        {
+          "path": "/fonts/OFL.txt",
+          "worker": true,
+          "bytes": 2025,
+          "status": 200
+        },
+        {
+          "path": "/assets/RoundedBoxGeometry-CAAoRYdM.js",
+          "worker": true,
+          "bytes": 139099,
+          "status": 200
+        },
+        {
+          "path": "/fonts/poppins-bold.ttf",
+          "worker": true,
+          "bytes": 155996,
+          "status": 200
+        },
+        {
+          "path": "/fonts/poppins-medium.ttf",
+          "worker": true,
+          "bytes": 158576,
+          "status": 200
+        },
+        {
+          "path": "/fonts/Poppins-OFL.txt",
+          "worker": true,
+          "bytes": 2033,
+          "status": 200
+        },
+        {
+          "path": "/fonts/public-sans.ttf",
+          "worker": true,
+          "bytes": 0,
+          "status": 200
+        },
+        {
+          "path": "/fonts/poppins-semibold.ttf",
+          "worker": true,
+          "bytes": 157312,
+          "status": 200
+        },
+        {
+          "path": "/fonts/poppins-regular.ttf",
+          "worker": true,
+          "bytes": 160316,
+          "status": 200
+        },
+        {
+          "path": "/fonts/PublicSans-OFL.txt",
+          "worker": true,
+          "bytes": 1992,
+          "status": 200
+        },
+        {
+          "path": "/fonts/public-sans.ttf",
+          "worker": false,
+          "bytes": 103316,
+          "status": 200
+        },
+        {
+          "path": "/api/auth/user",
+          "worker": false,
+          "bytes": 479,
+          "status": 200
+        },
+        {
+          "path": "/fonts/lora.ttf",
+          "worker": true,
+          "bytes": 0,
+          "status": 200
+        },
+        {
+          "path": "/fonts/lora.ttf",
+          "worker": false,
+          "bytes": -273,
+          "status": 200
+        },
+        {
+          "path": "/api/platform/summary",
+          "worker": false,
+          "bytes": 519,
+          "status": 200
+        },
+        {
+          "path": "/api/platform/events",
+          "worker": false,
+          "bytes": 981,
+          "status": 200
+        }
+      ],
+      "errors": [],
+      "apiCounts": {
+        "/api/auth/user": 1,
+        "/api/platform/summary": 1,
+        "/api/platform/events": 1
+      },
+      "jsRequests": 6,
+      "jsBodyBytes": 290695,
+      "workerBodyBytes": 1055971,
+      "totalFontBodyBytes": 995968,
+      "totalImageBodyBytes": 9533
+    }
+  },
+  "after": {
+    "runs": [
+      {
+        "performance": 92,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "SEO": 63,
+        "FCP": 2048.680125,
+        "LCP": 2770.4882,
+        "TBT": 175,
+        "CLS": 0,
+        "pageJSTransferBytes": 110858,
+        "pageJSRequests": 7,
+        "pageImageTransferBytes": 0,
+        "api": [
+          {
+            "path": "/api/auth/user",
+            "durationMs": 443
+          },
+          {
+            "path": "/api/platform/summary?page=1",
+            "durationMs": 396
+          },
+          {
+            "path": "/api/platform/events?page=1",
+            "durationMs": 718
+          }
+        ]
+      },
+      {
+        "performance": 94,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "SEO": 63,
+        "FCP": 2006.3917500000002,
+        "LCP": 2691.0267999999996,
+        "TBT": 124.62165000000027,
+        "CLS": 0,
+        "pageJSTransferBytes": 110858,
+        "pageJSRequests": 7,
+        "pageImageTransferBytes": 0,
+        "api": [
+          {
+            "path": "/api/auth/user",
+            "durationMs": 416
+          },
+          {
+            "path": "/api/platform/summary?page=1",
+            "durationMs": 367
+          },
+          {
+            "path": "/api/platform/events?page=1",
+            "durationMs": 688
+          }
+        ]
+      },
+      {
+        "performance": 95,
+        "accessibility": 100,
+        "bestPractices": 100,
+        "SEO": 63,
+        "FCP": 1980.1056250000001,
+        "LCP": 2640.5689999999995,
+        "TBT": 44,
+        "CLS": 0,
+        "pageJSTransferBytes": 110858,
+        "pageJSRequests": 7,
+        "pageImageTransferBytes": 0,
+        "api": [
+          {
+            "path": "/api/auth/user",
+            "durationMs": 433
+          },
+          {
+            "path": "/api/platform/summary?page=1",
+            "durationMs": 344
+          },
+          {
+            "path": "/api/platform/events?page=1",
+            "durationMs": 645
+          }
+        ]
+      }
+    ],
+    "medians": {
+      "performance": 94,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "SEO": 63,
+      "FCP": 2006.3917500000002,
+      "LCP": 2691.0267999999996,
+      "TBT": 124.62165000000027,
+      "CLS": 0,
+      "pageJSTransferBytes": 110858,
+      "pageJSRequests": 7,
+      "pageImageTransferBytes": 0
+    },
+    "network": {
+      "origin": "http://127.0.0.1:8443",
+      "responses": [
+        {
+          "path": "/dashboard",
+          "worker": false,
+          "bytes": 824,
+          "status": 200
+        },
+        {
+          "path": "/assets/download-DS9e6PEJ.js",
+          "worker": false,
+          "bytes": 272,
+          "status": 200
+        },
+        {
+          "path": "/assets/createLucideIcon-e5iqDn2G.js",
+          "worker": false,
+          "bytes": 4529,
+          "status": 200
+        },
+        {
+          "path": "/fonts/public-sans.woff2",
+          "worker": false,
+          "bytes": 42036,
+          "status": 200
+        },
+        {
+          "path": "/fonts/lora.woff2",
+          "worker": false,
+          "bytes": 84928,
+          "status": 200
+        },
+        {
+          "path": "/assets/account-CYnGSYXO.js",
+          "worker": false,
+          "bytes": 1208,
+          "status": 200
+        },
+        {
+          "path": "/assets/index-BXb12iI2.css",
+          "worker": false,
+          "bytes": 22652,
+          "status": 200
+        },
+        {
+          "path": "/assets/ui-DH7Clw0Y.js",
+          "worker": false,
+          "bytes": 33547,
+          "status": 200
+        },
+        {
+          "path": "/assets/index-Cmi1T0AB.js",
+          "worker": false,
+          "bytes": 65231,
+          "status": 200
+        },
+        {
+          "path": "/assets/Overview-CT3CJI6F.js",
+          "worker": false,
+          "bytes": 2645,
+          "status": 200
+        },
+        {
+          "path": "/assets/ResourceState-sc0_w36c.js",
+          "worker": false,
+          "bytes": 982,
+          "status": 200
+        },
+        {
+          "path": "/favicon.svg",
+          "worker": false,
+          "bytes": 211,
+          "status": 200
+        },
+        {
+          "path": "/sw.js",
+          "worker": true,
+          "bytes": 0,
+          "status": 200
+        },
+        {
+          "path": "/icons/peso-192.png",
+          "worker": true,
+          "bytes": 2250,
+          "status": 200
+        },
+        {
+          "path": "/offline.html",
+          "worker": true,
+          "bytes": 1001,
+          "status": 200
+        },
+        {
+          "path": "/icons/peso-512.png",
+          "worker": true,
+          "bytes": 7072,
+          "status": 200
+        },
+        {
+          "path": "/api/auth/user",
+          "worker": false,
+          "bytes": 479,
+          "status": 200
+        },
+        {
+          "path": "/api/platform/summary",
+          "worker": false,
+          "bytes": 519,
+          "status": 200
+        },
+        {
+          "path": "/api/platform/events",
+          "worker": false,
+          "bytes": 981,
+          "status": 200
+        }
+      ],
+      "errors": [],
+      "apiCounts": {
+        "/api/auth/user": 1,
+        "/api/platform/summary": 1,
+        "/api/platform/events": 1
+      },
+      "jsRequests": 8,
+      "jsBodyBytes": 108414,
+      "workerBodyBytes": 10323,
+      "totalFontBodyBytes": 126964,
+      "totalImageBodyBytes": 9533
+    }
+  },
+  "assets": [
+    {
+      "file": "RoundedBoxGeometry-BkJlFsUt.js",
+      "rawBytes": 556744
+    },
+    {
+      "file": "index-Cmi1T0AB.js",
+      "rawBytes": 207005
+    },
+    {
+      "file": "ui-DH7Clw0Y.js",
+      "rawBytes": 101244
+    },
+    {
+      "file": "OnboardingPage-56F-8Jlg.js",
+      "rawBytes": 58307
+    },
+    {
+      "file": "Catalog-D98d3340.js",
+      "rawBytes": 19437
+    },
+    {
+      "file": "Operations-NwiRldlF.js",
+      "rawBytes": 15671
+    },
+    {
+      "file": "AuthPages-DIBdeEv2.js",
+      "rawBytes": 13909
+    },
+    {
+      "file": "Landing-DTvsh0kG.js",
+      "rawBytes": 13854
+    },
+    {
+      "file": "Records-Be1cUAPv.js",
+      "rawBytes": 12133
+    },
+    {
+      "file": "components-DgL1XVSf.js",
+      "rawBytes": 11658
+    },
+    {
+      "file": "createLucideIcon-e5iqDn2G.js",
+      "rawBytes": 11434
+    },
+    {
+      "file": "Overview-CT3CJI6F.js",
+      "rawBytes": 7020
+    },
+    {
+      "file": "Account-CfA7tj1o.js",
+      "rawBytes": 6970
+    },
+    {
+      "file": "PathwayScene-D0qBaooU.js",
+      "rawBytes": 6817
+    },
+    {
+      "file": "Resume-DQhy_JJG.js",
+      "rawBytes": 6775
+    },
+    {
+      "file": "Install-CYMstz3T.js",
+      "rawBytes": 5289
+    },
+    {
+      "file": "PhoneScene-Dar8cCbg.js",
+      "rawBytes": 5111
+    },
+    {
+      "file": "Tutorial-E8R39ZJJ.js",
+      "rawBytes": 3849
+    },
+    {
+      "file": "account-CYnGSYXO.js",
+      "rawBytes": 2474
+    },
+    {
+      "file": "ResourceState-sc0_w36c.js",
+      "rawBytes": 2249
+    },
+    {
+      "file": "map-pin-DwoJU5ic.js",
+      "rawBytes": 299
+    },
+    {
+      "file": "download-DS9e6PEJ.js",
+      "rawBytes": 272
+    },
+    {
+      "file": "search-DecPynkQ.js",
+      "rawBytes": 214
+    },
+    {
+      "file": "arrow-left-BfvcilqX.js",
+      "rawBytes": 205
+    }
+  ]
+}

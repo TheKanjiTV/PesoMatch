@@ -1,0 +1,23 @@
+/* The requested black/white dark palette also covers older fixed color utilities. */
+:root[data-contrast="hc2"] [class*="bg-[#"],
+:root[data-contrast="hc2"] .legacy-light-surface { background-color: #000; }
+:root[data-contrast="hc2"] [class*="text-[#"],
+:root[data-contrast="hc2"] [class*="text-white"],
+:root[data-contrast="hc2"] ::placeholder { color: #fff; }
+:root[data-contrast="hc2"] [class*="border-[#"] { border-color: #fff; }
+:root[data-contrast="hc2"] .sidebar-active,
+:root[data-contrast="hc2"] .app-tab-active { background: #fff; color: #000; }
+:root[data-contrast="hc2"] .sidebar-active:hover { color: #000 !important; }
+:root[data-contrast="hc2"] .phone-canvas canvas,
+:root[data-contrast="hc2"] .scene-canvas canvas { filter: grayscale(1); }
+:root[data-contrast="hc2"] ::selection { background: #fff; color: #000; }
+:root[data-contrast="hc2"] { scrollbar-color: #fff #000; }
+.appearance-theme-option { display: inline-flex; align-items: center; gap: .6rem; min-height: 48px; padding: .7rem 1.1rem; border: 1px solid var(--border); border-radius: .5rem; color: var(--foreground); background: var(--card); font-weight: 700; }
+.appearance-theme-option[aria-pressed="true"] { color: var(--primary-foreground); background: var(--primary); }
+html[data-links="underlined"] main a { text-decoration: underline; text-underline-offset: .2em; }
+html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+html[data-motion="reduced"]::view-transition-new(root), html[data-motion="reduced"]::view-transition-old(root) { animation: none !important; }
+.workspace-walkthrough { position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: var(--foreground); overflow: hidden; }
+.workspace-walkthrough::backdrop { background: transparent; }
+.tour-spotlight { position: absolute; inset: 0; pointer-events: none; }
+.tour-coach { position: absolute; padding: 1.5rem; border: 1px solid var(--border); border-radius: .8rem; background: var(--card); color: var(--foreground); max-height: calc(100dvh - 32px); overflow-y: auto; box-shadow: 0 12px 48px #0006; }

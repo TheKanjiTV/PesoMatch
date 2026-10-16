@@ -1,0 +1,177 @@
+{
+  "audit": "UI/UX and mobile readiness",
+  "date": "2026-10-13",
+  "route": "/dashboard",
+  "build": "Vite production preview",
+  "lighthouse": [
+    {
+      "run": 1,
+      "version": "13.5.0",
+      "url": "http://127.0.0.1:8443/dashboard",
+      "performance": 96,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 63,
+      "FCP": 1773.480125,
+      "LCP": 2685.3682,
+      "TBT": 45,
+      "CLS": 0,
+      "jsTransfer": 113345,
+      "imageTransfer": 0,
+      "scriptRequests": 4,
+      "apiRequests": [
+        {
+          "path": "/api/auth/user",
+          "ms": 534
+        },
+        {
+          "path": "/api/platform/summary",
+          "ms": 492
+        },
+        {
+          "path": "/api/platform/events",
+          "ms": 870
+        }
+      ],
+      "largestScripts": [
+        {
+          "path": "/assets/index-BzWYgAop.js",
+          "bytes": 102669
+        },
+        {
+          "path": "/assets/createLucideIcon-DlvAWfRv.js",
+          "bytes": 5371
+        },
+        {
+          "path": "/assets/Overview-B44m7CSs.js",
+          "bytes": 3475
+        },
+        {
+          "path": "/assets/ResourceState-1h2ay7Qj.js",
+          "bytes": 1830
+        }
+      ],
+      "errors": []
+    },
+    {
+      "run": 2,
+      "version": "13.5.0",
+      "url": "http://127.0.0.1:8443/dashboard",
+      "performance": 94,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 63,
+      "FCP": 1793.2507500000002,
+      "LCP": 2700.0012,
+      "TBT": 113.75015000000008,
+      "CLS": 0,
+      "jsTransfer": 113345,
+      "imageTransfer": 0,
+      "scriptRequests": 4,
+      "apiRequests": [
+        {
+          "path": "/api/auth/user",
+          "ms": 528
+        },
+        {
+          "path": "/api/platform/summary",
+          "ms": 546
+        },
+        {
+          "path": "/api/platform/events",
+          "ms": 955
+        }
+      ],
+      "largestScripts": [
+        {
+          "path": "/assets/index-BzWYgAop.js",
+          "bytes": 102669
+        },
+        {
+          "path": "/assets/createLucideIcon-DlvAWfRv.js",
+          "bytes": 5371
+        },
+        {
+          "path": "/assets/Overview-B44m7CSs.js",
+          "bytes": 3475
+        },
+        {
+          "path": "/assets/ResourceState-1h2ay7Qj.js",
+          "bytes": 1830
+        }
+      ],
+      "errors": []
+    },
+    {
+      "run": 3,
+      "version": "13.5.0",
+      "url": "http://127.0.0.1:8443/dashboard",
+      "performance": 95,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 63,
+      "FCP": 1785.4245,
+      "LCP": 2684.6792,
+      "TBT": 90,
+      "CLS": 0,
+      "jsTransfer": 113345,
+      "imageTransfer": 0,
+      "scriptRequests": 4,
+      "apiRequests": [
+        {
+          "path": "/api/auth/user",
+          "ms": 498
+        },
+        {
+          "path": "/api/platform/summary",
+          "ms": 496
+        },
+        {
+          "path": "/api/platform/events",
+          "ms": 915
+        }
+      ],
+      "largestScripts": [
+        {
+          "path": "/assets/index-BzWYgAop.js",
+          "bytes": 102669
+        },
+        {
+          "path": "/assets/createLucideIcon-DlvAWfRv.js",
+          "bytes": 5371
+        },
+        {
+          "path": "/assets/Overview-B44m7CSs.js",
+          "bytes": 3475
+        },
+        {
+          "path": "/assets/ResourceState-1h2ay7Qj.js",
+          "bytes": 1830
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "viewports": [
+    320,
+    375,
+    390,
+    768,
+    1024,
+    1440
+  ],
+  "matrix": {
+    "public": {
+      "measurements": 90,
+      "overflows": 0
+    },
+    "jobseeker": {
+      "measurements": 126,
+      "overflows": 0
+    },
+    "roles": {
+      "measurements": 96,
+      "overflows": 0
+    }
+  }
+}

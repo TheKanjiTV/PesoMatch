@@ -1,0 +1,24 @@
+# Asset and integration rights inventory — 2026-10-13
+
+Local follow-up adds four attributed DOLE XI calendar records and one PSA OpenSTAT report (four national indicators); see [LOCAL-REFINEMENTS.md](LOCAL-REFINEMENTS.md) for sources and verification limits. These factual summaries and links do not establish permission to reproduce government logos, posters or full articles. Source checking and content rights remain separate.
+
+This records repository evidence, not a warranty of ownership. No unknown asset was silently deleted or replaced during the audit. **Unknown image and source-content permissions must be resolved before public distribution.**
+
+| Asset | Current use | Evidence | Status / action |
+| --- | --- | --- | --- |
+| Public Sans TTF/WOFF2 | Active interface font | `public/fonts/PublicSans-OFL.txt`, SIL OFL 1.1 with copyright notice | License text retained; retain it with distribution. WOFF2 is a format conversion of the local font. Confirm provenance against the upstream font when preparing release records. |
+| Lora TTF/WOFF2 | Active editorial/heading font | `public/fonts/Lora-OFL.txt`, SIL OFL 1.1, reserved font name notice | License text retained; no renaming or design alteration performed. Preserve conditions and notices. |
+| Poppins regular/medium/semibold/bold TTF | Retained legacy assets, not eagerly loaded by active UI | `public/fonts/Poppins-OFL.txt`, SIL OFL 1.1 | Keep notice if these files are distributed. |
+| Lucide icons | Named React icon imports | Installed `lucide-react/LICENSE`, ISC | Preserve copyright/license in release notices; no ownership claim. |
+| Three.js | Landing and phone preview geometry | Installed `three/LICENSE`, MIT | Retain license; generated geometry does not establish third-party trademark rights. |
+| React / React DOM / React Router | Application runtime | Installed package LICENSE files, MIT | Retain license notices in the distributed application/package. |
+| `public/images/career-portrait.webp` / original `.jpg` | Optimized active onboarding illustration (`Professional at work` alt text); original retained | WebP resized from the existing JPEG; no author/source/license proof located in repository | **Unknown rights; release blocker** until permission/source evidence or an approved replacement is supplied. Format conversion grants no new rights. Do not infer a stock license from filename. |
+| `career-professional.jpg`, `office-team.jpg`, `career-workspace.jpg`, `team-collaboration.jpg` | Retired prototype images still in public assets | No author/source/license proof located | Unknown rights; resolve or explicitly approve removal from distribution. Their absence from active routes does not make redistribution lawful. |
+| `public/images/announcements/*` (PNG assets) | Retained public poster files | Source/rightsholder permission not documented | Unknown rights; posters may contain logos or protected imagery. Public availability is not a license. |
+| `public/images/admin-guide/*` (4 PNGs) | Retained guide screenshots | No explicit authorship/license manifest | Verify ownership and that screenshots contain no real personal records before publishing. |
+| P mark SVG, application icons, Three scenes | Active product identity/code-generated visuals | Repository source and generation scripts | No imported logo kit found in the active graph; ownership and trademark clearance still require operator confirmation. Do not claim government authorization. |
+| PhilJobNet vacancy / TESDA course snapshots | Official-source catalog rows with source URL/check date | `backend/database/data/verified-vacancies.json`, `verified-training.json` | Source attribution verifies where the information was found, not permission to reproduce it. Review site terms/content reuse, description length, logo rights, expiry and accurate availability. No direct account integration or endorsement is asserted. |
+| User-uploaded PDFs | Private user-supplied documents | Account-scoped upload and terms draft | Operator needs a policy for uploads, third-party personal information and rights complaints; never reuse résumés in publicity or training datasets without a separate basis. |
+| Xpdf tools 4.06 | Server-side PDF text extraction only, private `.local/pdf-tools` | Official publisher archive; SHA-256 matched against [ScoopInstaller manifest](https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/xpdf-tools.json); included COPYING / COPYING3 | Not bundled in the browser or repository. Preserve GPL notices and obtain a legal assessment of obligations if distributing the tools/application package; no blanket licensing conclusion is made. |
+
+`public/THIRD-PARTY-NOTICES.txt` includes installed runtime package license notices. Font licenses remain in their public font directory. A final release reviewer must reconcile the files actually shipped with the approved asset register; this inventory does not certify unknown images or copied catalog text.

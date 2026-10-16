@@ -1,0 +1,388 @@
+[
+  {
+    "title": "Fundamentals of Artificial Intelligence",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5164",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111",
+    "skills": [
+      "Artificial Intelligence"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Fundamentals of Artificial Intelligence. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "AWS Certified Cloud Practitioner (CLF-C02 - English)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5163",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111",
+    "skills": [
+      "Cloud Computing"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: AWS Certified Cloud Practitioner (CLF-C02 - English). Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116289+00:00"
+  },
+  {
+    "title": "AWS Certified AI Practitioner (AIF-C01 - English)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5162",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111",
+    "skills": [
+      "Artificial Intelligence"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: AWS Certified AI Practitioner (AIF-C01 - English). Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Introduction to Content Creation",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4068",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "skills": [
+      "Social Media Management"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Introduction to Content Creation. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Creating Concepts for Social Media",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4069",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "skills": [
+      "Social Media Management"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Creating Concepts for Social Media. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116300+00:00"
+  },
+  {
+    "title": "Translating Concepts into Multimedia Contents",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4079",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "skills": [
+      "Social Media Management",
+      "Graphic Design"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Translating Concepts into Multimedia Contents. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116301+00:00"
+  },
+  {
+    "title": "Propagating Content",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4070",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "skills": [
+      "Social Media Management"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Propagating Content. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116303+00:00"
+  },
+  {
+    "title": "Introduction to Digital Marketing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4747",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "skills": [
+      "Digital Marketing"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Introduction to Digital Marketing. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Designing a Digital Marketing Funnel",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4748",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "skills": [
+      "Digital Marketing"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Designing a Digital Marketing Funnel. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Designing a Campaign Creative Brief",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4749",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "skills": [
+      "Digital Marketing",
+      "Graphic Design"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Designing a Campaign Creative Brief. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Creating Content",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4750",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "skills": [
+      "Digital Marketing"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Creating Content. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Optimizing Digital Marketing Campaign",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4751",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "skills": [
+      "Digital Marketing"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Optimizing Digital Marketing Campaign. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116313+00:00"
+  },
+  {
+    "title": "Conducting Data Analysis",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4752",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "skills": [
+      "Digital Marketing",
+      "Data Analysis"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Conducting Data Analysis. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116315+00:00"
+  },
+  {
+    "title": "Participating in Workplace Communication",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=56",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=37",
+    "skills": [
+      "Communication"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Participating in Workplace Communication. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Receiving and Responding to Workplace Communication",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=52",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=37",
+    "skills": [
+      "Communication"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Receiving and Responding to Workplace Communication. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Microsoft Digital Literacy",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4716",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310",
+    "skills": [
+      "Computer Literacy"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Microsoft Digital Literacy. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Practicing Data Privacy in the Workplace",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4395",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310",
+    "skills": [
+      "Data Privacy"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Practicing Data Privacy in the Workplace. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-10T08:43:21.116323+00:00"
+  },
+  {
+    "title": "Wi-Fi 101 and Digital Thumbprint Program",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2480",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310",
+    "skills": [
+      "Computer Literacy"
+    ],
+    "description": "Self-paced learning listed in the official TESDA Online Program catalog: Wi-Fi 101 and Digital Thumbprint Program. Open the source for the current syllabus and enrollment instructions.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Introduction to Bookkeeping",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3981",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Introduction to Bookkeeping. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Preparing Financial Reports",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4030",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Financial Reporting",
+      "Bookkeeping"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Preparing Financial Reports. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Preparing Trial Balance",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4029",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Bookkeeping",
+      "Accounting"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Preparing Trial Balance. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Reviewing Internal Control System",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4017",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Internal Controls",
+      "Bookkeeping"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Reviewing Internal Control System. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Introduction to Technical Drafting",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3470",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Technical Drawing"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Introduction to Technical Drafting. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Preparing Computer-Aided Drawings",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3472",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "CAD",
+      "Technical Drawing"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Preparing Computer-Aided Drawings. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Providing Front Office Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Front Office Services",
+      "Customer Service"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Providing Front Office Services. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Providing Housekeeping Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=96",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Housekeeping"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Providing Housekeeping Services. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Providing Table Service",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=119",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Food and Beverage Service",
+      "Customer Service"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Providing Table Service. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Providing Room Service",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=120",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Food and Beverage Service",
+      "Customer Service"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Providing Room Service. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Module 1: Crafting Your Career",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2001",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Career Planning"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Module 1: Crafting Your Career. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Module 2: Your Guide to Job Readiness",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2002",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Job Readiness"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Module 2: Your Guide to Job Readiness. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Module 3: Building Human Skills for Career Success",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2014",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Communication",
+      "Human Skills"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Module 3: Building Human Skills for Career Success. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Self-Management",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5039",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Self-Management"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Self-Management. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Problem Solving & Innovation",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5041",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Problem Solving"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Problem Solving & Innovation. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  },
+  {
+    "title": "Start and Improve Your Business",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=105",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "skills": [
+      "Entrepreneurship",
+      "Business Planning"
+    ],
+    "description": "Official TESDA Online Program catalog entry: Start and Improve Your Business. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
+    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+  }
+]

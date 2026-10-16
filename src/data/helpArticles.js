@@ -1,0 +1,81 @@
+export const helpArticles = [
+  {
+    id: "profile",
+    topic: "Your Profile",
+    title: "Update your profile and headline",
+    text: "Open Profile → View Profile, then choose Edit Profile. Edit personal information, education, skills, work experience or preferences in the corresponding dialog. Personal information is saved to your account; your headline is stored in this browser for this preview.",
+    link: ["Open My Profile", "/jobseeker/profile"],
+  },
+  {
+    id: "jobs",
+    topic: "Search and Apply for Jobs",
+    title: "Explore jobs and understand a match",
+    text: "Open Jobs to browse, view recommended opportunities or review saved jobs. Open Why You Match to inspect sample criteria and related skill gaps. Match scores are predefined examples and do not guarantee employment. You can request PESO assistance from an opportunity's details.",
+    link: ["Browse Jobs", "/jobs?tab=browse"],
+  },
+  {
+    id: "assistance",
+    topic: "PESO Assistance",
+    title: "Follow your PESO assistance journey",
+    text: "Request PESO assistance after reviewing the job details. Follow the journey from request received to PESO review, referral, employer coordination, follow-up and an outcome. Public updates appear in your assistance record. Employers make hiring decisions. Assistance records in this prototype remain browser-only examples.",
+    link: ["Open PESO Assistance", "/jobseeker/assistance"],
+  },
+  {
+    id: "training",
+    topic: "Training",
+    title: "Find training for a skill gap",
+    text: "Open a job's skill analysis to review related training. Save a training opportunity or register interest in the preview. A recommendation or interest record does not enroll you. Check provider details and confirm schedules before attending.",
+    link: ["Browse Training", "/training"],
+  },
+  {
+    id: "email",
+    topic: "Sign in & Security",
+    title: "Change your email or mobile number",
+    text: "Open Settings & Privacy → Sign in & security → Email addresses. Your current password is required to save account changes. Changing your email resets verification. Email delivery is not configured in this local phase.",
+    link: [
+      "Manage Account Information",
+      "/jobseeker/settings?section=security&detail=account",
+    ],
+  },
+  {
+    id: "password",
+    topic: "Sign in & Security",
+    title: "Change your password",
+    text: "Open Settings & Privacy → Sign in & security → Change password. Enter your current password and confirm a new password of at least eight characters. Saving your password signs out other sessions.",
+    link: [
+      "Change Password",
+      "/jobseeker/settings?section=security&detail=password",
+    ],
+  },
+  {
+    id: "feed",
+    topic: "Basics",
+    title: "Hide a post or follow an organization",
+    text: "Use a post's options menu to hide a post, mark it Not interested or save a local report. Hide shows an inline Undo option. Not interested unfollows the organization in this preview. Open People you unfollowed in settings to follow again. Feed preferences are stored per account in this browser.",
+    link: [
+      "Manage People You Unfollowed",
+      "/jobseeker/settings?section=account&detail=unfollowed",
+    ],
+  },
+  {
+    id: "privacy",
+    topic: "Data and Privacy",
+    title: "Download your profile or clear search history",
+    text: "Settings & Privacy → Data privacy lets you download your current profile and browser preferences as JSON or clear recent searches. Public-profile visibility and employer discovery are not connected in this phase. Read the privacy policy for the current account service.",
+    link: ["Open Data Privacy", "/jobseeker/settings?section=privacy"],
+  },
+  {
+    id: "staff",
+    topic: "Businesses",
+    title: "Explore the PESO Staff and Admin preview",
+    text: "Open Businesses → Admin Center → Enter Staff Portal. Select Preview PESO Staff or Preview PESO Admin. These fictional preview identities do not grant real roles. Staff actions update matching sample assistance records; internal notes stay out of the jobseeker public preview.",
+    link: ["Open Admin Center", "/business/admin-center"],
+  },
+  {
+    id: "support",
+    topic: "Basics",
+    title: "Contact support in this prototype",
+    text: "The Admin Center support panel accepts messages locally and provides help shortcuts. Gemini, live support and human-agent handoff are not connected yet. No message is transmitted to PESO or a support agent.",
+    link: ["Open Admin Center Support", "/business/admin-center?support=1"],
+  },
+]
