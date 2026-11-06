@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Vacancy;
 use App\Services\EmploymentMatcher;
 use App\Services\ResumeAnalyzer;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -111,6 +112,8 @@ class ResumeTest extends TestCase
         $this->artisan('peso:import-verified-training')->assertSuccessful();
         $this->assertDatabaseCount('training_programs', count(json_decode(file_get_contents(database_path('data/verified-training.json')), true)));
         $p = TrainingProgram::whereJsonContains('skills', 'Communication')->firstOrFail();
+        $sourceCourse = collect(json_decode(file_get_contents(database_path('data/verified-training.json')), true))->firstWhere('source_url', $p->source_url);
+        $this->assertSame(CarbonImmutable::parse($sourceCourse['checked_at'])->timestamp, $p->source_checked_at->timestamp);
         $this->assertNull($p->starts_on);
         $this->assertNull($p->capacity);
         $this->assertFalse($p->is_sample);

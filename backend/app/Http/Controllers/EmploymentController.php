@@ -54,7 +54,7 @@ class EmploymentController extends Controller
 
     public function publicCatalog()
     {
-        return response()->json(['vacancies' => Vacancy::available()->where('is_sample', false)->latest()->limit(6)->get(), 'training' => TrainingProgram::available()->where('is_sample', false)->orderBy('starts_on')->limit(6)->get(), 'events' => ServiceEvent::where('is_sample', false)->where('status', 'published')->where(fn ($q) => $q->where('starts_at', '>=', now())->orWhereDate('event_date', '>=', today()))->orderBy('event_date')->orderBy('starts_at')->limit(6)->get(), 'services' => self::SERVICES]);
+        return response()->json(['vacancies' => Vacancy::available()->where('is_sample', false)->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest()->orderByDesc('id')->limit(6)->get(), 'training' => TrainingProgram::available()->where('is_sample', false)->orderBy('starts_on')->orderBy('title')->orderBy('id')->limit(6)->get(), 'events' => ServiceEvent::where('is_sample', false)->where('status', 'published')->where(fn ($q) => $q->where('starts_at', '>=', now())->orWhereDate('event_date', '>=', today()))->orderBy('event_date')->orderBy('starts_at')->limit(6)->get(), 'services' => self::SERVICES]);
     }
 
     public function vacancies(Request $r)
@@ -81,7 +81,7 @@ class EmploymentController extends Controller
             $q->whereIn('id', DB::table('saved_vacancies')->where('user_id', $r->user()->id)->select('vacancy_id'));
         }
 
-        return $q->orderBy('is_sample')->latest()->paginate(100);
+        return $q->orderBy('is_sample')->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest()->orderByDesc('id')->paginate(100);
     }
 
     public function saveVacancy(Request $r, ?Vacancy $vacancy = null)
@@ -126,7 +126,7 @@ class EmploymentController extends Controller
             $q->where('status', $r->query('status'));
         }
 
-        return $q->orderBy('starts_on')->paginate(100);
+        return $q->orderBy('starts_on')->orderBy('title')->orderBy('id')->paginate(100);
     }
 
     public function saveProgram(Request $r, ?TrainingProgram $program = null)
@@ -160,7 +160,9 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['jobseeker']);
 
-        return response()->json($matcher->recommendations($r->user()));
+        $data = $r->validate(['page' => 'sometimes|integer|min:1|max:100000']);
+
+        return response()->json($matcher->recommendations($r->user(), (int) ($data['page'] ?? 1)));
     }
 
     public function bookmark(Request $r, Vacancy $vacancy)

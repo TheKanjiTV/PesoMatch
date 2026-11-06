@@ -171,6 +171,53 @@ class EmploymentPlatformTest extends TestCase
         $this->actingAs($u)->getJson('/api/platform/matches')->assertOk()->assertJsonPath('training.0.addresses.0', 'Microsoft Excel')->assertJsonPath('method', 'content-based-tfidf-v1');
     }
 
+    public function test_large_matching_catalog_is_paginated_without_losing_ranked_results_or_changing_scores(): void
+    {
+        $user = $this->person();
+        $skill = Skill::create(['name' => 'Communication']);
+        $user->jobseekerProfile->skills()->attach($skill);
+        for ($i = 0; $i < 205; $i++) {
+            $this->vacancy(['title' => 'Office Assistant '.$i, 'skills' => $i % 3 ? ['Communication', 'Microsoft Excel'] : ['Communication']]);
+        }
+        $this->vacancy(['is_sample' => true]);
+        $this->program();
+        $pages = [];
+        for ($page = 1; $page <= 3; $page++) {
+            $pages[] = $this->actingAs($user)->getJson('/api/platform/matches?page='.$page)
+                ->assertOk()->assertJsonPath('total', 205)->assertJsonPath('last_page', 3)
+                ->assertJsonPath('current_page', $page)->assertJsonCount($page === 3 ? 5 : 100, 'matches')->json();
+        }
+        $matches = array_merge(...array_column($pages, 'matches'));
+        $ids = array_column(array_column($matches, 'vacancy'), 'id');
+        $this->assertCount(205, array_unique($ids));
+        $scores = array_column(array_column($matches, 'assessment'), 'score');
+        $sorted = $scores;
+        rsort($sorted);
+        $this->assertSame($sorted, $scores);
+        $corpus = Vacancy::available()->where('is_sample', false)->get()
+            ->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
+        foreach ([0, 99, 100, 204] as $index) {
+            $assessment = app(EmploymentMatcher::class)->assess($user->fresh(), Vacancy::findOrFail($ids[$index]), $corpus);
+            $this->assertSame($assessment['score'], $scores[$index]);
+        }
+        $this->assertSame($pages[0]['training'], $pages[2]['training']);
+        $this->getJson('/api/platform/matches?page=0')->assertUnprocessable();
+    }
+
+    public function test_source_catalog_uses_posted_dates_instead_of_bulk_import_order(): void
+    {
+        $this->vacancy(['title' => 'Earlier posting imported later', 'external_application' => true,
+            'source_checked_at' => now(), 'source_posted_on' => today()->subDay(), 'created_at' => now()]);
+        $latest = $this->vacancy(['title' => 'Latest source posting', 'external_application' => true,
+            'source_checked_at' => now(), 'source_posted_on' => today(), 'created_at' => now()->subDay()]);
+        $this->program(['title' => 'Zulu course']);
+        $alpha = $this->program(['title' => 'Alpha course']);
+        $this->getJson('/api/public/catalog')->assertOk()->assertJsonPath('vacancies.0.id', $latest->id)
+            ->assertJsonPath('training.0.id', $alpha->id);
+        $this->actingAs($this->person())->getJson('/api/platform/vacancies')->assertOk()->assertJsonPath('data.0.id', $latest->id);
+        $this->getJson('/api/platform/training')->assertOk()->assertJsonPath('data.0.id', $alpha->id);
+    }
+
     public function test_role_management_and_audit_are_admin_only(): void
     {
         $u = $this->person();

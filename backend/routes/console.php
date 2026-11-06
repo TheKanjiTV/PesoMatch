@@ -6,6 +6,7 @@ use App\Models\Skill;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -76,7 +77,7 @@ Artisan::command('peso:import-verified-training', function () {
                 Skill::firstOrCreate(['name' => $skill]);
             }
 
-            TrainingProgram::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'provider' => 'TESDA Online Program', 'location' => 'Online · Philippines', 'mode' => 'Online', 'description' => $row['description'], 'requirements' => 'Create an account on the official TESDA Online Program website and review the course prerequisites. Course completion is not an automatic National Certificate.', 'skills' => $row['skills'], 'capacity' => null, 'starts_on' => null, 'ends_on' => null, 'schedule' => 'Self-paced · see official source', 'fee' => 0, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => $row['checked_at'], 'external_enrollment' => true]);
+            TrainingProgram::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'provider' => 'TESDA Online Program', 'location' => 'Online · Philippines', 'mode' => 'Online', 'description' => $row['description'], 'requirements' => 'Create an account on the official TESDA Online Program website and review the course prerequisites. Course completion is not an automatic National Certificate.', 'skills' => $row['skills'], 'capacity' => null, 'starts_on' => null, 'ends_on' => null, 'schedule' => 'Self-paced · see official source', 'fee' => 0, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'external_enrollment' => true]);
 
         }
     });
@@ -95,7 +96,7 @@ Artisan::command('peso:import-verified-vacancies', function () {
             foreach ($row['skills'] as $skill) {
                 Skill::firstOrCreate(['name' => $skill]);
             }
-            Vacancy::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => null, 'deadline' => null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => $row['checked_at'], 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true]);
+            Vacancy::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => null, 'deadline' => null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true]);
         }
     });
     $this->info(count($rows).' source-checked listings imported. Availability must be confirmed on PhilJobNet; no partner relationship or referral was fabricated.');
@@ -106,16 +107,19 @@ Artisan::command('peso:import-verified-public-resources', function () {
     $reports = json_decode(file_get_contents(database_path('data/verified-public-resources.json')), true, 512, JSON_THROW_ON_ERROR);
     DB::transaction(function () use ($events, $reports) {
         foreach ($events as $row) {
-            if (parse_url($row['source_url'], PHP_URL_HOST) !== 'ro11.dole.gov.ph') {
+            if (! in_array($row['source_url'], [
+                'https://ro11.dole.gov.ph/job-fair-schedules/',
+                'https://docs.google.com/spreadsheets/d/1PlMXkd0LkWnWD640JrIprx7DGjleu5U4-9wD_UNIQys/edit',
+            ], true)) {
                 throw new RuntimeException('Unexpected calendar host.');
             }
-            ServiceEvent::updateOrCreate(['source_key' => $row['source_key']], collect($row)->except(['checked_at', 'source_key'])->all() + ['starts_at' => null, 'is_sample' => false, 'source_checked_at' => $row['checked_at']]);
+            ServiceEvent::updateOrCreate(['source_key' => $row['source_key']], collect($row)->except(['checked_at', 'source_key'])->all() + ['starts_at' => null, 'is_sample' => false, 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone'))]);
         }
         foreach ($reports as $row) {
             if (parse_url($row['source_url'], PHP_URL_HOST) !== 'openstat.psa.gov.ph') {
                 throw new RuntimeException('Unexpected statistics host.');
             }
-            PublicResource::updateOrCreate(['source_url' => $row['source_url']], collect($row)->except(['checked_at'])->all() + ['source_checked_at' => $row['checked_at']]);
+            PublicResource::updateOrCreate(['source_url' => $row['source_url']], collect($row)->except(['checked_at'])->all() + ['source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone'))]);
         }
     });
     $this->info(count($events).' source events and '.count($reports).' official statistical report imported. No people, enrollments or outcomes were fabricated.');

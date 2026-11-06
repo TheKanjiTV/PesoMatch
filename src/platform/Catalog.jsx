@@ -561,6 +561,13 @@ function Detail({
             <li key={s}>{s}</li>
           ))}
         </ul>
+        {!v.skills.length && (
+          <p className="mt-3 text-sm text-muted-foreground">
+            {training
+              ? "No skill topics mapped. Review the official course syllabus and entry requirements."
+              : "No skill requirements mapped. Review the official listing for the full qualifications."}
+          </p>
+        )}
         {training && (
           <>
             <h3 className="mt-8 text-base font-semibold">
@@ -622,7 +629,7 @@ function Detail({
 
                   v.external_application
                     ? v.source_salary
-                      ? `${v.source_salary} · pay period not stated`
+                      ? `${v.source_salary} · confirm pay period with employer`
                       : "Not stated"
                     : v.salary_min
                       ? `${money(v.salary_min)} – ${money(v.salary_max || v.salary_min)}`
@@ -775,7 +782,7 @@ export function MatchesPage() {
           </button>
         ))}
       </div>
-      <ResourceState resource={r}>
+      <ResourceState resource={r} paginate={tab === "jobs"}>
         {tab === "jobs" ? (
           <div className="space-y-4">
             {!r.data?.matches.length && (
@@ -819,8 +826,10 @@ export function MatchesPage() {
                       Skills to develop
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {a.missing_skills.join(", ") ||
-                        "All listed skills appear in your profile"}
+                      {!v.skills.length
+                        ? "No skill requirements mapped · review the official listing"
+                        : a.missing_skills.join(", ") ||
+                          "All listed skills appear in your profile"}
                     </p>
                   </div>
                 </div>

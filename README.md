@@ -48,6 +48,8 @@ php artisan peso:import-verified-public-resources
 
 These commands are idempotent. Recheck sources before editing the dataset/check timestamp. External jobs are excluded from browse/matching after 30 days without a researched refresh; no ongoing source synchronization is claimed.
 
+The [November 3 source refresh](docs/DATA-REFRESH-2026-11-03.md) covers the requested October 14–November 3 posting/event window, expands the current TESDA catalog and records source-access limits. PSA figures retain their actual reference period.
+
 ## Included flows
 
 | Module | Behavior |
@@ -85,7 +87,7 @@ Open the printed LAN address followed by `/app` on the phone. Enter that platfor
 
 ## Scope
 
-All new service actions are backed by Laravel. Ten researched PhilJobNet vacancies across Luzon, Visayas and Mindanao and eighteen nationwide TESDA Online Program courses are imported with official source URLs and check dates. Source-listed jobs open the official application page; they do not pretend to have connected partner accounts. Unknown closing dates, positions and pay periods stay explicitly unstated. Official enrollment opens on TESDA; it is not fabricated in the local enrollment queue. Existing sample vacancies and local programs remain visibly fictional. See [source evidence](docs/DATA-SOURCES.md). The matching implementation is an explainable content-based recommender baseline, not a validated predictive hiring model or external LLM. It must be evaluated with pilot data before making effectiveness claims. It does not infer eligibility from sensitive personal attributes.
+All new service actions are backed by Laravel. Researched PhilJobNet vacancies and 230 TESDA Online Program courses are imported with official source URLs and check dates; see the dated refresh report for coverage and current totals. Source-listed jobs open the official application page; they do not pretend to have connected partner accounts. Unknown closing dates, positions and pay periods stay explicitly unstated. Official enrollment opens on TESDA; it is not fabricated in the local enrollment queue. Existing sample vacancies and local programs remain visibly fictional. See [source evidence](docs/DATA-SOURCES.md). The matching implementation is an explainable content-based recommender baseline, not a validated predictive hiring model or external LLM. It must be evaluated with pilot data before making effectiveness claims. It does not infer eligibility from sensitive personal attributes.
 
 No TESDA/PEIS/government integration, official certification, scholarship reservation, email delivery or production deployment is configured. PESO facilitates; providers confirm enrollment; employers decide hiring. A provider completion reference is not a TESDA National Certificate.
 

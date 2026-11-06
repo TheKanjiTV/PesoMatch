@@ -1,0 +1,90 @@
+{
+  "review_date": "2026-11-03",
+  "requested_window": {
+    "from": "2026-10-14",
+    "through": "2026-11-03",
+    "inclusive": true
+  },
+  "vacancies": {
+    "source_url": "https://philjobnet.gov.ph/job-vacancies/",
+    "public_pages_reviewed": 413,
+    "missing_pages": [],
+    "page_receipts": 446,
+    "unique_source_identities_observed": 4121,
+    "candidate_postings_in_window": 2678,
+    "added": 2677,
+    "earlier_preserved": 20,
+    "total_records": 2697,
+    "by_posted_date": {
+      "2026-10-14": 150,
+      "2026-10-15": 215,
+      "2026-10-16": 99,
+      "2026-10-17": 62,
+      "2026-10-18": 7,
+      "2026-10-19": 182,
+      "2026-10-20": 183,
+      "2026-10-21": 183,
+      "2026-10-22": 253,
+      "2026-10-23": 111,
+      "2026-10-24": 24,
+      "2026-10-25": 15,
+      "2026-10-26": 152,
+      "2026-10-27": 292,
+      "2026-10-28": 161,
+      "2026-10-29": 229,
+      "2026-10-30": 143,
+      "2026-10-31": 17,
+      "2026-11-01": 4,
+      "2026-11-02": 32,
+      "2026-11-03": 163
+    },
+    "excluded": [
+      {
+        "source_url": "https://philjobnet.gov.ph/job-vacancies/job/general-manager-gfi-sg-30-1488811",
+        "reason": "Detail identity differs from list evidence"
+      }
+    ],
+    "without_mapped_skills": 513,
+    "first_list_checked_at": "2026-11-03T06:42:38.056790+00:00",
+    "last_list_checked_at": "2026-11-03T07:22:36.708346+00:00"
+  },
+  "training": {
+    "source_url": "https://e-tesda.gov.ph/course/index.php?perpage=1000",
+    "category_pages_reviewed": 84,
+    "added": 196,
+    "total_records": 230,
+    "publication_dates_disclosed": false
+  },
+  "events": {
+    "added": 10,
+    "total_records": 14,
+    "limits": "Regional official calendars; scheduled dates do not establish conduct or attendance. See dated report for source-access limits."
+  },
+  "statistics": {
+    "source_url": "https://openstat.psa.gov.ph/PXWeb/pxweb/en/DB/DB__1B__LFS/0021B3FKEI2.px/",
+    "latest_available_reference_period": "August 2026",
+    "indicators": [
+      {
+        "label": "Labor Force Participation Rate",
+        "value": 64.016,
+        "unit": "percent"
+      },
+      {
+        "label": "Employment Rate",
+        "value": 94.731,
+        "unit": "percent"
+      },
+      {
+        "label": "Unemployment Rate",
+        "value": 5.269,
+        "unit": "percent"
+      },
+      {
+        "label": "Underemployment Rate",
+        "value": 11.859,
+        "unit": "percent"
+      }
+    ]
+  },
+  "limits": "A review of currently accessible public pages, not a historical archive. Deleted, private and inaccessible postings cannot be reconstructed. Public pagination can change while collection is running."
+}

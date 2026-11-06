@@ -1,5 +1,7 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Data Sources
 
+Current review: [November 3 refresh, coverage and verification](DATA-REFRESH-2026-11-03.md). The October 10 counts and tables below are historical evidence for the original catalog.
+
 ## Nationwide official training catalog
 
 Eighteen real course records were researched and imported on October 10, 2026 from the official TESDA Online Program. Every record includes its official course URL, source name and checked timestamp. The table below reproduces the source identity, not private learner records. Titles were read from official category pages; short descriptions are authored summaries. Skill mappings are authored curriculum interpretations for recommendation, not a TESDA endorsement or qualification equivalence.

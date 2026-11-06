@@ -151,6 +151,18 @@ export function Sample({ record }) {
 export function Source({ record }) {
   if (!record?.source_url) return null
 
+  const checked = record.source_checked_at
+    ? new Date(record.source_checked_at).toLocaleDateString("en-PH", {
+        timeZone: "Asia/Manila",
+
+        month: "short",
+
+        day: "numeric",
+
+        year: "numeric",
+      })
+    : "Not checked"
+
   return (
     <span className="inline-flex flex-wrap items-center gap-2 text-xs leading-6 text-muted-foreground">
       <a
@@ -161,7 +173,7 @@ export function Source({ record }) {
       >
         {record.source_name || "Official source"}
       </a>
-      <span>Checked {date(record.source_checked_at)}</span>
+      <span>Checked {checked}</span>
     </span>
   )
 }

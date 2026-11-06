@@ -31,6 +31,9 @@ export default defineConfig({
   // Keep content-hashed files available while publishing the new index.
   build: { emptyOutDir: false },
 
+  // Saved official-source HTML is evidence, not an application entry point.
+  optimizeDeps: { entries: ["index.html"] },
+
   server: {
     host: "127.0.0.1",
 
@@ -56,6 +59,8 @@ export default defineConfig({
     watch: {
       ignored: [
         "**/backend/**",
+        "**/.local/**",
+        "**/artifacts/**",
         "**/logs/**",
         "**/test-results/**",
         "**/playwright-report/**",

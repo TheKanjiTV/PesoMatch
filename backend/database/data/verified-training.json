@@ -3,386 +3,2338 @@
     "title": "Fundamentals of Artificial Intelligence",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=5164",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111&perpage=1000",
     "skills": [
       "Artificial Intelligence"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Fundamentals of Artificial Intelligence. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:52.413915+00:00"
   },
   {
     "title": "AWS Certified Cloud Practitioner (CLF-C02 - English)",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=5163",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111&perpage=1000",
     "skills": [
       "Cloud Computing"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: AWS Certified Cloud Practitioner (CLF-C02 - English). Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116289+00:00"
+    "checked_at": "2026-11-03T06:45:52.413915+00:00"
   },
   {
     "title": "AWS Certified AI Practitioner (AIF-C01 - English)",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=5162",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2111&perpage=1000",
     "skills": [
       "Artificial Intelligence"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: AWS Certified AI Practitioner (AIF-C01 - English). Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:52.413915+00:00"
   },
   {
     "title": "Introduction to Content Creation",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4068",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789&perpage=1000",
     "skills": [
       "Social Media Management"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Introduction to Content Creation. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:53.064670+00:00"
   },
   {
     "title": "Creating Concepts for Social Media",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4069",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789&perpage=1000",
     "skills": [
       "Social Media Management"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Creating Concepts for Social Media. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116300+00:00"
+    "checked_at": "2026-11-03T06:45:53.064670+00:00"
   },
   {
     "title": "Translating Concepts into Multimedia Contents",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4079",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789&perpage=1000",
     "skills": [
       "Social Media Management",
       "Graphic Design"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Translating Concepts into Multimedia Contents. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116301+00:00"
+    "checked_at": "2026-11-03T06:45:53.064670+00:00"
   },
   {
     "title": "Propagating Content",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4070",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1789&perpage=1000",
     "skills": [
       "Social Media Management"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Propagating Content. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116303+00:00"
+    "checked_at": "2026-11-03T06:45:53.064670+00:00"
   },
   {
     "title": "Introduction to Digital Marketing",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4747",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004&perpage=1000",
     "skills": [
       "Digital Marketing"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Introduction to Digital Marketing. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:53.797785+00:00"
   },
   {
     "title": "Designing a Digital Marketing Funnel",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4748",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004&perpage=1000",
     "skills": [
       "Digital Marketing"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Designing a Digital Marketing Funnel. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:53.797785+00:00"
   },
   {
     "title": "Designing a Campaign Creative Brief",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4749",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004&perpage=1000",
     "skills": [
       "Digital Marketing",
       "Graphic Design"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Designing a Campaign Creative Brief. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:53.797785+00:00"
   },
   {
     "title": "Creating Content",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4750",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004&perpage=1000",
     "skills": [
       "Digital Marketing"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Creating Content. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:53.797785+00:00"
   },
   {
     "title": "Optimizing Digital Marketing Campaign",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4751",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004&perpage=1000",
     "skills": [
       "Digital Marketing"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Optimizing Digital Marketing Campaign. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116313+00:00"
+    "checked_at": "2026-11-03T06:45:53.797785+00:00"
   },
   {
     "title": "Conducting Data Analysis",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4752",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2004&perpage=1000",
     "skills": [
       "Digital Marketing",
       "Data Analysis"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Conducting Data Analysis. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116315+00:00"
+    "checked_at": "2026-11-03T06:45:53.797785+00:00"
   },
   {
     "title": "Participating in Workplace Communication",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=56",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=37",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=37&perpage=1000",
     "skills": [
       "Communication"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Participating in Workplace Communication. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:19.578492+00:00"
   },
   {
     "title": "Receiving and Responding to Workplace Communication",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=52",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=37",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=37&perpage=1000",
     "skills": [
       "Communication"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Receiving and Responding to Workplace Communication. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:19.578492+00:00"
   },
   {
     "title": "Microsoft Digital Literacy",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4716",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310&perpage=1000",
     "skills": [
       "Computer Literacy"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Microsoft Digital Literacy. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:22.701610+00:00"
   },
   {
     "title": "Practicing Data Privacy in the Workplace",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4395",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310&perpage=1000",
     "skills": [
       "Data Privacy"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Practicing Data Privacy in the Workplace. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-10T08:43:21.116323+00:00"
+    "checked_at": "2026-11-03T06:45:22.701610+00:00"
   },
   {
     "title": "Wi-Fi 101 and Digital Thumbprint Program",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=2480",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1310&perpage=1000",
     "skills": [
       "Computer Literacy"
     ],
     "description": "Self-paced learning listed in the official TESDA Online Program catalog: Wi-Fi 101 and Digital Thumbprint Program. Open the source for the current syllabus and enrollment instructions.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:22.701610+00:00"
   },
   {
     "title": "Introduction to Bookkeeping",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=3981",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1764&perpage=1000",
     "skills": [
       "Bookkeeping"
     ],
     "description": "Official TESDA Online Program catalog entry: Introduction to Bookkeeping. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:13.437003+00:00"
   },
   {
     "title": "Preparing Financial Reports",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4030",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1764&perpage=1000",
     "skills": [
       "Financial Reporting",
       "Bookkeeping"
     ],
     "description": "Official TESDA Online Program catalog entry: Preparing Financial Reports. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:13.437003+00:00"
   },
   {
     "title": "Preparing Trial Balance",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4029",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1764&perpage=1000",
     "skills": [
       "Bookkeeping",
       "Accounting"
     ],
     "description": "Official TESDA Online Program catalog entry: Preparing Trial Balance. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:13.437003+00:00"
   },
   {
     "title": "Reviewing Internal Control System",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4017",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1764&perpage=1000",
     "skills": [
       "Internal Controls",
       "Bookkeeping"
     ],
     "description": "Official TESDA Online Program catalog entry: Reviewing Internal Control System. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:13.437003+00:00"
   },
   {
     "title": "Introduction to Technical Drafting",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=3470",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
     "skills": [
       "Technical Drawing"
     ],
     "description": "Official TESDA Online Program catalog entry: Introduction to Technical Drafting. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
   },
   {
     "title": "Preparing Computer-Aided Drawings",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=3472",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
     "skills": [
       "CAD",
       "Technical Drawing"
     ],
     "description": "Official TESDA Online Program catalog entry: Preparing Computer-Aided Drawings. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
   },
   {
     "title": "Providing Front Office Services",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=4",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=7&perpage=1000",
     "skills": [
       "Front Office Services",
       "Customer Service"
     ],
     "description": "Official TESDA Online Program catalog entry: Providing Front Office Services. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:20.432304+00:00"
   },
   {
     "title": "Providing Housekeeping Services",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=96",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=30&perpage=1000",
     "skills": [
       "Housekeeping"
     ],
     "description": "Official TESDA Online Program catalog entry: Providing Housekeeping Services. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:22.159855+00:00"
   },
   {
     "title": "Providing Table Service",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=119",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=8&perpage=1000",
     "skills": [
       "Food and Beverage Service",
       "Customer Service"
     ],
     "description": "Official TESDA Online Program catalog entry: Providing Table Service. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:19.810267+00:00"
   },
   {
     "title": "Providing Room Service",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=120",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=8&perpage=1000",
     "skills": [
       "Food and Beverage Service",
       "Customer Service"
     ],
     "description": "Official TESDA Online Program catalog entry: Providing Room Service. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:19.810267+00:00"
   },
   {
     "title": "Module 1: Crafting Your Career",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=2001",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=811&perpage=1000",
     "skills": [
       "Career Planning"
     ],
     "description": "Official TESDA Online Program catalog entry: Module 1: Crafting Your Career. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:25.850911+00:00"
   },
   {
     "title": "Module 2: Your Guide to Job Readiness",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=2002",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=811&perpage=1000",
     "skills": [
       "Job Readiness"
     ],
     "description": "Official TESDA Online Program catalog entry: Module 2: Your Guide to Job Readiness. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:25.850911+00:00"
   },
   {
     "title": "Module 3: Building Human Skills for Career Success",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=2014",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=811&perpage=1000",
     "skills": [
       "Communication",
       "Human Skills"
     ],
     "description": "Official TESDA Online Program catalog entry: Module 3: Building Human Skills for Career Success. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:46:25.850911+00:00"
   },
   {
     "title": "Self-Management",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=5039",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
     "skills": [
       "Self-Management"
     ],
     "description": "Official TESDA Online Program catalog entry: Self-Management. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
   },
   {
     "title": "Problem Solving & Innovation",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=5041",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
     "skills": [
       "Problem Solving"
     ],
     "description": "Official TESDA Online Program catalog entry: Problem Solving & Innovation. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
   },
   {
     "title": "Start and Improve Your Business",
     "source_url": "https://e-tesda.gov.ph/course/view.php?id=105",
     "source_name": "TESDA Online Program",
-    "category_url": "https://e-tesda.gov.ph/course/search.php?perpage=all&search=ID",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1321&perpage=1000",
     "skills": [
       "Entrepreneurship",
       "Business Planning"
     ],
     "description": "Official TESDA Online Program catalog entry: Start and Improve Your Business. Review the official syllabus and prerequisites before enrolling; completing this course does not automatically issue a National Certificate.",
-    "checked_at": "2026-10-13T12:52:44.309601+00:00"
+    "checked_at": "2026-11-03T06:45:40.634153+00:00"
+  },
+  {
+    "title": "Establishing & Operating Micro-Small Medium Enterprises (MSMEs)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2985",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=17&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Entrepreneurship. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:50.475732+00:00"
+  },
+  {
+    "title": "Working in a Gender-Diverse Environment",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2497",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1286&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Gender and Development (GAD). Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:50.984283+00:00"
+  },
+  {
+    "title": "Conducting Gender Analysis, Mainstreaming, and Planning and Budgeting",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2498",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1286&perpage=1000",
+    "skills": [
+      "Budgeting"
+    ],
+    "description": "TESDA lists this module under Gender and Development (GAD). Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:50.984283+00:00"
+  },
+  {
+    "title": "Developing Awareness on Halal Principles and Practices",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3902",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1724&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Halal Awareness Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:51.562418+00:00"
+  },
+  {
+    "title": "IBM SkillsBuild",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3331",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=21&perpage=1000",
+    "skills": [
+      "Communication"
+    ],
+    "description": "TESDA lists this module under Information and Communication Technology. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:57.058100+00:00"
+  },
+  {
+    "title": "Using Familiar Everyday Expressions and Very Basic Phrases in Japanese (Japanese Language A1 Level)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5062",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2080&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Language. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:57.649086+00:00"
+  },
+  {
+    "title": "Using English Expressions Related to Areas of Most Immediate Relevance (English Language A2 Level)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5064",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2080&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Language. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:44:57.649086+00:00"
+  },
+  {
+    "title": "English for Business and Entrepreneurship",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2801",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1311&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Language Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.258993+00:00"
+  },
+  {
+    "title": "Using Educational Technology in the English Language Classroom",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2043",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1311&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Language Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.258993+00:00"
+  },
+  {
+    "title": "English as a Medium of Instruction",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2042",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1311&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Language Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.258993+00:00"
+  },
+  {
+    "title": "English for Science, Technology, Engineering, and Mathematics (eSTEM)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1947",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1311&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Language Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.258993+00:00"
+  },
+  {
+    "title": "English for Tourism Professionals",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=398",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1311&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Language Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.258993+00:00"
+  },
+  {
+    "title": "Developing Awareness on Circular Economy Principles and Practices",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4566",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=36&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Environmental Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.897550+00:00"
+  },
+  {
+    "title": "Exercising Sustainable Development in the Workplace",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=123",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=36&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Environmental Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.897550+00:00"
+  },
+  {
+    "title": "Orienting Oneself To Environmentally Sustainable Work Standards",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=122",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=36&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Environmental Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.897550+00:00"
+  },
+  {
+    "title": "Performing Solid Waste Management in the Workplace",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=175",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=36&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Environmental Literacy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:20.897550+00:00"
+  },
+  {
+    "title": "TESDA Information Management",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4657",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1979&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Khan Academy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:23.272660+00:00"
+  },
+  {
+    "title": "HP LIFE Courses",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4745",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2001&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under HP LIFE. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:23.829555+00:00"
+  },
+  {
+    "title": "Impactful Writing Skills",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5037",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Job Ready Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
+  },
+  {
+    "title": "Self-Presentation",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5038",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Job Ready Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
+  },
+  {
+    "title": "Interpersonal Skills",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5040",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Job Ready Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
+  },
+  {
+    "title": "Professionalism",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5042",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Job Ready Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
+  },
+  {
+    "title": "Customer Centricity",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5043",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2075&perpage=1000",
+    "skills": [
+      "Customer Service"
+    ],
+    "description": "TESDA lists this module under Job Ready Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:25.694708+00:00"
+  },
+  {
+    "title": "Introduction to Agro-Entrepreneurship",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=305",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=98&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:26.731375+00:00"
+  },
+  {
+    "title": "Assessing Market Opportunities",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=308",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=98&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:26.731375+00:00"
+  },
+  {
+    "title": "Establishing the Farm Production Plan",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=307",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=98&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:26.731375+00:00"
+  },
+  {
+    "title": "Handling Finances",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=309",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=98&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:26.731375+00:00"
+  },
+  {
+    "title": "Marketing Farm Produce",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=310",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=98&perpage=1000",
+    "skills": [
+      "Marketing",
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:26.731375+00:00"
+  },
+  {
+    "title": "Introduction to Aquaponic Food Production",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=168",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=55&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Aquaponic Food Production. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:27.373666+00:00"
+  },
+  {
+    "title": "Setting up Aquaponics Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=183",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=55&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Aquaponic Food Production. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:27.373666+00:00"
+  },
+  {
+    "title": "Maintaining Aquaponics Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=184",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=55&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Aquaponic Food Production. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:27.373666+00:00"
+  },
+  {
+    "title": "Introduction to Organic Agriculture",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=151",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=63&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Organic Agriculture Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.108937+00:00"
+  },
+  {
+    "title": "Formulating Organic Concoctions & Extracts",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=232",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=63&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Organic Agriculture Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.108937+00:00"
+  },
+  {
+    "title": "Producing Organic Fertilizers",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=198",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=63&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Organic Agriculture Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.108937+00:00"
+  },
+  {
+    "title": "Producing Organic Vegetables",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=210",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=63&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Organic Agriculture Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.108937+00:00"
+  },
+  {
+    "title": "Raising Organic Chickens",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=233",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=63&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Organic Agriculture Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.108937+00:00"
+  },
+  {
+    "title": "Introduction to Agricultural Crops Production",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1937",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=788&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Agricultural Crops Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.764314+00:00"
+  },
+  {
+    "title": "Performing Nursery Operations",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1938",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=788&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Agricultural Crops Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.764314+00:00"
+  },
+  {
+    "title": "Planting Crops",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1940",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=788&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Agricultural Crops Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.764314+00:00"
+  },
+  {
+    "title": "Caring and Maintaining Crops",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1944",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=788&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Agricultural Crops Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.764314+00:00"
+  },
+  {
+    "title": "Performing Harvest and Postharvest Operations",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1946",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=788&perpage=1000",
+    "skills": [
+      "Agriculture"
+    ],
+    "description": "TESDA lists this module under Agricultural Crops Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:28.764314+00:00"
+  },
+  {
+    "title": "Fruit Grower",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=54",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1317&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Fruit Growing. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:29.381155+00:00"
+  },
+  {
+    "title": "Introduction to Agroentrepreneurship",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4661",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1981&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:30.626782+00:00"
+  },
+  {
+    "title": "Engaging Agroenterprise (AE) Industry Stakeholders",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4662",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1981&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:30.626782+00:00"
+  },
+  {
+    "title": "Ensuring Product Supply",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4666",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1981&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:30.626782+00:00"
+  },
+  {
+    "title": "Implementing Financial Management",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4674",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1981&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:30.626782+00:00"
+  },
+  {
+    "title": "Mobilizing Farmers Participation in Capacity Building Activities",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4676",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1981&perpage=1000",
+    "skills": [
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:30.626782+00:00"
+  },
+  {
+    "title": "Conducting Collective Marketing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4677",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1981&perpage=1000",
+    "skills": [
+      "Marketing",
+      "Entrepreneurship"
+    ],
+    "description": "TESDA lists this module under Agro-Entrepreneurship NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:30.626782+00:00"
+  },
+  {
+    "title": "Introduction to Automotive Servicing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3009",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=822&perpage=1000",
+    "skills": [
+      "Vehicle Maintenance"
+    ],
+    "description": "TESDA lists this module under Automotive Servicing (Engine Repair) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:31.870962+00:00"
+  },
+  {
+    "title": "Performing Periodic Maintenance of the Automotive Engine",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3052",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=822&perpage=1000",
+    "skills": [
+      "Vehicle Maintenance"
+    ],
+    "description": "TESDA lists this module under Automotive Servicing (Engine Repair) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:31.870962+00:00"
+  },
+  {
+    "title": "Diagnosing and Repairing Engine Cooling and Lubricating System",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3053",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=822&perpage=1000",
+    "skills": [
+      "Vehicle Maintenance"
+    ],
+    "description": "TESDA lists this module under Automotive Servicing (Engine Repair) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:31.870962+00:00"
+  },
+  {
+    "title": "Diagnosing and Repairing Intake and Exhaust Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3054",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=822&perpage=1000",
+    "skills": [
+      "Vehicle Maintenance"
+    ],
+    "description": "TESDA lists this module under Automotive Servicing (Engine Repair) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:31.870962+00:00"
+  },
+  {
+    "title": "Diagnosing and Overhauling Engine Mechanical Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3055",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=822&perpage=1000",
+    "skills": [
+      "Vehicle Maintenance"
+    ],
+    "description": "TESDA lists this module under Automotive Servicing (Engine Repair) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:31.870962+00:00"
+  },
+  {
+    "title": "Introduction to Plumbing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=234",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=76&perpage=1000",
+    "skills": [
+      "Plumbing"
+    ],
+    "description": "TESDA lists this module under Plumbing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:32.599647+00:00"
+  },
+  {
+    "title": "Preparing Estimation of Materials for Multiple Plumbing Units",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=243",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=76&perpage=1000",
+    "skills": [
+      "Plumbing"
+    ],
+    "description": "TESDA lists this module under Plumbing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:32.599647+00:00"
+  },
+  {
+    "title": "Performing Multiple Plumbing Units Installation and Assembly",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=244",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=76&perpage=1000",
+    "skills": [
+      "Plumbing"
+    ],
+    "description": "TESDA lists this module under Plumbing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:32.599647+00:00"
+  },
+  {
+    "title": "Performing Leak Testing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=245",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=76&perpage=1000",
+    "skills": [
+      "Plumbing"
+    ],
+    "description": "TESDA lists this module under Plumbing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:32.599647+00:00"
+  },
+  {
+    "title": "Performing Plumbing Repair and Maintenance Work",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=246",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=76&perpage=1000",
+    "skills": [
+      "Plumbing"
+    ],
+    "description": "TESDA lists this module under Plumbing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:32.599647+00:00"
+  },
+  {
+    "title": "Introduction to Photovoltaic Systems Installation",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2499",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1287&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Photovoltaic Systems Installation NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:33.874463+00:00"
+  },
+  {
+    "title": "Performing Site Assessment",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2500",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1287&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Photovoltaic Systems Installation NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:33.874463+00:00"
+  },
+  {
+    "title": "Checking PV Components and Materials Compliance",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2501",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1287&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Photovoltaic Systems Installation NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:33.874463+00:00"
+  },
+  {
+    "title": "Installing Photovoltaic Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2502",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1287&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Photovoltaic Systems Installation NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:33.874463+00:00"
+  },
+  {
+    "title": "Performing PV System Testing and Commissioning",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2503",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1287&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Photovoltaic Systems Installation NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:33.874463+00:00"
+  },
+  {
+    "title": "Drafting Architectural Layout and Details",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3471",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
+    "skills": [
+      "Technical Drawing"
+    ],
+    "description": "TESDA lists this module under Technical Drafting NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
+  },
+  {
+    "title": "Drafting Structural Layout and Details",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3473",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
+    "skills": [
+      "Technical Drawing"
+    ],
+    "description": "TESDA lists this module under Technical Drafting NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
+  },
+  {
+    "title": "Drafting Electrical and Electronic Layout and Details",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3474",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
+    "skills": [
+      "Technical Drawing"
+    ],
+    "description": "TESDA lists this module under Technical Drafting NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
+  },
+  {
+    "title": "Drafting Sanitary and Plumbing Layout and Details",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3475",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
+    "skills": [
+      "Technical Drawing",
+      "Plumbing"
+    ],
+    "description": "TESDA lists this module under Technical Drafting NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
+  },
+  {
+    "title": "Drafting Mechanical Layout and Details",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3476",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1557&perpage=1000",
+    "skills": [
+      "Technical Drawing"
+    ],
+    "description": "TESDA lists this module under Technical Drafting NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:34.626630+00:00"
+  },
+  {
+    "title": "Introduction to Computer Systems Servicing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=92",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=16&perpage=1000",
+    "skills": [
+      "Computer Hardware"
+    ],
+    "description": "TESDA lists this module under Computer System Servicing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:35.683145+00:00"
+  },
+  {
+    "title": "Installing and Configuring Computer Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=81",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=16&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Computer System Servicing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:35.683145+00:00"
+  },
+  {
+    "title": "Setting Up Computer Networks",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=82",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=16&perpage=1000",
+    "skills": [
+      "Computer Networking"
+    ],
+    "description": "TESDA lists this module under Computer System Servicing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:35.683145+00:00"
+  },
+  {
+    "title": "Setting Up Computer Servers",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=83",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=16&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Computer System Servicing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:35.683145+00:00"
+  },
+  {
+    "title": "Maintaining Computer Systems and Networks",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=73",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=16&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Computer System Servicing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:35.683145+00:00"
+  },
+  {
+    "title": "Introduction to Electrical Installation and Maintenance",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=236",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=77&perpage=1000",
+    "skills": [
+      "Electrical Installation"
+    ],
+    "description": "TESDA lists this module under Electrical Installation and Maintenance NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:36.584614+00:00"
+  },
+  {
+    "title": "Performing Roughing-In Activities, Wiring and Cabling Works for Single-Phase Distribution, Power, Lighting and Auxiliary Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=248",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=77&perpage=1000",
+    "skills": [
+      "Electrical Installation"
+    ],
+    "description": "TESDA lists this module under Electrical Installation and Maintenance NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:36.584614+00:00"
+  },
+  {
+    "title": "Installing Electrical Protective Devices for Distribution, Power, Lightning Protection and Grounding Systems",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=249",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=77&perpage=1000",
+    "skills": [
+      "Electrical Installation"
+    ],
+    "description": "TESDA lists this module under Electrical Installation and Maintenance NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:36.584614+00:00"
+  },
+  {
+    "title": "Installing Wiring Devices for Floor and Wall Mounted Outlets, Lighting Fixtures, Switches and Auxiliary Outlets",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=250",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=77&perpage=1000",
+    "skills": [
+      "Electrical Installation"
+    ],
+    "description": "TESDA lists this module under Electrical Installation and Maintenance NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:36.584614+00:00"
+  },
+  {
+    "title": "Solar Night Light Assembly",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=104",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1319&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Renewable/Alternative Energy. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.141211+00:00"
+  },
+  {
+    "title": "Building Business Mindset",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4808",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2026&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under iSTAR Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.810827+00:00"
+  },
+  {
+    "title": "Planning the Business",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4809",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2026&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under iSTAR Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.810827+00:00"
+  },
+  {
+    "title": "Managing Business Operation",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4810",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2026&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under iSTAR Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.810827+00:00"
+  },
+  {
+    "title": "Ensuring Business Sustainability and Success",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4811",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2026&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under iSTAR Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.810827+00:00"
+  },
+  {
+    "title": "Basic E-Commerce Using Social Media Under the iSTAR Program in Partnership With Coca-Cola Philippines",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4812",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2026&perpage=1000",
+    "skills": [
+      "Social Media"
+    ],
+    "description": "TESDA lists this module under iSTAR Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.810827+00:00"
+  },
+  {
+    "title": "Access to Business Coaching, Resources and Peer Mentoring",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4813",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2026&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under iSTAR Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:37.810827+00:00"
+  },
+  {
+    "title": "Packaged Air Conditioner Unit Servicing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=94",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1320&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Refrigeration and Airconditioning Servicing (DOMRAC). Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:41.267175+00:00"
+  },
+  {
+    "title": "Installing Commercial Air-Conditioning Units",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3420",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1536&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Commercial Air-Conditioning Installation and Servicing NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:41.877653+00:00"
+  },
+  {
+    "title": "Introduction to Barangay Health Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=235",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=78&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Health Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:42.855457+00:00"
+  },
+  {
+    "title": "Assisting Household to Identify Health Problems and Promote Health and Well-being",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=238",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=78&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Health Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:42.855457+00:00"
+  },
+  {
+    "title": "Sharing Knowledge and Skills Among Members to Provide Information, Education and Communication and Household Teaching in Disease Prevention and Control",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=239",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=78&perpage=1000",
+    "skills": [
+      "Communication"
+    ],
+    "description": "TESDA lists this module under Barangay Health Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:42.855457+00:00"
+  },
+  {
+    "title": "Monitoring Health Status of Household Members Under Your Area of Service Coverage",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=241",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=78&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Health Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:42.855457+00:00"
+  },
+  {
+    "title": "Safekeeping of Equipment, Medical Supplies and Materials in Health Station",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=240",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=78&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Health Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:42.855457+00:00"
+  },
+  {
+    "title": "Maintaining Updated List/ Record of Health Activities",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=242",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=78&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Health Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:42.855457+00:00"
+  },
+  {
+    "title": "Foundations of Massage Practice",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=79",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=19&perpage=1000",
+    "skills": [
+      "Massage Therapy"
+    ],
+    "description": "TESDA lists this module under Massage Therapy NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:43.629411+00:00"
+  },
+  {
+    "title": "Fundamentals of Massage Therapy",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=68",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=19&perpage=1000",
+    "skills": [
+      "Massage Therapy"
+    ],
+    "description": "TESDA lists this module under Massage Therapy NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:43.629411+00:00"
+  },
+  {
+    "title": "Performing Shiatsu",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=23",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=19&perpage=1000",
+    "skills": [
+      "Massage Therapy"
+    ],
+    "description": "TESDA lists this module under Massage Therapy NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:43.629411+00:00"
+  },
+  {
+    "title": "Performing Swedish Massage",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=26",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=19&perpage=1000",
+    "skills": [
+      "Massage Therapy"
+    ],
+    "description": "TESDA lists this module under Massage Therapy NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:43.629411+00:00"
+  },
+  {
+    "title": "Introduction to Caregiving",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1935",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=786&perpage=1000",
+    "skills": [
+      "Caregiving"
+    ],
+    "description": "TESDA lists this module under Caregiving (Elderly) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.079076+00:00"
+  },
+  {
+    "title": "Developing the Ability to Recognize Aging Process",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1936",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=786&perpage=1000",
+    "skills": [
+      "Caregiving"
+    ],
+    "description": "TESDA lists this module under Caregiving (Elderly) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.079076+00:00"
+  },
+  {
+    "title": "Participating in the Implementation and Monitoring of Client's Care Plan",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1939",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=786&perpage=1000",
+    "skills": [
+      "Caregiving"
+    ],
+    "description": "TESDA lists this module under Caregiving (Elderly) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.079076+00:00"
+  },
+  {
+    "title": "Performing Caring Skills",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1941",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=786&perpage=1000",
+    "skills": [
+      "Caregiving"
+    ],
+    "description": "TESDA lists this module under Caregiving (Elderly) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.079076+00:00"
+  },
+  {
+    "title": "Performing Specialty Care Procedures",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1942",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=786&perpage=1000",
+    "skills": [
+      "Caregiving"
+    ],
+    "description": "TESDA lists this module under Caregiving (Elderly) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.079076+00:00"
+  },
+  {
+    "title": "Assisting Client in Administering Prescribed Medication",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=1943",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=786&perpage=1000",
+    "skills": [
+      "Caregiving"
+    ],
+    "description": "TESDA lists this module under Caregiving (Elderly) NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.079076+00:00"
+  },
+  {
+    "title": "Introduction to Contact Tracing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=403",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=171&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Contact Tracing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.894379+00:00"
+  },
+  {
+    "title": "Conducting Case Investigation and Contact Identification",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=404",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=171&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Contact Tracing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.894379+00:00"
+  },
+  {
+    "title": "Profiling Close Contacts",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=405",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=171&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Contact Tracing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.894379+00:00"
+  },
+  {
+    "title": "Conducting Health Education Program",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=406",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=171&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Contact Tracing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.894379+00:00"
+  },
+  {
+    "title": "Performing Data Recording and Reporting",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=407",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=171&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Contact Tracing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.894379+00:00"
+  },
+  {
+    "title": "Conducting Monitoring and Surveillance",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=408",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=171&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Contact Tracing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:48.894379+00:00"
+  },
+  {
+    "title": "Introduction to Barangay Infectious Disease Management",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2532",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1308&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Infectious Disease Management Services Level II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:49.627032+00:00"
+  },
+  {
+    "title": "Disseminating Preventive Measures in Infectious Disease Transmission and the Importance of Immunization",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2537",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1308&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Infectious Disease Management Services Level II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:49.627032+00:00"
+  },
+  {
+    "title": "Assisting in the Management of Infectious Disease in Different Settings",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2538",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1308&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Barangay Infectious Disease Management Services Level II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:49.627032+00:00"
+  },
+  {
+    "title": "Practicing COVID-19 Preventive Measures in the Workplace",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=149",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1314&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Practicing COVID-19 Preventive Measures in the Workplace. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:51.769348+00:00"
+  },
+  {
+    "title": "Google AI Educator Series",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=5314",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2160&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Google AI Educator Series. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:54.419971+00:00"
+  },
+  {
+    "title": "Microsoft Artificial Intelligence Course: Azure AI Fundamentals",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4297",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=23&perpage=1000",
+    "skills": [
+      "Cybersecurity",
+      "Artificial Intelligence"
+    ],
+    "description": "TESDA lists this module under Microsoft AI and Cybersecurity Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:55.030005+00:00"
+  },
+  {
+    "title": "Microsoft Cybersecurity Course: Security, Compliance, and Identity Fundamentals",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4459",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=23&perpage=1000",
+    "skills": [
+      "Cybersecurity"
+    ],
+    "description": "TESDA lists this module under Microsoft AI and Cybersecurity Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:45:55.030005+00:00"
+  },
+  {
+    "title": "Introduction to Visual Graphic Design",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3365",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Developing Designs for a Logo",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3366",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Developing Designs for Print Media",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3367",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Developing Designs for User Experience",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3368",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Developing Designs for User Interface",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3369",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Developing Designs for Product Packaging",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3370",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Designing Booth and Product/Window Display",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3371",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1524&perpage=1000",
+    "skills": [
+      "Graphic Design"
+    ],
+    "description": "TESDA lists this module under Visual Graphic Design NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:02.825211+00:00"
+  },
+  {
+    "title": "Financial Planning",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3910",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Budgeting and Saving",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3911",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [
+      "Budgeting"
+    ],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Debt Management",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3914",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Basics of Investing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4415",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Fraud and Scam Prevention",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4416",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Financial Consumer Protection",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4417",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Digital Financial Literacy",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4418",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Personal Equity and Retirement Account",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4419",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "The BSP’s Role in the Economy",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4420",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1729&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Personal Financial Management Courses. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:03.703305+00:00"
+  },
+  {
+    "title": "Ships' Catering NC III (Updates)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=76",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1316&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Ships' Catering. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:04.347996+00:00"
+  },
+  {
+    "title": "Introduction to Food Processing",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=6",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=10&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.089089+00:00"
+  },
+  {
+    "title": "Processing Food by Drying and Dehydration",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=21",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=10&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.089089+00:00"
+  },
+  {
+    "title": "Processing Food by Fermentation and Pickling",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=17",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=10&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.089089+00:00"
+  },
+  {
+    "title": "Processing Food by Salting, Curing, and Smoking",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=14",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=10&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.089089+00:00"
+  },
+  {
+    "title": "Processing Food by Sugar Concentration",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=20",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=10&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.089089+00:00"
+  },
+  {
+    "title": "Processing Food by Thermal Application",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=15",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=10&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.089089+00:00"
+  },
+  {
+    "title": "Beauty Care Services (Nail Care) NCII",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=93",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1315&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Beauty Care (Nail Care) Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:05.711634+00:00"
+  },
+  {
+    "title": "Introduction to Domestic Service",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2952",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1414&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Domestic Work NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:11.926455+00:00"
+  },
+  {
+    "title": "Cleaning Rooms and Kitchen",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2953",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1414&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Domestic Work NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:11.926455+00:00"
+  },
+  {
+    "title": "Washing and Ironing Clothes and Linens",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2954",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1414&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Domestic Work NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:11.926455+00:00"
+  },
+  {
+    "title": "Preparing Hot and Cold Meals",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2955",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1414&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Domestic Work NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:11.926455+00:00"
+  },
+  {
+    "title": "Providing Food and Beverage Service",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2957",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1414&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Domestic Work NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:11.926455+00:00"
+  },
+  {
+    "title": "Journalizing Transactions",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3982",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1764&perpage=1000",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "TESDA lists this module under Bookkeeping NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:13.437003+00:00"
+  },
+  {
+    "title": "Posting Transactions",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=3983",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1764&perpage=1000",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "TESDA lists this module under Bookkeeping NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:13.437003+00:00"
+  },
+  {
+    "title": "Introduction to Early Childhood Care and Development Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4879",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2038&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Early Childhood Care and Development Services NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.146987+00:00"
+  },
+  {
+    "title": "Managing Center Operations",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4880",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2038&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Early Childhood Care and Development Services NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.146987+00:00"
+  },
+  {
+    "title": "Conducting Assessment on Progress and Development of Children",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4881",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2038&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Early Childhood Care and Development Services NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.146987+00:00"
+  },
+  {
+    "title": "Implementing the Early Childhood Care and Development Curriculum",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4882",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2038&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Early Childhood Care and Development Services NC III. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.146987+00:00"
+  },
+  {
+    "title": "Introduction to Bookkeeping for Sangguniang Kabataan Financial Transactions",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4883",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2039&perpage=1000",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "TESDA lists this module under Bookkeeping for Sangguniang Kabataan (SK) Financial Transactions NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.795852+00:00"
+  },
+  {
+    "title": "Maintaining Records of Financial Transactions",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4884",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2039&perpage=1000",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "TESDA lists this module under Bookkeeping for Sangguniang Kabataan (SK) Financial Transactions NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.795852+00:00"
+  },
+  {
+    "title": "Handling Disbursement",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4885",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2039&perpage=1000",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "TESDA lists this module under Bookkeeping for Sangguniang Kabataan (SK) Financial Transactions NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.795852+00:00"
+  },
+  {
+    "title": "Processing Procurement, and Inventory of Supplies, Materials, and Equipment",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=4886",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=2039&perpage=1000",
+    "skills": [
+      "Bookkeeping"
+    ],
+    "description": "TESDA lists this module under Bookkeeping for Sangguniang Kabataan (SK) Financial Transactions NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:17.795852+00:00"
+  },
+  {
+    "title": "Preparing Cakes",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=117",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=28&perpage=1000",
+    "skills": [
+      "Baking"
+    ],
+    "description": "TESDA lists this module under Bread and Pastry Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:18.438630+00:00"
+  },
+  {
+    "title": "Fundamentals of Professional Cookery",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=8",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Stocks, Sauces, and Soup",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=13",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Egg, Vegetable and Farinaceous Dishes",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=12",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Seafood Dishes",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=11",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Poultry and Game Dishes",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=10",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Meat Dishes",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=9",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Sandwiches",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=19",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Salads and Salad Dressings",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=18",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Appetizers and Hors d'oeuvres",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=16",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Preparing Desserts (Updated)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=286",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=4&perpage=1000",
+    "skills": [
+      "Food Preparation"
+    ],
+    "description": "TESDA lists this module under Cookery NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.148366+00:00"
+  },
+  {
+    "title": "Introduction to Food and Beverage Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=7",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=8&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food and Beverage Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:19.810267+00:00"
+  },
+  {
+    "title": "Introduction to Front Office Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=50",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=7&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Front Office Services NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:20.432304+00:00"
+  },
+  {
+    "title": "Deal with Intoxicated Guests",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=49",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=30&perpage=1000",
+    "skills": [
+      "Housekeeping"
+    ],
+    "description": "TESDA lists this module under Housekeeping NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.159855+00:00"
+  },
+  {
+    "title": "Providing Guest Room Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=121",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=30&perpage=1000",
+    "skills": [
+      "Housekeeping"
+    ],
+    "description": "TESDA lists this module under Housekeeping NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.159855+00:00"
+  },
+  {
+    "title": "Providing Laundry Services to Guests",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=55",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=30&perpage=1000",
+    "skills": [
+      "Housekeeping"
+    ],
+    "description": "TESDA lists this module under Housekeeping NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.159855+00:00"
+  },
+  {
+    "title": "Providing Public Area Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=41",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=30&perpage=1000",
+    "skills": [
+      "Housekeeping"
+    ],
+    "description": "TESDA lists this module under Housekeeping NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.159855+00:00"
+  },
+  {
+    "title": "Providing Valet Services",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=98",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=30&perpage=1000",
+    "skills": [
+      "Housekeeping"
+    ],
+    "description": "TESDA lists this module under Housekeeping NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.159855+00:00"
+  },
+  {
+    "title": "Supervising Work-Based Learning",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=63",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=31&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Trainers Methodology I. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.885138+00:00"
+  },
+  {
+    "title": "Utilizing Electronic Media in Facilitating Training",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=62",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=31&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Trainers Methodology I. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.885138+00:00"
+  },
+  {
+    "title": "Maintaining Training Facilities",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=60",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=31&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Trainers Methodology I. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.885138+00:00"
+  },
+  {
+    "title": "Planning Training Session",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=57",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=31&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Trainers Methodology I. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.885138+00:00"
+  },
+  {
+    "title": "Conducting Competency Assessment",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=64",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=31&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Trainers Methodology I. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:22.885138+00:00"
+  },
+  {
+    "title": "Developing Training Curriculum",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=22",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=34&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Trainers Methodology II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:23.509789+00:00"
+  },
+  {
+    "title": "Preparing Cakes - TOP CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2524",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1305&perpage=1000",
+    "skills": [
+      "Baking"
+    ],
+    "description": "TESDA lists this module under Bread and Pastry Production NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.124713+00:00"
+  },
+  {
+    "title": "Introduction to Food Processing - TOP CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2529",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1304&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.856996+00:00"
+  },
+  {
+    "title": "Processing Food by Drying and Dehydration - TOP CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2523",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1304&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.856996+00:00"
+  },
+  {
+    "title": "Processing Food by Sugar Concentration - TOP CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2525",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1304&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.856996+00:00"
+  },
+  {
+    "title": "Processing Food by Fermentation and Pickling - CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2526",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1304&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.856996+00:00"
+  },
+  {
+    "title": "Processing Food by Thermal Application - TOP CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2527",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1304&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.856996+00:00"
+  },
+  {
+    "title": "Processing Food by Salting, Curing, and Smoking - TOP CAF",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2528",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1304&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Food Processing NC II. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:24.856996+00:00"
+  },
+  {
+    "title": "Learner-Centred STEM in TVET",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2521",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1302&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under STEM in TVET Workshop. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:26.474693+00:00"
+  },
+  {
+    "title": "Blended Learning using Learning Management System",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2976",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=51&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under National Institute for Technical Education and Skills Development. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:27.174753+00:00"
+  },
+  {
+    "title": "eLearning Appreciation Course for RDs, PDs and TTI Administrators",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=194",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=51&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under National Institute for Technical Education and Skills Development. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:27.174753+00:00"
+  },
+  {
+    "title": "Developing eLearning Materials (Phase 1: Online Training)",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=189",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=51&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under National Institute for Technical Education and Skills Development. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:27.174753+00:00"
+  },
+  {
+    "title": "Area-Based and Demand-Driven TVET",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2505",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=164&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Capability-building Program (CBP) for the Implementation of the Area-based and Demand-driven TVET. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:28.432241+00:00"
+  },
+  {
+    "title": "Industry Scanning and Organizing and Engaging the Industry Boards",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2015",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=164&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Capability-building Program (CBP) for the Implementation of the Area-based and Demand-driven TVET. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:28.432241+00:00"
+  },
+  {
+    "title": "Developing Institutional Assessment Tools",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=444",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=164&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Capability-building Program (CBP) for the Implementation of the Area-based and Demand-driven TVET. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:28.432241+00:00"
+  },
+  {
+    "title": "Developing Competency Standards",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=397",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=164&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Capability-building Program (CBP) for the Implementation of the Area-based and Demand-driven TVET. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:28.432241+00:00"
+  },
+  {
+    "title": "Facilitating Competency-Based Curriculum Development",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=396",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=164&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Capability-building Program (CBP) for the Implementation of the Area-based and Demand-driven TVET. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:28.432241+00:00"
+  },
+  {
+    "title": "Skills Mapping",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=395",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=164&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Capability-building Program (CBP) for the Implementation of the Area-based and Demand-driven TVET. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:28.432241+00:00"
+  },
+  {
+    "title": "Moodle Training for TESDA Regional/Institutional Administrators",
+    "source_url": "https://e-tesda.gov.ph/course/view.php?id=2602",
+    "source_name": "TESDA Online Program",
+    "category_url": "https://e-tesda.gov.ph/course/index.php?categoryid=1341&perpage=1000",
+    "skills": [],
+    "description": "TESDA lists this module under Regional/Institutional LMS Administration Training Program. Review the official syllabus, intended audience and access requirements before enrolling. Course completion does not automatically issue a National Certificate.",
+    "checked_at": "2026-11-03T06:46:29.080710+00:00"
   }
 ]

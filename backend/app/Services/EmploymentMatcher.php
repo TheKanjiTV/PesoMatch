@@ -16,7 +16,19 @@ class EmploymentMatcher
         return array_values(array_diff($words, ['the', 'and', 'for', 'with', 'a', 'an', 'of', 'to', 'in', 'is', 'on', 'at']));
     }
 
-    public function assess(User $user, Vacancy $vacancy, ?array $corpus = null): array
+    private function weights(array $corpus): array
+    {
+        $frequencies = [];
+        foreach ($corpus as $document) {
+            foreach (array_unique($this->tokens($document)) as $token) {
+                $frequencies[$token] = ($frequencies[$token] ?? 0) + 1;
+            }
+        }
+
+        return ['documents' => count($corpus), 'frequencies' => $frequencies];
+    }
+
+    public function assess(User $user, Vacancy $vacancy, ?array $corpus = null, ?array $weights = null): array
     {
         $profile = $user->jobseekerProfile;
         $own = $profile?->skills->pluck('name')->all() ?? [];
@@ -26,14 +38,16 @@ class EmploymentMatcher
         $preferences = $profile?->preferences;
         $query = implode(' ', array_merge($own, $preferences?->occupations->pluck('value')->all() ?? [], [$preferences?->preferred_industry ?? '']));
         $document = $vacancy->title.' '.$vacancy->industry.' '.$vacancy->description.' '.implode(' ', $required);
-        $corpus ??= Vacancy::where('status', 'published')->get()->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
-        $docs = array_map(fn ($d) => $this->tokens($d), $corpus);
+        if ($weights === null) {
+            $corpus ??= Vacancy::where('status', 'published')->get()->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
+            $weights = $this->weights($corpus);
+        }
         $a = array_count_values($this->tokens($query));
         $b = array_count_values($this->tokens($document));
         $dot = $normA = $normB = 0.0;
         foreach (array_unique(array_merge(array_keys($a), array_keys($b))) as $token) {
-            $df = count(array_filter($docs, fn ($d) => in_array($token, $d, true)));
-            $idf = log((count($docs) + 1) / ($df + 1)) + 1;
+            $df = $weights['frequencies'][$token] ?? 0;
+            $idf = log(($weights['documents'] + 1) / ($df + 1)) + 1;
             $x = ($a[$token] ?? 0) * $idf;
             $y = ($b[$token] ?? 0) * $idf;
             $dot += $x * $y;
@@ -46,28 +60,38 @@ class EmploymentMatcher
         return ['score' => (int) round(100 * (.75 * $coverage + .25 * $similarity)), 'matched_skills' => $matched, 'missing_skills' => $missing, 'profile_incomplete' => ! $profile?->profile_completed_at, 'method' => 'content-based-tfidf-v1', 'explanation' => '75% declared skill coverage + 25% TF-IDF profile/occupation similarity. Advisory only; PESO reviews referrals and employers decide hiring.'];
     }
 
-    public function recommendations(User $user): array
+    public function recommendations(User $user, int $page = 1): array
     {
-        $vacancies = Vacancy::available()->where('is_sample', false)->get();
+        $vacancies = Vacancy::available()->where('is_sample', false)->orderBy('id')->get();
         $corpus = $vacancies->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
+        // Compute corpus frequencies once, rather than rescanning every listing
+        // for every token of every other listing as the public catalog grows.
+        $weights = $this->weights($corpus);
         $programs = TrainingProgram::available()->where('is_sample', false)->get();
-        $matches = $vacancies->map(function ($v) use ($user, $corpus, $programs) {
-            $assessment = $this->assess($user, $v, $corpus);
+        $ranked = $vacancies->map(fn ($v) => ['vacancy' => $v, 'assessment' => $this->assess($user, $v, null, $weights)])
+            ->sortByDesc('assessment.score')->values();
+        $gaps = $ranked->take(5)->flatMap(fn ($m) => $m['assessment']['missing_skills'])->unique()->values()->all();
+        $lastPage = max(1, (int) ceil($ranked->count() / 100));
+        $page = max(1, $page);
+        // The existing ResourceState page controls expose every ranked result.
+        // Only expand course suggestions for the requested page.
+        $matches = $ranked->slice(($page - 1) * 100, 100)->map(function ($match) use ($programs) {
+            $assessment = $match['assessment'];
             $training = $programs->map(function ($p) use ($assessment) {
                 $addresses = array_values(array_uintersect($p->skills, $assessment['missing_skills'], 'strcasecmp'));
 
                 return ['program' => $p, 'addresses' => $addresses];
             })->filter(fn ($p) => count($p['addresses']))->sortByDesc(fn ($p) => count($p['addresses']))->values();
 
-            return ['vacancy' => $v, 'assessment' => $assessment, 'training' => $training];
-        })->sortByDesc('assessment.score')->values();
-        $gaps = $matches->take(5)->flatMap(fn ($m) => $m['assessment']['missing_skills'])->unique()->values()->all();
-        $training = TrainingProgram::available()->get()->map(function ($p) use ($gaps) {
+            return $match + ['training' => $training];
+        })->values();
+        $training = $programs->map(function ($p) use ($gaps) {
             $addresses = array_values(array_intersect($p->skills, $gaps));
 
             return ['program' => $p, 'addresses' => $addresses, 'reason' => count($addresses) ? 'Builds skills requested in your recommended vacancies.' : 'Explore this program with a PESO counselor.'];
         })->sortByDesc(fn ($p) => count($p['addresses']))->values();
 
-        return ['matches' => $matches, 'training' => $training, 'method' => 'content-based-tfidf-v1'];
+        return ['matches' => $matches, 'training' => $training, 'method' => 'content-based-tfidf-v1',
+            'current_page' => $page, 'last_page' => $lastPage, 'per_page' => 100, 'total' => $ranked->count()];
     }
 }

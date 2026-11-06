@@ -26,10 +26,11 @@ test("official nationwide vacancies show provenance, honest metadata and a worki
   await expect(
     page.getByText("Not stated · confirm with employer", { exact: true }),
   ).toBeVisible()
-  await expect(page.getByText(/pay period not stated/)).toBeVisible()
+  await expect(page.getByText(/confirm pay period with employer/)).toBeVisible()
   const checked = new Date(vacancy.source_checked_at).toLocaleDateString(
     "en-PH",
     {
+      timeZone: "Asia/Manila",
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -68,14 +69,61 @@ test("official nationwide vacancies show provenance, honest metadata and a worki
     path: "artifacts/revisions/official-vacancy-mobile.png",
     fullPage: true,
   })
-  const matches = (
-    await (await apiCall(account.request, "/api/platform/matches")).json()
-  ).matches
-  expect(matches.some((m) => m.vacancy.id === vacancy.id)).toBe(true)
+  const result = await (
+    await apiCall(account.request, "/api/platform/matches")
+  ).json()
+  const matches = result.matches
+  expect(result.total).toBeGreaterThanOrEqual(official.length)
   for (const match of matches)
     for (const course of match.training)
       for (const skill of course.addresses) {
         expect(match.assessment.missing_skills).toContain(skill)
         expect(course.program.skills).toContain(skill)
       }
+  if (result.last_page > 1) {
+    await page.goto("/matches")
+    await expect(
+      page.getByRole("button", { name: "Next page", exact: true }),
+    ).toBeEnabled()
+    const response = page.waitForResponse((r) =>
+      r.url().includes("/api/platform/matches?page=2"),
+    )
+    await page.getByRole("button", { name: "Next page", exact: true }).click()
+    expect((await (await response).json()).current_page).toBe(2)
+    await expect(
+      page.getByText(`Page 2 of ${result.last_page} · ${result.total} records`),
+    ).toBeVisible()
+    await page
+      .getByRole("button", {
+        name: "Skills Development Recommendation",
+        exact: true,
+      })
+      .click()
+    await expect(
+      page.getByRole("button", { name: "Next page", exact: true }),
+    ).toHaveCount(0)
+  }
+  const courses = (
+    await (await apiCall(account.request, "/api/platform/training")).json()
+  ).data
+  const unmappedCourse = courses.find(
+    (course) => course.external_enrollment && !course.skills.length,
+  )
+  if (unmappedCourse) {
+    await page.goto(`/training/${unmappedCourse.id}`)
+    await expect(
+      page.getByText(
+        "No skill topics mapped. Review the official course syllabus and entry requirements.",
+      ),
+    ).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBe(true)
+    await page.screenshot({
+      path: "artifacts/revisions/official-course-mobile.png",
+      fullPage: true,
+    })
+  }
 })

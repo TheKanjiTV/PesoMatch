@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Vacancy;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,7 +17,9 @@ class VerifiedVacanciesTest extends TestCase
         $this->artisan('peso:import-verified-vacancies')->assertSuccessful();
         $this->artisan('peso:import-verified-vacancies')->assertSuccessful();
         $this->assertDatabaseCount('vacancies', count(json_decode(file_get_contents(database_path('data/verified-vacancies.json')), true)));
+        $sourceRows = collect(json_decode(file_get_contents(database_path('data/verified-vacancies.json')), true))->keyBy('source_url');
         foreach (Vacancy::all() as $v) {
+            $this->assertSame(CarbonImmutable::parse($sourceRows[$v->source_url]['checked_at'])->timestamp, $v->source_checked_at->timestamp);
             $this->assertSame('philjobnet.gov.ph', parse_url($v->source_url, PHP_URL_HOST));
             $this->assertFalse($v->is_sample);
             $this->assertTrue($v->external_application);
@@ -45,8 +48,10 @@ class VerifiedVacanciesTest extends TestCase
         $rows[2]->update(['status' => 'draft']);
         $u = User::factory()->create(['role' => 'jobseeker']);
         $u->jobseekerProfile()->create()->forceFill(['profile_completed_at' => now()])->save();
-        $browse = $this->actingAs($u)->getJson('/api/platform/vacancies')->assertOk()->json('data');
-        $this->assertCount(Vacancy::count() - 3, $browse);
+        $response = $this->actingAs($u)->getJson('/api/platform/vacancies')->assertOk();
+        $response->assertJsonPath('total', Vacancy::count() - 3);
+        $browse = $response->json('data');
+        $this->assertCount(min(100, Vacancy::count() - 3), $browse);
         $excluded = $rows->take(3)->modelKeys();
         $this->assertSame([], array_values(array_intersect($excluded, array_column($browse, 'id'))));
         $matches = $this->getJson('/api/platform/matches')->assertOk()->json('matches');
