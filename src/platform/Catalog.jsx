@@ -38,6 +38,11 @@ import { CatalogSkeleton, MatchesSkeleton } from "./LoadingStates.jsx"
 import { SearchInput } from "./SearchInput.jsx"
 
 import { searchSuggestions } from "./search.js"
+import {
+  isPhilJobNet,
+  useVacancySource,
+  VacancySourceNotice,
+} from "./VacancySource.jsx"
 
 const fieldLimits = {
   skills_text: 3030,
@@ -152,6 +157,7 @@ export function CatalogPage({ kind = "vacancies" }) {
     { id } = useParams()
 
   const training = kind === "training"
+  const showSourceStatus = !training && user.role !== "employer"
 
   const [search, setSearch] = useState(""),
     [filter, setFilter] = useState("all"),
@@ -173,6 +179,9 @@ export function CatalogPage({ kind = "vacancies" }) {
   )
 
   const summary = useResource("/summary")
+  // Serve the saved catalog before probing an external portal. This also
+  // avoids putting the probe ahead of catalog reads on a single-worker server.
+  const sourceStatus = useVacancySource(showSourceStatus && !r.loading)
 
   const canManage =
       staffRole(user.role) ||
@@ -310,6 +319,9 @@ export function CatalogPage({ kind = "vacancies" }) {
           )
         }
       />
+      {showSourceStatus && (!id || detail?.external_application) && (
+        <VacancySourceNotice status={sourceStatus} />
+      )}
       {message && (
         <div className="mb-5">
           <Notice>{message}</Notice>
@@ -420,6 +432,7 @@ export function CatalogPage({ kind = "vacancies" }) {
               saved={summary.data?.saved?.includes(detail.id)}
               edit={edit}
               action={action}
+              sourceStatus={sourceStatus}
             />
           </>
         ) : (
@@ -529,8 +542,11 @@ function Detail({
   action,
 
   saved,
+  sourceStatus,
 }) {
   const [consent, setConsent] = useState(false)
+  const unconfirmedSource =
+    isPhilJobNet(v.source_url) && sourceStatus?.status !== "reachable"
 
   return (
     <div className="grid gap-8 xl:grid-cols-[1.5fr_1fr]">
@@ -649,13 +665,24 @@ function Detail({
         </dl>
         {v.external_application ? (
           <div className="mt-7 space-y-3">
+            {unconfirmedSource && role === "jobseeker" && (
+              <Link to="/services" className={`${primaryStyle} w-full`}>
+                Ask PESO for application guidance
+              </Link>
+            )}
             <a
               href={v.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${primaryStyle} w-full`}
+              className={`${
+                unconfirmedSource ? secondaryStyle : primaryStyle
+              } w-full`}
             >
-              View official listing & apply
+              {unconfirmedSource
+                ? sourceStatus?.status === "unavailable"
+                  ? "Retry original PhilJobNet listing"
+                  : "Open original PhilJobNet listing"
+                : "View official listing & apply"}
             </a>
             <p className="text-xs leading-6 text-muted-foreground">
               Listed {date(v.source_posted_on)}. Confirm current availability
@@ -672,12 +699,14 @@ function Detail({
                   <Bookmark size={16} />
                   {saved ? "Unsave vacancy" : "Save vacancy"}
                 </button>
-                <Link
-                  to="/services"
-                  className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline"
-                >
-                  Ask PESO for application guidance
-                </Link>
+                {!unconfirmedSource && (
+                  <Link
+                    to="/services"
+                    className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline"
+                  >
+                    Ask PESO for application guidance
+                  </Link>
+                )}
               </>
             )}
           </div>

@@ -21,7 +21,9 @@ test("official nationwide vacancies show provenance, honest metadata and a worki
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto(`/jobs/${vacancy.id}`)
   await expect(
-    page.getByRole("link", { name: "View official listing & apply" }),
+    page.getByRole("link", {
+      name: /^(View official listing & apply|Retry original PhilJobNet listing|Open original PhilJobNet listing)$/,
+    }),
   ).toHaveAttribute("href", vacancy.source_url)
   await expect(
     page.getByText("Not stated · confirm with employer", { exact: true }),
