@@ -23,3 +23,9 @@ Pending page data uses the matching layout in `src/platform/LoadingStates.jsx`. 
 Unknown record counts and optional saved content cannot be predicted before the response. Placeholder rows describe the page structure without inventing counts or personal facts.
 
 `tests/platform/loading-layouts.spec.js` checks public logo loaders, 22 workspace/onboarding routes in desktop/mobile viewports, error replacement, absence of workspace logo loaders during cold starts and navigation, and Overview geometry/accessibility in both themes. Its responses are intercepted UI fixtures and do not create accounts or catalog records.
+
+## Local account maintenance
+
+`php artisan peso:refresh-local-accounts` previews recognized timestamp-based browser fixture emails under `example.test`. `--apply` is restricted to local/testing environments, preserves other accounts and an existing administrator, and refuses candidates owning non-sample partner catalog data.
+
+Before changes it writes and decrypt-verifies a complete encrypted row snapshot plus affected private document bytes on the private local disk. New demonstration accounts have unique generated passwords delivered in an ignored private Markdown file under `backend/storage/app/private/account-maintenance/`. Passwords are never printed. Repeating the command does not reset their passwords. Demo names are fictional, email uses `demo.example.test`, and profile facts, consent and employment outcomes are not fabricated.
