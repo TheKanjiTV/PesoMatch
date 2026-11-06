@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+
 import {
   CollectionNotice,
   trainingNoticeVersion,
@@ -7,17 +8,11 @@ import {
 
 import { Link, useParams } from "react-router"
 
-import {
-  ArrowRight,
-  Bookmark,
-  CalendarDays,
-  MapPin,
-  Search,
-} from "lucide-react"
+import { ArrowRight, Bookmark, CalendarDays, MapPin } from "lucide-react"
 
 import { useAuth } from "../context/AuthContext.jsx"
 
-import { api, useDebounced, useResource } from "./api.js"
+import { api, useSearchQuery, useResource } from "./api.js"
 
 import {
   ActionLink,
@@ -27,7 +22,6 @@ import {
   Empty,
   Heading,
   inputStyle,
-  Loading,
   money,
   Notice,
   primaryStyle,
@@ -39,12 +33,35 @@ import {
 
 import { ResourceState } from "./ResourceState.jsx"
 
+
+import { SearchInput } from "./SearchInput.jsx"
+
+import { searchSuggestions } from "./search.js"
+
+const fieldLimits = {
+  skills_text: 3030,
+
+  description: 8000,
+
+  requirements: 4000,
+
+  schedule: 200,
+
+  industry: 120,
+}
+
 const F = (name, label, type = "text", extra = {}) => ({
   name,
 
   label,
 
   type,
+
+  ...(!extra.options && ["text", "textarea"].includes(type)
+    ? {
+        maxLength: fieldLimits[name] ?? (type === "textarea" ? 4000 : 160),
+      }
+    : {}),
 
   ...extra,
 })
@@ -143,7 +160,7 @@ export function CatalogPage({ kind = "vacancies" }) {
     [busy, setBusy] = useState(false),
     [savedOnly, setSavedOnly] = useState(false)
 
-  const query = useDebounced(search)
+  const query = useSearchQuery(search)
 
   const r = useResource(
     (training ? "/training" : "/vacancies") +
@@ -163,25 +180,7 @@ export function CatalogPage({ kind = "vacancies" }) {
 
   const records = r.data?.data || []
 
-  const filtered = records.filter(
-    (v) =>
-      JSON.stringify([
-        v.title,
-
-        v.organization,
-
-        v.provider,
-
-        v.location,
-
-        v.skills,
-      ])
-
-        .toLowerCase()
-
-        .includes(search.toLowerCase()) &&
-      (filter === "all" || v.status === filter),
-  )
+  const filtered = records
 
   const detail = id ? records.find((v) => String(v.id) === id) : null
 
@@ -258,6 +257,7 @@ export function CatalogPage({ kind = "vacancies" }) {
           : training
             ? {
                 consent: true,
+
                 consent_notice_version: trainingNoticeVersion,
 
                 notes:
@@ -340,7 +340,60 @@ export function CatalogPage({ kind = "vacancies" }) {
           onClose={() => setEditor(null)}
         />
       )}
-      <ResourceState resource={r}>
+      {!id && (
+        <div className="mb-6 flex flex-wrap items-start gap-3">
+          {!training && user.role === "jobseeker" && (
+            <button
+              className={savedOnly ? primaryStyle : secondaryStyle}
+              aria-pressed={savedOnly}
+              onClick={() => setSavedOnly(!savedOnly)}
+            >
+              {savedOnly ? "Show all vacancies" : "Saved vacancies"}
+            </button>
+          )}
+          <SearchInput
+            label={`Search ${training ? "training" : "vacancies"}`}
+            value={search}
+            onChange={setSearch}
+            loading={r.loading}
+            placeholder={
+              training
+                ? "Search programs, providers or skills"
+                : "Search job title, employer, location or skill"
+            }
+            suggestions={searchSuggestions(records, search, [
+              "title",
+
+              "organization",
+
+              "provider",
+
+              "location",
+
+              "skills",
+            ])}
+          />
+          {canManage && (
+            <select
+              aria-label="Filter by publication status"
+              className={`${inputStyle} max-w-48`}
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+            >
+              {["all", "draft", "pending_review", "published", "closed"].map(
+                (status) => (
+                  <option key={status} value={status}>
+                    {status.replaceAll("_", " ")}
+                  </option>
+                ),
+              )}
+            </select>
+          )}
+        </div>
+      )}
+      <ResourceState
+        resource={r}
+      >
         {id && !detail ? (
           <Empty title="Record unavailable">
             This record may be closed or outside your permitted catalog.{" "}
@@ -369,60 +422,6 @@ export function CatalogPage({ kind = "vacancies" }) {
           </>
         ) : (
           <>
-            <div className="mb-6 flex flex-wrap gap-3">
-              {!training && user.role === "jobseeker" && (
-                <button
-                  className={savedOnly ? primaryStyle : secondaryStyle}
-                  aria-pressed={savedOnly}
-                  onClick={() => setSavedOnly(!savedOnly)}
-                >
-                  {savedOnly ? "Show all vacancies" : "Saved vacancies"}
-                </button>
-              )}
-              <label className="relative min-w-0 flex-1">
-                <span className="sr-only">
-                  Search {training ? "training" : "vacancies"}
-                </span>
-                <Search
-                  className="absolute left-3 top-3.5 text-muted-foreground"
-                  size={17}
-                />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className={`${inputStyle} pl-10`}
-                  placeholder={
-                    training
-                      ? "Search programs, providers or skills"
-                      : "Search job title, employer, location or skill"
-                  }
-                />
-              </label>
-              {canManage && (
-                <select
-                  aria-label="Filter by publication status"
-                  className={`${inputStyle} max-w-48`}
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                >
-                  {[
-                    "all",
-
-                    "draft",
-
-                    "pending_review",
-
-                    "published",
-
-                    "closed",
-                  ].map((s) => (
-                    <option key={s} value={s}>
-                      {s.replaceAll("_", " ")}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
             {!filtered.length ? (
               <Empty
                 title={
@@ -617,6 +616,7 @@ function Detail({
             : [
                 [
                   "Deadline",
+
                   v.deadline
                     ? date(v.deadline)
                     : "Not stated · confirm with employer",
@@ -636,12 +636,14 @@ function Detail({
                       : "Contact employer",
                 ],
               ]
-          ).map(([k, value]) => (
-            <div key={k}>
-              <dt className="text-xs text-muted-foreground">{k}</dt>
-              <dd className="mt-1 font-medium">{value}</dd>
-            </div>
-          ))}
+          )
+
+            .map(([k, value]) => (
+              <div key={k}>
+                <dt className="text-xs text-muted-foreground">{k}</dt>
+                <dd className="mt-1 font-medium">{value}</dd>
+              </div>
+            ))}
         </dl>
         {v.external_application ? (
           <div className="mt-7 space-y-3">
@@ -782,7 +784,10 @@ export function MatchesPage() {
           </button>
         ))}
       </div>
-      <ResourceState resource={r} paginate={tab === "jobs"}>
+      <ResourceState
+        resource={r}
+        paginate={tab === "jobs"}
+      >
         {tab === "jobs" ? (
           <div className="space-y-4">
             {!r.data?.matches.length && (

@@ -1,10 +1,11 @@
-import { useEffect, useId, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 
 import { Link } from "react-router"
 
 import { ArrowRight, Check, CircleAlert, LoaderCircle, X } from "lucide-react"
 
 import { PesoMark } from "./Logo.jsx"
+
 
 export const title =
   "AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO)"
@@ -25,6 +26,7 @@ export const staffRole = (role) => ["peso_staff", "admin"].includes(role)
 
 export const human = (value) =>
   String(value || "")
+
     .replaceAll("_", " ")
 
     .replace(/\b\w/g, (c) => c.toUpperCase())
@@ -86,12 +88,15 @@ export function Brand({ light = false, to = "/" }) {
 
 export function Contact({ value, phone = false }) {
   if (!value) return <>Not provided</>
+
   const destination = phone
     ? String(value).replace(/[^+\d]/g, "")
     : String(value)
+
   const valid = phone
     ? /^\+?\d{7,15}$/.test(destination)
     : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(destination)
+
   return valid ? (
     <a
       href={`${phone ? "tel" : "mailto"}:${
@@ -229,6 +234,7 @@ export function ActionLink({ to, children, secondary = false }) {
 
 export function Field({
   label,
+
   error,
 
   type = "text",
@@ -244,7 +250,18 @@ export function Field({
   ...rest
 }) {
   const id = useId()
+
   const errorId = `${id}-error`
+
+  const [localError, setLocalError] = useState("")
+
+  const displayedError = error || localError
+
+  function validate(input) {
+    if (required && !String(input.value).trim()) return `${label} is required.`
+
+    return input.validationMessage
+  }
 
   const shared = {
     id,
@@ -255,13 +272,25 @@ export function Field({
 
     value: value ?? "",
 
-    onChange: (e) => onChange(e.target.value),
+    onChange: (e) => {
+      onChange(e.target.value)
+
+      if (localError) setLocalError(validate(e.target))
+    },
+
+    onBlur: (event) => setLocalError(validate(event.target)),
+
+    onInvalid: (event) => setLocalError(validate(event.target)),
 
     ...rest,
-    "aria-invalid": error ? true : undefined,
+
+    "aria-invalid": displayedError ? true : undefined,
+
     "aria-describedby":
-      [rest["aria-describedby"], error ? errorId : null]
+      [rest["aria-describedby"], displayedError ? errorId : null]
+
         .filter(Boolean)
+
         .join(" ") || undefined,
   }
 
@@ -292,9 +321,9 @@ export function Field({
       ) : (
         <input {...shared} type={type} />
       )}
-      {error && (
+      {displayedError && (
         <span id={errorId} className="mt-2 block text-xs text-error-ink">
-          {[].concat(error).join(" ")}
+          {[].concat(displayedError).join(" ")}
         </span>
       )}
     </label>
@@ -303,39 +332,60 @@ export function Field({
 
 export function Editor({
   title,
+
   fields,
+
   initial = {},
+
   onSave,
+
   onClose,
+
   help,
+
   submitLabel = "Save record",
+
   pendingLabel = "Saving…",
 }) {
   const [values, setValues] = useState(initial)
 
   const [busy, setBusy] = useState(false)
 
+  const submitting = useRef(false)
+
+  const focusErrors = useRef(false)
+
   const [error, setError] = useState("")
 
   const [errors, setErrors] = useState({})
 
   useEffect(() => {
-    if (Object.keys(errors).length)
+    if (focusErrors.current) {
+      focusErrors.current = false
+
       document.querySelector('#record-editor [aria-invalid="true"]')?.focus()
+    }
   }, [errors])
 
   useEffect(() => {
     const previous = document.activeElement
+
     const editor = document.getElementById("record-editor")
+
     editor
+
       ?.querySelector("input, select, textarea")
+
       ?.focus({ preventScroll: true })
+
     editor?.scrollIntoView({
       behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "instant"
         : "smooth",
+
       block: "start",
     })
+
     return () => {
       if (previous?.isConnected) previous.focus()
     }
@@ -343,6 +393,24 @@ export function Editor({
 
   async function submit(e) {
     e.preventDefault()
+
+    if (submitting.current) return
+
+    const form = e.currentTarget
+
+    const blank = [
+      ...form.querySelectorAll("input[required], textarea[required]"),
+    ].find((input) => !input.value.trim())
+
+    if (blank) {
+      blank.focus()
+
+      blank.dispatchEvent(new Event("invalid", { bubbles: false }))
+
+      return
+    }
+
+    submitting.current = true
 
     setBusy(true)
 
@@ -357,8 +425,12 @@ export function Editor({
     } catch (e) {
       setError(e.message)
 
+      focusErrors.current = true
+
       setErrors(e.errors || {})
     } finally {
+      submitting.current = false
+
       setBusy(false)
     }
   }
@@ -385,7 +457,23 @@ export function Editor({
           {help}
         </p>
       )}
-      <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
+      <form
+        onSubmit={submit}
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && !busy) {
+            event.preventDefault()
+
+            onClose()
+          }
+
+          if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault()
+
+            event.currentTarget.requestSubmit()
+          }
+        }}
+        className="grid gap-5 sm:grid-cols-2"
+      >
         {fields.map((f) => (
           <div
             key={f.name}
@@ -395,7 +483,12 @@ export function Editor({
               {...f}
               error={errors[f.name]}
               value={values[f.name]}
-              onChange={(v) => setValues((s) => ({ ...s, [f.name]: v }))}
+              disabled={busy}
+              onChange={(v) => {
+                setValues((s) => ({ ...s, [f.name]: v }))
+
+                setErrors((current) => ({ ...current, [f.name]: undefined }))
+              }}
             />
           </div>
         ))}

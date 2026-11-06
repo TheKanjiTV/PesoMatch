@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('login', fn (Request $request) => [Limit::perMinute(30)->by($request->ip()), Limit::perMinute(5)->by(strtolower(is_string($request->input('email')) ? $request->input('email') : '<invalid>').'|'.$request->ip())]);
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
-        RateLimiter::for('platform', fn (Request $request) => $request->isMethod('GET')
+        RateLimiter::for('platform', fn (Request $request) => in_array($request->method(), ['GET', 'HEAD'], true)
             ? Limit::perMinute(180)->by('read:'.$request->user()->id)
             : Limit::perMinute(60)->by('write:'.$request->user()->id));
     }

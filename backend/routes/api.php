@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/public/catalog', [Employment::class, 'publicCatalog'])->middleware('throttle:60,1');
 
-Route::prefix('platform')->middleware(['auth:sanctum', ValidatePlatformQuery::class, 'throttle:platform'])->group(function () {
+Route::prefix('platform')->middleware(['auth:sanctum', 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
     Route::get('/summary', [Employment::class, 'summary']);
     Route::get('/vacancies', [Employment::class, 'vacancies']);
     Route::post('/vacancies', [Employment::class, 'saveVacancy']);

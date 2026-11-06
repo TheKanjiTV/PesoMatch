@@ -8,9 +8,14 @@ import { Download } from "lucide-react"
 
 import { useAuth } from "../context/AuthContext.jsx"
 
-import { api, useResource } from "./api.js"
+import { api, useResource, useSearchQuery } from "./api.js"
+
+import { SearchInput } from "./SearchInput.jsx"
+
+import { searchSuggestions } from "./search.js"
 
 import { ResourceState } from "./ResourceState.jsx"
+
 
 import {
   Badge,
@@ -290,7 +295,9 @@ export function LaborMarketPage() {
           </button>
         }
       />
-      <ResourceState resource={r}>
+      <ResourceState
+        resource={r}
+      >
         {r.data && (
           <>
             {r.data.official_reports?.map((report) => (
@@ -317,6 +324,7 @@ export function LaborMarketPage() {
                       <p className="mt-2 text-3xl font-semibold text-primary">
                         {Number(indicator.value).toLocaleString("en-PH", {
                           minimumFractionDigits: 1,
+
                           maximumFractionDigits: 1,
                         })}
                         %
@@ -331,7 +339,9 @@ export function LaborMarketPage() {
                   <Source
                     record={{
                       source_name: "View PSA source and definitions",
+
                       source_url: report.source_url,
+
                       source_checked_at: report.source_checked_at,
                     }}
                   />
@@ -507,18 +517,14 @@ export function LaborMarketPage() {
 }
 
 export function RegistryPage() {
-  const r = useResource("/jobseekers")
-
   const [search, setSearch] = useState(""),
     [expanded, setExpanded] = useState(null)
 
-  const rows = (r.data?.data || []).filter((u) =>
-    `${u.name} ${u.email} ${u.jobseeker_profile?.municipality}`
+  const query = useSearchQuery(search)
 
-      .toLowerCase()
+  const r = useResource(`/jobseekers?search=${encodeURIComponent(query)}`)
 
-      .includes(search.toLowerCase()),
-  )
+  const rows = r.data?.data || []
 
   return (
     <>
@@ -526,15 +532,26 @@ export function RegistryPage() {
         title="Jobseeker Registration & Profiling"
         description="Review registered profiles, declared skills, employment preferences, and profile completion for PESO facilitation."
       />
-      <label>
-        <span className="sr-only">Search jobseekers</span>
-        <input
-          className={`${inputStyle} mb-6 sm:max-w-lg`}
+      <div className="mb-6 max-w-xl">
+        <SearchInput
+          label="Search jobseekers"
           placeholder="Search name, email or municipality…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={setSearch}
+          loading={r.loading}
+          suggestions={searchSuggestions(
+            rows.map((row) => ({
+              ...row,
+
+              municipality: row.jobseeker_profile?.municipality,
+            })),
+
+            search,
+
+            ["name", "email", "municipality"],
+          )}
         />
-      </label>
+      </div>
       <ResourceState resource={r}>
         {!rows.length ? (
           <Empty title="No registered jobseekers found" />
@@ -734,7 +751,9 @@ export function AccessPage() {
           }}
         />
       )}
-      <ResourceState resource={r}>
+      <ResourceState
+        resource={r}
+      >
         <div className="overflow-x-auto rounded-lg border border-border bg-card">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="bg-secondary text-xs text-primary">
@@ -782,7 +801,9 @@ export function AuditPage() {
         title="Audit Records"
         description="Trace who changed catalog records, referrals, enrollment, services, placement, outcomes, and access."
       />
-      <ResourceState resource={r}>
+      <ResourceState
+        resource={r}
+      >
         {!r.data?.data.length ? (
           <Empty title="No audited changes yet" />
         ) : (

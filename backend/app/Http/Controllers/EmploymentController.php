@@ -52,6 +52,26 @@ class EmploymentController extends Controller
         return $this->staff($r) ? $query : $query->where('user_id', $r->user()->id);
     }
 
+    private function searchPattern(Request $r): string
+    {
+        // Bind the value and treat LIKE metacharacters as literal search text.
+        return '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], (string) $r->query('search', '')).'%';
+    }
+
+    private function searchCatalog($query, Request $r, array $columns): void
+    {
+        if (! $r->filled('search')) {
+            return;
+        }
+        $pattern = $this->searchPattern($r);
+        $query->where(function ($q) use ($columns, $pattern) {
+            // Column names are server-owned constants at each call site.
+            foreach ($columns as $column) {
+                $q->orWhereRaw("{$column} LIKE ? ESCAPE '!'", [$pattern]);
+            }
+        });
+    }
+
     public function publicCatalog()
     {
         return response()->json(['vacancies' => Vacancy::available()->where('is_sample', false)->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest()->orderByDesc('id')->limit(6)->get(), 'training' => TrainingProgram::available()->where('is_sample', false)->orderBy('starts_on')->orderBy('title')->orderBy('id')->limit(6)->get(), 'events' => ServiceEvent::where('is_sample', false)->where('status', 'published')->where(fn ($q) => $q->where('starts_at', '>=', now())->orWhereDate('event_date', '>=', today()))->orderBy('event_date')->orderBy('starts_at')->limit(6)->get(), 'services' => self::SERVICES]);
@@ -71,9 +91,7 @@ class EmploymentController extends Controller
         } elseif (! $this->staff($r)) {
             $q->available();
         }
-        if ($r->filled('search')) {
-            $q->where(fn ($q) => $q->where('title', 'like', '%'.$r->string('search').'%')->orWhere('organization', 'like', '%'.$r->string('search').'%')->orWhere('location', 'like', '%'.$r->string('search').'%')->orWhere('skills', 'like', '%'.$r->string('search').'%'));
-        }
+        $this->searchCatalog($q, $r, ['title', 'organization', 'location', 'skills']);
         if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
             $q->where('status', $r->query('status'));
         }
@@ -119,9 +137,7 @@ class EmploymentController extends Controller
         } elseif (! $this->staff($r)) {
             $q->available();
         }
-        if ($r->filled('search')) {
-            $q->where(fn ($q) => $q->where('title', 'like', '%'.$r->string('search').'%')->orWhere('provider', 'like', '%'.$r->string('search').'%')->orWhere('location', 'like', '%'.$r->string('search').'%')->orWhere('skills', 'like', '%'.$r->string('search').'%'));
-        }
+        $this->searchCatalog($q, $r, ['title', 'provider', 'location', 'skills']);
         if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
             $q->where('status', $r->query('status'));
         }
@@ -447,7 +463,15 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['peso_staff', 'admin']);
 
-        return User::where('role', 'jobseeker')->with([
+        $query = User::where('role', 'jobseeker');
+        if ($r->filled('search')) {
+            $pattern = $this->searchPattern($r);
+            $query->where(fn ($q) => $q->whereRaw("name LIKE ? ESCAPE '!'", [$pattern])
+                ->orWhereRaw("email LIKE ? ESCAPE '!'", [$pattern])
+                ->orWhereHas('jobseekerProfile', fn ($profile) => $profile->whereRaw("municipality LIKE ? ESCAPE '!'", [$pattern])));
+        }
+
+        return $query->with([
             'jobseekerProfile:id,user_id,barangay,municipality,province,mobile_number,profile_completed_at',
             'jobseekerProfile.skills:id,name',
             'jobseekerProfile.education:id,jobseeker_profile_id,highest_attainment',
