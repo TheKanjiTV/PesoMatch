@@ -142,3 +142,41 @@ test("server failures never render diagnostic messages or internal field errors"
     return true
   })
 })
+
+test("an HTML redirect cannot be mistaken for a successful login", async (t) => {
+  const c = await client(t, async (url) =>
+    url.endsWith("/sanctum/csrf-cookie")
+      ? new Response(null, { status: 204 })
+      : new Response("<!doctype html><h1>Public home</h1>", {
+          headers: { "Content-Type": "text/html" },
+        }),
+  )
+  await assert.rejects(
+    c.loginAccount({
+      email: "account@example.test",
+      password: "test-password",
+    }),
+    (error) =>
+      error.name === "AccountError" && /Reload this page/.test(error.message),
+  )
+})
+
+test("a non-JSON login failure asks to retry sign-in instead of saving changes", async (t) => {
+  const c = await client(t, async (url) =>
+    url.endsWith("/sanctum/csrf-cookie")
+      ? new Response(null, { status: 204 })
+      : new Response("Bad request", { status: 400 }),
+  )
+  await assert.rejects(
+    c.loginAccount({
+      email: "account@example.test",
+      password: "test-password",
+    }),
+    (error) => {
+      assert.equal(error.status, 400)
+      assert.match(error.message, /sign you in/)
+      assert.doesNotMatch(error.message, /save your changes/)
+      return true
+    },
+  )
+})

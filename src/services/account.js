@@ -113,24 +113,33 @@ async function performAccountRequest(
     })
 
     const json =
-      response.status === 204 ? {} : await response.json().catch(() => ({}))
+      response.status === 204 ? {} : await response.json().catch(() => null)
 
     if (!response.ok)
       throw new AccountError(
         (response.status >= 500
           ? "PesoMatch is temporarily unavailable. Please try again. Your entries are still here."
-          : json.message) ||
+          : json?.message) ||
           (response.status === 419
             ? "Your session expired. Sign in again to continue."
             : response.status === 429
               ? "Too many requests. Wait a moment before trying again."
-              : mutating
-                ? "We couldn't save your changes. Please try again."
-                : "We couldn't load these records. Please try again."),
+              : path === "/api/auth/login"
+                ? "We couldn't sign you in. Reload this page and try again."
+                : mutating
+                  ? "We couldn't save your changes. Please try again."
+                  : "We couldn't load these records. Please try again."),
 
         response.status,
 
-        response.status >= 500 ? {} : json.errors || {},
+        response.status >= 500 ? {} : json?.errors || {},
+      )
+
+    // A followed HTML redirect is not a successful account/API response.
+    if (json === null)
+      throw new AccountError(
+        "We couldn't read the response from PesoMatch. Reload this page and try again.",
+        response.status,
       )
 
     return json

@@ -575,53 +575,84 @@ test("staff, employer, provider and administrator workspaces enforce role bounda
   }
 })
 
-test("real login opens the jobseeker and provisioned partner workspace", async ({
-  page,
+for (const role of ["jobseeker", "employer", "admin"]) {
+  test(`real login opens the ${role} workspace on both local hostnames`, async ({
+    page,
 
-  account,
-}) => {
-  await page.goto("/dashboard")
-
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
-
-  await page.getByRole("button", { name: "Sign out", exact: true }).click()
-
-  await expect(page).toHaveURL(/\/login$/)
-
-  for (const role of ["jobseeker", "employer"]) {
-    provision(account.email, role)
-
-    await page.goto("/login")
-
-    await page.getByLabel("Email Address").fill(account.email)
-
-    await page
-
-      .getByLabel("Password", { exact: false })
-
-      .first()
-
-      .fill(account.password)
-
-    const [loginResponse] = await Promise.all([
-      page.waitForResponse((response) =>
-        response.url().endsWith("/api/auth/login"),
-      ),
-
-      page.getByRole("button", { name: "Log In", exact: true }).click(),
-    ])
-
-    expect(loginResponse.status(), `Login HTTP status for ${role}`).toBe(200)
-
-    await expect(page).toHaveURL(/\/dashboard$/)
+    account,
+  }) => {
+    await page.goto("/dashboard")
 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
 
     await page.getByRole("button", { name: "Sign out", exact: true }).click()
 
     await expect(page).toHaveURL(/\/login$/)
-  }
-})
+
+    provision(account.email, role)
+
+    for (const origin of ["http://127.0.0.1:8443", "http://localhost:8443"]) {
+      const loginPath = role === "jobseeker" ? "/login" : "/staff/login"
+
+      await page.goto(`${origin}${loginPath}`)
+
+      await page.getByLabel("Email Address").fill(account.email)
+
+      await page
+
+        .getByLabel("Password", { exact: false })
+
+        .first()
+
+        .fill(account.password)
+
+      const [loginResponse] = await Promise.all([
+        page.waitForResponse((response) =>
+          response.url().endsWith("/api/auth/login"),
+        ),
+
+        page.getByRole("button", { name: "Log In", exact: true }).click(),
+      ])
+
+      expect(loginResponse.status(), `Login HTTP status for ${role}`).toBe(200)
+
+      await expect(page).toHaveURL(/\/dashboard$/)
+
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
+
+      await page.reload()
+
+      await expect(page).toHaveURL(/\/dashboard$/)
+
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
+
+      // Another tab/bookmark can reopen sign-in while the session is still valid.
+      await page.goto(`${origin}${loginPath}`)
+      await page.getByLabel("Email Address").fill(account.email)
+      await page
+        .getByLabel("Password", { exact: false })
+        .first()
+        .fill(account.password)
+
+      const [repeatLogin] = await Promise.all([
+        page.waitForResponse((response) =>
+          response.url().endsWith("/api/auth/login"),
+        ),
+        page.getByRole("button", { name: "Log In", exact: true }).click(),
+      ])
+
+      expect(repeatLogin.status(), `Existing-session login for ${role}`).toBe(
+        200,
+      )
+      expect((await repeatLogin.json()).user.role).toBe(role)
+      await expect(page).toHaveURL(/\/dashboard$/)
+
+      await page.getByRole("button", { name: "Sign out", exact: true }).click()
+
+      await expect(page).toHaveURL(/\/login$/)
+    }
+  })
+}
 
 test("catalog and service forms remain usable on narrow screens", async ({
   page,
