@@ -7,10 +7,13 @@ test("official PESO details keep application links, provenance and mobile access
 }) => {
   const sourceRequests = []
   page.on("request", (request) => {
-    if (request.url().includes("vacancy-source-status") || request.url().includes("philjobnet.gov.ph")) sourceRequests.push(request.url())
+    if (
+      request.url().includes("vacancy-source-status") ||
+      request.url().includes("philjobnet.gov.ph")
+    )
+      sourceRequests.push(request.url())
   })
-  const original =
-    "https://pasay.gov.ph/peso-jobs/utility-helper/"
+  const original = "https://pasay.gov.ph/peso-jobs/utility-helper/"
   const vacancy = {
     id: 900001,
     title: "PESO source review",
@@ -18,7 +21,8 @@ test("official PESO details keep application links, provenance and mobile access
     location: "Manila",
     industry: "Services",
     employment_type: "Full-time",
-    description: "A browser fixture used only to check official PESO source presentation.",
+    description:
+      "A browser fixture used only to check official PESO source presentation.",
     skills: [],
     source_url: original,
     source_name: "Pasay City PESO",
@@ -56,11 +60,28 @@ test("official PESO details keep application links, provenance and mobile access
   page.on("pageerror", (error) => errors.push(error.message))
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto("/jobs/900001")
-  await expect(page.getByText("Reviewed listings from Pasay City PESO", { exact: true })).toBeVisible()
-  await expect(page.getByRole("link", { name: "View official PESO listing & apply", exact: true })).toHaveAttribute("href", original)
-  await expect(page.getByRole("link", { name: "View official PESO listing & apply", exact: true })).toHaveAttribute("rel", "noopener noreferrer")
-  await expect(page.getByRole("link", { name: "Ask PESO for application guidance", exact: true })).toHaveAttribute("href", "/services")
-  await expect(page.getByText(/not all Philippine/)).toBeVisible()
+  await expect(
+    page.getByText("Reviewed PESO and government sources", { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole("link", {
+      name: "View official listing & apply",
+      exact: true,
+    }),
+  ).toHaveAttribute("href", original)
+  await expect(
+    page.getByRole("link", {
+      name: "View official listing & apply",
+      exact: true,
+    }),
+  ).toHaveAttribute("rel", "noopener noreferrer")
+  await expect(
+    page.getByRole("link", {
+      name: "Ask PESO for application guidance",
+      exact: true,
+    }),
+  ).toHaveAttribute("href", "/services")
+  await expect(page.getByText(/Coverage varies by office/)).toBeVisible()
   await expect(page.getByText(/No skill requirements mapped/)).toBeVisible()
   await expect(
     page.getByText(vacancy.description, { exact: true }),
@@ -90,8 +111,15 @@ test("official PESO details keep application links, provenance and mobile access
     path: "artifacts/peso-sources/peso-mobile.png",
     fullPage: true,
   })
-  await page.getByRole("link", { name: "View official PESO listing & apply", exact: true }).focus()
-  await expect(page.getByRole("link", { name: "View official PESO listing & apply", exact: true })).toBeFocused()
+  await page
+    .getByRole("link", { name: "View official listing & apply", exact: true })
+    .focus()
+  await expect(
+    page.getByRole("link", {
+      name: "View official listing & apply",
+      exact: true,
+    }),
+  ).toBeFocused()
   expect(sourceRequests).toEqual([])
   expect(errors).toEqual([])
 })

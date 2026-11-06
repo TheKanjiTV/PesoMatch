@@ -1,0 +1,18 @@
+{
+  "review_date": "2026-11-06",
+  "source_url": "https://iloiloprovince.balinkbayan.gov.ph/available-job-opportunities",
+  "source_name": "Iloilo Provincial PESO · CFO BaLinkBayan",
+  "http_status": 200,
+  "checked_at": "2026-11-06T15:38:22.009Z",
+  "sha256": "b9d9bc061a622212298b7c514e54fdfc363530f9f103259fb926eaad75e23260",
+  "observed_company_cards": 21,
+  "included_records": 87,
+  "overseas_references": 14,
+  "excluded": [
+    {
+      "organization": "PHARMA GALENX INNOVATIONS, INC.",
+      "reason": "No complete public application instructions"
+    }
+  ],
+  "limits": "Official-board references only; current intake, remaining slots, country and deadlines are not confirmed. No agency licensing claim is inferred."
+}

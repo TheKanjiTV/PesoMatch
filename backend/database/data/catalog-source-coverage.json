@@ -1,0 +1,151 @@
+{
+  "review_date": "2026-11-06",
+  "coverage": "Reviewed public sources; not a complete feed from every PESO office.",
+  "vacancies": {
+    "total": 498,
+    "source_lists_open": 61,
+    "confirm_availability": 437,
+    "overseas_references": 14
+  },
+  "training": {
+    "registered_programs": 21855,
+    "online_courses": 230,
+    "overseas_training": 1,
+    "total": 22086,
+    "held_for_closure_confirmation": 19
+  },
+  "priority_locations": {
+    "Oriental Mindoro": 427,
+    "Occidental Mindoro": 103,
+    "Palawan": 128,
+    "Puerto Princesa": 96
+  },
+  "sources": [
+    {
+      "area": "Oriental Mindoro",
+      "name": "Provincial Government / PESO",
+      "url": "https://ormindoro.gov.ph/careers/",
+      "status": "7 official government role postings",
+      "notes": "Current provincial careers table rows have a November 8, 2026 application deadline. These are government HR postings, not connected PESO partner vacancies."
+    },
+    {
+      "area": "Occidental Mindoro",
+      "name": "San Jose Municipal PESO",
+      "url": "https://sanjoseoccimindoro.gov.ph/department-offices/public-employment-service-office/",
+      "status": "Office confirmation needed",
+      "notes": "A new Taiwan recruitment announcement was indexed, but direct source access could not be rechecked. No expired registration window was treated as open."
+    },
+    {
+      "area": "Palawan",
+      "name": "Provincial Government of Palawan",
+      "url": "https://palawan.gov.ph/career/",
+      "status": "Office confirmation needed",
+      "notes": "The careers table contains 2023 government deadlines and August 2024 private listings marked Open. Their current availability could not be verified, so they were not imported as current jobs. This does not mean no jobs exist."
+    },
+    {
+      "area": "Puerto Princesa",
+      "name": "City PESO contact directory",
+      "url": "https://puertoprincesa.ph/city-government-contacts/",
+      "status": "Office confirmation needed",
+      "notes": "Use the official City PESO contact entry to check local openings."
+    },
+    {
+      "area": "NCR / Pasay",
+      "name": "Pasay City PESO",
+      "url": "https://pasay.gov.ph/job-openings/",
+      "status": "347 reviewed public listings",
+      "notes": "Applications are linked individually. Remaining vacancies are not confirmed by page access alone."
+    },
+    {
+      "area": "Negros Occidental",
+      "name": "PESO Negros Occidental",
+      "url": "https://www.negros-occ.gov.ph/negros-jobs/",
+      "status": "54 source-listed open postings",
+      "notes": "Individual public details and future deadlines were checked. The portal advertises 60; only 54 distinct accessible details were verified."
+    },
+    {
+      "area": "Camarines Sur",
+      "name": "Provincial PESO",
+      "url": "https://www.camarinessur.gov.ph/announcement/177",
+      "status": "3 reviewed announcements",
+      "notes": "Includes the November 11 recruitment activity in Pili. Multi-role announcements are kept as single records."
+    },
+    {
+      "area": "Iloilo / overseas references",
+      "name": "Provincial PESO · CFO BaLinkBayan",
+      "url": "https://iloiloprovince.balinkbayan.gov.ph/available-job-opportunities",
+      "status": "87 official-board references, including 14 overseas roles",
+      "notes": "The public board lists employers/agencies and role names. It does not confirm current deadlines, destination countries or remaining places; verify with PESO and DMW before applying."
+    },
+    {
+      "area": "Cauayan / Isabela",
+      "name": "Cauayan City PESO",
+      "url": "https://jobs.cityofcauayan.gov.ph/pages/jobs.php",
+      "status": "Office confirmation needed",
+      "notes": "The public board had a listing, but details required sign-in and no current deadline was confirmed."
+    },
+    {
+      "area": "Davao Oriental / Mati",
+      "name": "Mati City PESO",
+      "url": "https://trabawho.mati.gov.ph/",
+      "status": "Office confirmation needed",
+      "notes": "Public entries lacked complete current application evidence. A test-only posting and duplicate/stale candidates were not imported."
+    },
+    {
+      "area": "Ilocos Norte",
+      "name": "WorkIN / Provincial PESO",
+      "url": "https://workinilocosnorte.ph/",
+      "status": "Office confirmation needed",
+      "notes": "The public home response had no recent vacancy records."
+    },
+    {
+      "area": "Cebu",
+      "name": "Cebu Provincial PESO",
+      "url": "https://www.cebu.gov.ph/peso/",
+      "status": "No public openings listed",
+      "notes": "The official board displayed zero available jobs at review time."
+    },
+    {
+      "area": "Eastern Visayas",
+      "name": "DOLE VIII · HIRE-EV",
+      "url": "https://hire-ev.com/",
+      "status": "Official regional hub / directory",
+      "notes": "Government launch was verified. Aggregated partner-board jobs were not imported as confirmed PESO openings, and removed PhilJobNet links were not reintroduced."
+    },
+    {
+      "area": "Nationwide",
+      "name": "Bureau of Local Employment PESO directory",
+      "url": "https://ble.dole.gov.ph/peso-directory/",
+      "status": "Local office confirmation needed",
+      "notes": "The directory is the official starting point for offices beyond this reviewed selection. Its feed was unavailable to this collector."
+    },
+    {
+      "area": "Overseas employment",
+      "name": "Department of Migrant Workers",
+      "url": "https://dmw.gov.ph/inquiry/approved-job-orders",
+      "status": "Agency confirmation required",
+      "notes": "Approved orders are not proof of remaining vacancies. The public feed was inaccessible; no unverified orders were imported."
+    },
+    {
+      "area": "Nationwide training",
+      "name": "TESDA registered-program directory",
+      "url": "https://www.tesda.gov.ph/Tvi/Result",
+      "status": "21,855 reviewed registry records",
+      "notes": "All 746 observed pages were reviewed. Registry presence does not confirm an open intake, fee or scholarship."
+    },
+    {
+      "area": "Online / remote access",
+      "name": "TESDA Online Program",
+      "url": "https://e-tesda.gov.ph/",
+      "status": "230 official course records",
+      "notes": "Online access is distinct from a physical training center abroad. Each course keeps its own source review date."
+    },
+    {
+      "area": "Japan",
+      "name": "MWO Osaka / TESDA NLSC",
+      "url": "https://mwo-osaka.dmw.gov.ph/2026/09/26/free-jlpt-n3-examination-preparation-training-program/",
+      "status": "Official November training announcement",
+      "notes": "For eligible OFWs in western and central Japan. Reconfirm registration and remaining places with MWO Osaka."
+    }
+  ]
+}

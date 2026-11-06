@@ -11,6 +11,7 @@ use App\Models\Skill;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/public/catalog', [Employment::class, 'publicCatalog'])->middleware('throttle:60,1');
+Route::get('/public/source-coverage', fn () => response()->json(json_decode(file_get_contents(database_path('data/catalog-source-coverage.json')), true, 512, JSON_THROW_ON_ERROR)))->middleware('throttle:60,1');
 
 Route::prefix('platform')->middleware(['auth:sanctum', 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
     Route::get('/summary', [Employment::class, 'summary']);

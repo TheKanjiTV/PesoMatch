@@ -408,7 +408,11 @@ export default function Landing() {
                   <div className="mt-4 flex flex-wrap justify-between gap-3 text-xs text-[#d4e0d5]">
                     <span>
                       {p.external_enrollment
-                        ? "TESDA Online Program · Self-paced"
+                        ? p.catalog_type === "online_course"
+                          ? "Official online course · Self-paced"
+                          : p.catalog_type === "overseas_training"
+                            ? "Official overseas announcement · Confirm intake"
+                            : "Registered program · Confirm intake"
                         : `Starts ${date(p.starts_on)}`}
                     </span>
                     <Link

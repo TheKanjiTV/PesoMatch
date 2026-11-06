@@ -3,6 +3,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises"
 const paths = [
   "../backend/database/data/verified-vacancies.json",
   "../backend/database/data/verified-training.json",
+  "../backend/database/data/verified-international-training.json",
   "../backend/database/data/verified-events.json",
   "../backend/database/data/verified-public-resources.json",
 ]
@@ -27,7 +28,7 @@ await Promise.all(
       const parsed = new URL(url)
       if (
         parsed.protocol !== "https:" ||
-        !/^(pasay\.gov\.ph|e-tesda\.gov\.ph|ble\.dole\.gov\.ph|www\.tesda\.gov\.ph|privacy\.gov\.ph|ro11\.dole\.gov\.ph|openstat\.psa\.gov\.ph|docs\.google\.com)$/.test(
+        !/^(pasay\.gov\.ph|negrosjobs\.mis-negros\.com|www\.camarinessur\.gov\.ph|ormindoro\.gov\.ph|iloiloprovince\.balinkbayan\.gov\.ph|mwo-osaka\.dmw\.gov\.ph|e-tesda\.gov\.ph|ble\.dole\.gov\.ph|www\.tesda\.gov\.ph|privacy\.gov\.ph|ro11\.dole\.gov\.ph|openstat\.psa\.gov\.ph|docs\.google\.com)$/.test(
           parsed.hostname,
         )
       )

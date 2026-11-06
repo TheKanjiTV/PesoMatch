@@ -6,9 +6,13 @@ Laravel 12 / Sanctum stateful cookie sessions. Obtain `/sanctum/csrf-cookie` and
 
 Responses: 401 unauthenticated; 403 unauthorized role/ownership; 404 missing record; 409 duplicate request or already-verified report; 422 validation or invalid workflow state. Validation errors appear in `errors`. List endpoints return Laravel `data`, pagination metadata and links, with up to 100 rows per page. Catalog queries support `id`, `search` and `status`; vacancies also support `saved=1` for the current user.
 
+Training additionally accepts `catalog=all|registered_program|online_course|overseas_training|partner_program`. Vacancies accept `availability=all|source_lists_open`. Search includes retained source descriptions so full institution/qualification/address text remains searchable. Query values are validated server-side; LIKE wildcard characters are treated literally.
+
 ## Public and existing account routes
 
 `GET /api/public/catalog` returns current published vacancies, upcoming training/events, and service names. It does not return personal records. Existing `/api/auth/*`, `/api/jobseeker/onboarding/*`, `/api/jobseeker/profile`, and `/api/skills` remain.
+
+`GET /api/public/source-coverage` returns the committed review date, source counts, priority-location counts and office coverage limitations. It is throttled to 60 requests/minute and does not probe sources, expose accounts or claim live availability. See [national catalog review](NATIONAL-CATALOG-2026-11-06.md).
 
 ## Employment endpoints
 
@@ -69,6 +73,8 @@ Jobseekers cannot self-approve referrals/enrollment or placement. Employers cann
 
 `content-based-tfidf-v1`: 75% declared skill coverage + 25% TF-IDF cosine similarity. Returned matched/missing skills are explanations, not eligibility decisions. A snapshot is stored with the referral.
 
+Matching returns at most 100 training suggestions, with the full count in `training_total`. Each paginated vacancy match includes up to eight related training suggestions and its own `training_total`. The full training directory remains available through `/training` pagination; suggestion limits do not change matching scores or delete programs.
+
 Labor-market demand excludes sample vacancies and external source listings with unknown positions. `source_listed_vacancies` separately counts recently researched external listings. Monitoring uses the latest reported employment date per jobseeker, breaking ties by record ID, and shows verified counts separately. Sample-linked outcomes/completions are excluded from operational aggregates. Due placement follow-ups remain pending until a linked, verified report covers the follow-up date. Reports are platform-scoped, not population unemployment statistics.
 
 Workflow mutations use transactions and audit records. Vacancy bookmarks use an idempotent owner-scoped database operation. Account erasure cascades personal profiles, referrals, enrollment, placements and employment reports while leaving catalog/audit attribution nullable. Production audit retention/anonymization rules require PESO approval.
@@ -89,10 +95,14 @@ Detection reports `local-pdf-text-skill-evidence-v1`; this is local text/skill e
 
 Training records can include `source_url`, `source_name`, `source_checked_at` and `external_enrollment`. Source imports are maintained by the local import command, not accepted as arbitrary provenance in catalog forms. External self-paced courses can have null capacity/dates and cannot create a local enrollment; the provider handles enrollment. Every `/matches` vacancy now includes its own `training` list of `{program, addresses}` covering only that vacancy's missing skills.
 
+Training also returns `catalog_type` and `availability_status`. Registered-program rows expose `fee: null`, unknown capacity/dates and `intake_unconfirmed`; registry presence does not confirm an open intake or scholarship. Overseas announcements are labeled `official_announcement` and retain their eligibility restrictions. External training evidence cannot be edited through the normal program mutation endpoint, including by staff; use the reviewed import. Public/current external training requires a source review within 30 days and no passed known end date.
+
 ## Official source-listed vacancies
 
 Vacancies can additionally return `source_url`, `source_name`, `source_checked_at`, `source_posted_on`, `source_salary` and `external_application`. Researched external listings have no partner owner and may have null `slots`, `deadline`, `salary_min` and `salary_max`. `source_salary` preserves the source amount without assuming a monthly period.
 
 Published external listings appear in public browse, jobseeker browse and recommendations only while the source was checked within 30 days and any stated deadline has not passed. This is a research recency policy, not confirmation that a position remains unfilled. A recheck is required before updating source timestamps. Source metadata is not editable through ordinary vacancy forms. The source import command updates unique URLs without duplicating records.
+
+Vacancy `availability_status` separates `source_lists_open`, `confirm_availability`, `review_expired`, `deadline_passed` and `partner_vacancy`. Source-listed-open requires an explicitly supported deadline-bearing source, a check within seven days and an unexpired source deadline. It does not guarantee remaining places. Imports reject unapproved source destinations or ownership conflicts and may unpublish withdrawn external records without deleting workflow history.
 
 Jobseekers can save a source-listed vacancy and request general PESO application guidance. `POST /api/platform/vacancies/{id}/referrals` returns 422 for an external listing; the official website handles its actual application. Connected partner vacancies retain the local reviewed referral/placement flow.

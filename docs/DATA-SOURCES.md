@@ -1,6 +1,6 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Data Sources
 
-Current review: [November 3 refresh, coverage and verification](DATA-REFRESH-2026-11-03.md). The October 10 counts and tables below are historical evidence for the original catalog.
+Current review: [November 6 nationwide catalog, coverage and verification](NATIONAL-CATALOG-2026-11-06.md). The October 10 counts and tables below are historical evidence for the original catalog.
 
 ## Nationwide official training catalog
 
@@ -37,7 +37,7 @@ Run `php artisan peso:import-verified-training` from backend/ to import/update t
 
 ## Reviewed official PESO vacancies
 
-The active vacancy dataset now comes from the [Pasay City PESO job board](https://pasay.gov.ph/job-openings/), reviewed on November 6, 2026. See [current source coverage and replacement](PESO-VACANCY-SOURCES.md) and `backend/database/data/verified-peso-vacancy-coverage.json`. This is a local PESO selection, not nationwide coverage or a live vacancy feed.
+The active vacancy dataset now includes the Pasay, Negros Occidental, Camarines Sur and Iloilo PESO boards, plus the Oriental Mindoro provincial careers table. See [current nationwide source coverage](NATIONAL-CATALOG-2026-11-06.md) and `backend/database/data/catalog-source-coverage.json`. The [earlier Pasay replacement report](PESO-VACANCY-SOURCES.md) documents the first replacement snapshot. Neither snapshot is a complete feed from every Philippine PESO office.
 
 Each imported record has its own HTTPS official PESO detail/application URL, source-posted date and actual detail-review timestamp. Qualifications are summarized from the source. Work locations are confirmed through the retained source qualifications, and explicit employment terms are preserved. Undisclosed salaries, deadlines and slot counts remain unknown. No skills are inferred from a job title or employer. Opening an application page does not submit a local referral or transmit a profile.
 

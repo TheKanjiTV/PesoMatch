@@ -108,8 +108,8 @@ class ResumeTest extends TestCase
 
     public function test_verified_catalog_is_idempotent_external_and_training_is_specific_to_missing_skills(): void
     {
-        $this->artisan('peso:import-verified-training')->assertSuccessful();
-        $this->artisan('peso:import-verified-training')->assertSuccessful();
+        $this->artisan('peso:import-verified-training', ['--catalog' => 'online'])->assertSuccessful();
+        $this->artisan('peso:import-verified-training', ['--catalog' => 'online'])->assertSuccessful();
         $this->assertDatabaseCount('training_programs', count(json_decode(file_get_contents(database_path('data/verified-training.json')), true)));
         $p = TrainingProgram::whereJsonContains('skills', 'Communication')->firstOrFail();
         $sourceCourse = collect(json_decode(file_get_contents(database_path('data/verified-training.json')), true))->firstWhere('source_url', $p->source_url);

@@ -67,31 +67,58 @@ class EmploymentMatcher
         // Compute corpus frequencies once, rather than rescanning every listing
         // for every token of every other listing as the public catalog grows.
         $weights = $this->weights($corpus);
-        $programs = TrainingProgram::available()->where('is_sample', false)->get();
+        // Keep the national directory out of the full-model hot path. Only
+        // topic IDs are indexed, and only returned suggestions are hydrated.
+        $programs = TrainingProgram::available()->where('is_sample', false)->orderBy('id')->get(['id', 'skills']);
+        $bySkill = [];
+        foreach ($programs as $program) {
+            foreach ($program->skills as $skill) {
+                $bySkill[mb_strtolower($skill)][$program->id] = true;
+            }
+        }
         $ranked = $vacancies->map(fn ($v) => ['vacancy' => $v, 'assessment' => $this->assess($user, $v, null, $weights)])
             ->sortByDesc('assessment.score')->values();
         $gaps = $ranked->take(5)->flatMap(fn ($m) => $m['assessment']['missing_skills'])->unique()->values()->all();
         $lastPage = max(1, (int) ceil($ranked->count() / 100));
         $page = max(1, $page);
-        // The existing ResourceState page controls expose every ranked result.
-        // Only expand course suggestions for the requested page.
-        $matches = $ranked->slice(($page - 1) * 100, 100)->map(function ($match) use ($programs) {
-            $assessment = $match['assessment'];
-            $training = $programs->map(function ($p) use ($assessment) {
-                $addresses = array_values(array_uintersect($p->skills, $assessment['missing_skills'], 'strcasecmp'));
+        $summaries = $programs->keyBy('id');
+        $needed = [];
+        $matches = $ranked->slice(($page - 1) * 100, 100)->map(function ($match) use ($bySkill, $summaries, &$needed) {
+            $missing = $match['assessment']['missing_skills'];
+            $ids = [];
+            foreach ($missing as $skill) {
+                $ids += $bySkill[mb_strtolower($skill)] ?? [];
+            }
+            $training = collect(array_keys($ids))->sort()->map(function ($id) use ($missing, $summaries) {
+                return ['id' => $id, 'addresses' => array_values(array_uintersect($summaries[$id]->skills, $missing, 'strcasecmp'))];
+            })->sortByDesc(fn ($p) => count($p['addresses']))->values();
+            $total = $training->count();
+            $training = $training->take(8)->values();
+            foreach ($training as $suggestion) {
+                $needed[$suggestion['id']] = true;
+            }
 
-                return ['program' => $p, 'addresses' => $addresses];
-            })->filter(fn ($p) => count($p['addresses']))->sortByDesc(fn ($p) => count($p['addresses']))->values();
-
-            return $match + ['training' => $training];
+            return $match + ['training' => $training, 'training_total' => $total];
         })->values();
-        $training = $programs->map(function ($p) use ($gaps) {
-            $addresses = array_values(array_intersect($p->skills, $gaps));
+        $training = $programs->map(function ($program) use ($gaps) {
+            $addresses = array_values(array_intersect($program->skills, $gaps));
 
-            return ['program' => $p, 'addresses' => $addresses, 'reason' => count($addresses) ? 'Builds skills requested in your recommended vacancies.' : 'Explore this program with a PESO counselor.'];
-        })->sortByDesc(fn ($p) => count($p['addresses']))->values();
+            return ['id' => $program->id, 'addresses' => $addresses,
+                'reason' => count($addresses) ? 'Builds skills requested in your recommended vacancies.' : 'Explore this program and confirm intake with its provider.'];
+        })->sortByDesc(fn ($p) => count($p['addresses']))->take(100)->values();
+        foreach ($training as $suggestion) {
+            $needed[$suggestion['id']] = true;
+        }
+        $full = TrainingProgram::whereIn('id', array_keys($needed))->get()->keyBy('id');
+        $hydrate = fn ($item) => ['program' => $full[$item['id']], 'addresses' => $item['addresses']] + (isset($item['reason']) ? ['reason' => $item['reason']] : []);
+        $matches = $matches->map(function ($match) use ($hydrate) {
+            $match['training'] = $match['training']->map($hydrate);
+
+            return $match;
+        });
+        $training = $training->map($hydrate);
 
         return ['matches' => $matches, 'training' => $training, 'method' => 'content-based-tfidf-v1',
-            'current_page' => $page, 'last_page' => $lastPage, 'per_page' => 100, 'total' => $ranked->count()];
+            'current_page' => $page, 'last_page' => $lastPage, 'per_page' => 100, 'total' => $ranked->count(), 'training_total' => $programs->count()];
     }
 }

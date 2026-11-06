@@ -72,6 +72,24 @@ const statusField = F("status", "Publication status", "text", {
   options: ["draft", "pending_review", "published", "closed"],
 })
 
+function Verification({ record }) {
+  if (!record.external_application && !record.external_enrollment) return null
+  const labels = {
+    source_lists_open: "Source lists open · check remaining places",
+    confirm_availability: "Availability needs confirmation",
+    intake_unconfirmed: "Registered program · confirm intake",
+    official_announcement: "Official overseas announcement · confirm intake",
+    online_catalog: "Official online course",
+    deadline_passed: "Application deadline passed",
+    review_expired: "Source review expired",
+  }
+  return (
+    <Badge>
+      {labels[record.availability_status] || "Confirm availability with source"}
+    </Badge>
+  )
+}
+
 const vacancyFields = [
   F("title", "Vacancy title"),
 
@@ -153,7 +171,8 @@ export function CatalogPage({ kind = "vacancies" }) {
     { id } = useParams()
 
   const training = kind === "training"
-  const showSourceStatus = !training && user.role !== "employer"
+  const showSourceStatus =
+    user.role !== (training ? "training_provider" : "employer")
 
   const [search, setSearch] = useState(""),
     [filter, setFilter] = useState("all"),
@@ -161,7 +180,9 @@ export function CatalogPage({ kind = "vacancies" }) {
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [savedOnly, setSavedOnly] = useState(false)
+    [savedOnly, setSavedOnly] = useState(false),
+    [catalogFilter, setCatalogFilter] = useState("all"),
+    [availabilityFilter, setAvailabilityFilter] = useState("all")
 
   const query = useSearchQuery(search)
 
@@ -171,6 +192,10 @@ export function CatalogPage({ kind = "vacancies" }) {
         ? `?id=${id}`
         : `?search=${encodeURIComponent(query)}&status=${filter}${
             savedOnly && !training ? "&saved=1" : ""
+          }&${
+            training
+              ? `catalog=${catalogFilter}`
+              : `availability=${availabilityFilter}`
           }`),
   )
 
@@ -312,9 +337,15 @@ export function CatalogPage({ kind = "vacancies" }) {
           )
         }
       />
-      {showSourceStatus && (!id || detail?.external_application) && (
-        <PesoVacancySource />
-      )}
+      {showSourceStatus &&
+        (!id ||
+          detail?.external_application ||
+          detail?.external_enrollment) && (
+          <PesoVacancySource
+            training={training}
+            onArea={!id ? setSearch : undefined}
+          />
+        )}
       {message && (
         <div className="mb-5">
           <Notice>{message}</Notice>
@@ -379,6 +410,38 @@ export function CatalogPage({ kind = "vacancies" }) {
               "skills",
             ])}
           />
+          {training ? (
+            <select
+              aria-label="Filter training catalog"
+              className={`${inputStyle} max-w-64`}
+              value={catalogFilter}
+              onChange={(event) => setCatalogFilter(event.target.value)}
+            >
+              <option value="all">All training records</option>
+              <option value="online_course">TESDA online courses</option>
+              <option value="registered_program">
+                TESDA registered programs
+              </option>
+              <option value="overseas_training">
+                Official overseas training
+              </option>
+              <option value="partner_program">
+                Connected provider programs
+              </option>
+            </select>
+          ) : (
+            <select
+              aria-label="Filter vacancy availability"
+              className={`${inputStyle} max-w-64`}
+              value={availabilityFilter}
+              onChange={(event) => setAvailabilityFilter(event.target.value)}
+            >
+              <option value="all">All reviewed listings</option>
+              <option value="source_lists_open">
+                Source-listed open postings
+              </option>
+            </select>
+          )}
           {canManage && (
             <select
               aria-label="Filter by publication status"
@@ -454,6 +517,7 @@ export function CatalogPage({ kind = "vacancies" }) {
                       )}
                       <Sample record={v} />
                       <Source record={v} />
+                      <Verification record={v} />
                     </div>
                     <h2 className="mt-5 text-xl font-semibold text-primary">
                       <Link
@@ -487,7 +551,11 @@ export function CatalogPage({ kind = "vacancies" }) {
                       <span className="text-xs text-muted-foreground">
                         {training
                           ? v.external_enrollment
-                            ? "Self-paced · official provider"
+                            ? v.catalog_type === "registered_program"
+                              ? "Registration listed · intake not confirmed"
+                              : v.catalog_type === "overseas_training"
+                                ? "Overseas announcement · confirm intake"
+                                : "Self-paced · official provider"
                             : `Starts ${date(v.starts_on)}`
                           : v.external_application
                             ? "Confirm availability on source"
@@ -504,12 +572,6 @@ export function CatalogPage({ kind = "vacancies" }) {
                   </article>
                 ))}
               </div>
-            )}
-            {records.length === 100 && (
-              <p className="mt-5 text-sm">
-                Showing the first 100 records. Refine your search to find a
-                vacancy.
-              </p>
             )}
           </>
         )}
@@ -544,6 +606,7 @@ function Detail({
           <Badge>{training ? v.mode : v.employment_type}</Badge>
           <Sample record={v} />
           <Source record={v} />
+          <Verification record={v} />
         </div>
         <h2 className="mt-5 font-display text-3xl text-primary">
           {training ? v.provider : v.organization}
@@ -596,7 +659,10 @@ function Detail({
                   "Training dates",
 
                   v.external_enrollment
-                    ? "Self-paced"
+                    ? v.catalog_type === "registered_program" ||
+                      v.catalog_type === "overseas_training"
+                      ? "Confirm current intake with provider"
+                      : "Self-paced"
                     : `${date(v.starts_on)} – ${date(v.ends_on)}`,
                 ],
 
@@ -613,11 +679,15 @@ function Detail({
                 [
                   "Training fee",
 
-                  Number(v.fee)
-                    ? money(v.fee)
-                    : v.external_enrollment
-                      ? "Free online course"
-                      : "No training fee listed",
+                  v.fee === null
+                    ? "Not disclosed · confirm with provider"
+                    : Number(v.fee)
+                      ? money(v.fee)
+                      : v.external_enrollment
+                        ? v.catalog_type === "overseas_training"
+                          ? "Free as announced · confirm eligibility"
+                          : "Free online course"
+                        : "No training fee listed",
                 ],
               ]
             : [
@@ -636,7 +706,11 @@ function Detail({
 
                   v.external_application
                     ? v.source_salary
-                      ? `${v.source_salary} · confirm pay period with employer`
+                      ? /\/\s*(month|day|hour)|per\s+(month|day|hour)/i.test(
+                          v.source_salary,
+                        )
+                        ? v.source_salary
+                        : `${v.source_salary} · confirm pay period with employer`
                       : "Not stated"
                     : v.salary_min
                       ? `${money(v.salary_min)} – ${money(v.salary_max || v.salary_min)}`
@@ -660,12 +734,14 @@ function Detail({
               rel="noopener noreferrer"
               className={`${primaryStyle} w-full`}
             >
-              View official PESO listing & apply
+              View official listing & apply
             </a>
             <p className="text-xs leading-6 text-muted-foreground">
-              Listed {date(v.source_posted_on)}. Confirm current availability
-              and requirements with the source. This employer has no connected
-              PESO referral account here.
+              {v.source_posted_on
+                ? `Listed ${date(v.source_posted_on)}.`
+                : "Exact posting date not disclosed."}{" "}
+              Confirm current availability and requirements with the source.
+              This employer has no connected PESO referral account here.
             </p>
             {role === "jobseeker" && (
               <>
@@ -694,11 +770,16 @@ function Detail({
               rel="noopener noreferrer"
               className={`${primaryStyle} w-full`}
             >
-              Open official course & enroll
+              {v.catalog_type === "registered_program"
+                ? "Verify official registration & intake"
+                : v.catalog_type === "overseas_training"
+                  ? "Check official training announcement"
+                  : "Open official course & enroll"}
             </a>
             <p className="mt-3 text-xs leading-6 text-muted-foreground">
-              Enrollment and completion are handled on the provider website. No
-              local place is reserved by opening this link.
+              {v.catalog_type === "registered_program"
+                ? "This link opens the official registry, not an enrollment form. Confirm the provider's current registration, intake, fees and scholarship availability."
+                : "Follow the official provider's application instructions. Opening this link does not reserve a place or send your profile."}
             </p>
           </div>
         ) : canManage ? (
@@ -906,6 +987,15 @@ export function MatchesPage() {
           </div>
         ) : (
           <div className="space-y-4">
+            {r.data?.training_total > (r.data?.training?.length || 0) && (
+              <Notice>
+                Showing {r.data.training.length} suggestions from{" "}
+                {r.data.training_total.toLocaleString()} training records.{" "}
+                <Link to="/training" className="font-semibold underline">
+                  Browse and search the full training catalog.
+                </Link>
+              </Notice>
+            )}
             {!r.data?.training.length && (
               <Empty title="No published training programs yet" />
             )}
@@ -931,7 +1021,7 @@ export function MatchesPage() {
                 </p>
                 <div className="mt-5">
                   <ActionLink to={`/training/${p.id}`} secondary>
-                    Review program & enroll
+                    Review program & availability
                   </ActionLink>
                 </div>
               </article>

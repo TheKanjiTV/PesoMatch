@@ -3,9 +3,9 @@
 use App\Models\PublicResource;
 use App\Models\ServiceEvent;
 use App\Models\Skill;
-use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
+use App\Services\ReviewedTrainingImporter;
 use App\Services\VacancySources;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Inspiring;
@@ -63,44 +63,36 @@ Artisan::command('peso:access {email} {role}', function () {
 
 })->purpose('Provision a PESO, employer or training-provider role on an existing local account');
 
-Artisan::command('peso:import-verified-training', function () {
+Artisan::command('peso:import-verified-training {--catalog=all}', function (ReviewedTrainingImporter $importer) {
+    $catalog = $this->option('catalog');
+    if (! in_array($catalog, ['all', 'online', 'registered', 'international'], true)) {
+        $this->error('Choose all, online, registered or international.');
 
-    $rows = json_decode(file_get_contents(database_path('data/verified-training.json')), true, 512, JSON_THROW_ON_ERROR);
-
-    DB::transaction(function () use ($rows) {
-        foreach ($rows as $row) {
-
-            if (parse_url($row['source_url'], PHP_URL_HOST) !== 'e-tesda.gov.ph') {
-                throw new RuntimeException('Unexpected source host.');
-            }
-
-            foreach ($row['skills'] as $skill) {
-                Skill::firstOrCreate(['name' => $skill]);
-            }
-
-            TrainingProgram::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'provider' => 'TESDA Online Program', 'location' => 'Online · Philippines', 'mode' => 'Online', 'description' => $row['description'], 'requirements' => 'Create an account on the official TESDA Online Program website and review the course prerequisites. Course completion is not an automatic National Certificate.', 'skills' => $row['skills'], 'capacity' => null, 'starts_on' => null, 'ends_on' => null, 'schedule' => 'Self-paced · see official source', 'fee' => 0, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'external_enrollment' => true]);
-
-        }
-    });
-
-    $this->info(count($rows).' official-source course records imported idempotently. No local enrollment or certification was fabricated.');
-
-})->purpose('Import the researched official training catalog with source evidence');
+        return 1;
+    }
+    $result = $importer->importCatalog($catalog);
+    $this->info($result['imported'].' reviewed training records imported; '.$result['retired'].' withdrawn source records unpublished without deletion. Registered programs do not confirm an open intake, scholarship or fee. No local enrollment or certification was fabricated.');
+})->purpose('Import reviewed TESDA online, registered-institution and official overseas training catalogs');
 
 Artisan::command('peso:import-verified-vacancies', function () {
     $rows = json_decode(file_get_contents(database_path('data/verified-vacancies.json')), true, 512, JSON_THROW_ON_ERROR);
-    DB::transaction(function () use ($rows) {
+    $importedAt = now()->startOfSecond();
+    DB::transaction(function () use ($rows, $importedAt) {
         foreach ($rows as $row) {
             if (! VacancySources::allows($row['source_url'])) {
                 throw new RuntimeException('Unexpected source host.');
             }
+            if (Vacancy::where('source_url', $row['source_url'])->where(fn ($q) => $q->whereNotNull('owner_id')->orWhere('external_application', false))->exists()) {
+                throw new RuntimeException('A source identity conflicts with an owned vacancy.');
+            }
             foreach ($row['skills'] as $skill) {
                 Skill::firstOrCreate(['name' => $skill]);
             }
-            Vacancy::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => null, 'deadline' => null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true]);
+            Vacancy::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => $row['slots'] ?? null, 'deadline' => $row['deadline'] ?? null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true, 'updated_at' => $importedAt]);
         }
+        Vacancy::currentSource()->where('external_application', true)->whereNull('owner_id')->where('status', 'published')->where('updated_at', '<', $importedAt)->update(['status' => 'draft']);
     });
-    $this->info(count($rows).' reviewed Pasay PESO listings imported. Confirm availability and application requirements on each official source page. No local partner account or referral was fabricated.');
+    $this->info(count($rows).' reviewed official PESO/government listings imported. Confirm availability and application requirements on each official source page. No local partner account or referral was fabricated.');
 })->purpose('Import researched official-source job listings without inventing deadlines, positions or PESO relationships');
 
 Artisan::command('peso:import-verified-public-resources', function () {

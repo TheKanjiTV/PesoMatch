@@ -12,17 +12,17 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
     (v) => !v.is_sample && v.external_application,
   )
   expect(official.length).toBeGreaterThanOrEqual(10)
-  const vacancy = official[0]
-  expect(vacancy.source_url).toMatch(
-    /^https:\/\/pasay.gov.ph\/peso-jobs\//,
+  const vacancy = official.find((v) =>
+    v.source_url.startsWith("https://pasay.gov.ph/peso-jobs/"),
   )
+  expect(vacancy.source_url).toMatch(/^https:\/\/pasay.gov.ph\/peso-jobs\//)
   expect(vacancy.deadline).toBeNull()
   expect(vacancy.slots).toBeNull()
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto(`/jobs/${vacancy.id}`)
   await expect(
     page.getByRole("link", {
-      name: "View official PESO listing & apply",
+      name: "View official listing & apply",
     }),
   ).toHaveAttribute("href", vacancy.source_url)
   await expect(

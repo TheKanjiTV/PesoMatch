@@ -48,7 +48,7 @@ class VerifiedPublicResourcesTest extends TestCase
     {
         $this->artisan('db:seed', ['--class' => 'EmploymentSampleSeeder'])->assertSuccessful();
         $this->artisan('peso:import-verified-vacancies')->assertSuccessful();
-        $this->artisan('peso:import-verified-training')->assertSuccessful();
+        $this->artisan('peso:import-verified-training', ['--catalog' => 'online'])->assertSuccessful();
         $public = $this->getJson('/api/public/catalog')->assertOk()->json();
         foreach (array_merge($public['vacancies'], $public['training'], $public['events']) as $record) {
             $this->assertFalse($record['is_sample']);

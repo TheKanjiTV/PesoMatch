@@ -13,6 +13,8 @@ use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
 use App\Services\EmploymentMatcher;
+use App\Services\TrainingSources;
+use App\Services\VacancySources;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -92,6 +94,10 @@ class EmploymentController extends Controller
             $q->available();
         }
         $this->searchCatalog($q, $r, ['title', 'organization', 'location', 'skills', 'description']);
+        if ($r->query('availability') === 'source_lists_open') {
+            $q->where('external_application', true)->where(fn ($source) => $source->where('source_url', 'like', VacancySources::NEGROS_PREFIX.'%')->orWhere('source_url', 'like', VacancySources::ORIENTAL.'%'))
+                ->whereDate('deadline', '>=', today())->where('source_checked_at', '>=', now()->subDays(7));
+        }
         if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
             $q->where('status', $r->query('status'));
         }
@@ -137,7 +143,14 @@ class EmploymentController extends Controller
         } elseif (! $this->staff($r)) {
             $q->available();
         }
-        $this->searchCatalog($q, $r, ['title', 'provider', 'location', 'skills']);
+        $this->searchCatalog($q, $r, ['title', 'provider', 'location', 'skills', 'description']);
+        $catalogSources = ['registered_program' => TrainingSources::REGISTERED,
+            'online_course' => 'TESDA Online Program', 'overseas_training' => TrainingSources::OVERSEAS];
+        if (isset($catalogSources[$r->query('catalog')])) {
+            $q->where('source_name', $catalogSources[$r->query('catalog')]);
+        } elseif ($r->query('catalog') === 'partner_program') {
+            $q->where('external_enrollment', false);
+        }
         if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
             $q->where('status', $r->query('status'));
         }
@@ -151,6 +164,7 @@ class EmploymentController extends Controller
         if ($program?->exists && ! $this->staff($r)) {
             abort_unless($program->owner_id === $r->user()->id, 403);
         }
+        abort_if($program?->external_enrollment, 422, 'Source listings are maintained through the researched source import.');
         $data = $r->validate(['title' => 'required|string|max:160', 'provider' => 'required|string|max:160', 'location' => 'required|string|max:160', 'mode' => ['required', Rule::in(['In person', 'Online', 'Blended'])], 'description' => 'required|string|max:8000', 'requirements' => 'required|string|max:4000', 'skills' => 'required|array|min:1|max:30', 'skills.*' => 'required|string|max:100|distinct:ignore_case', 'capacity' => 'required|integer|min:1|max:10000', 'starts_on' => ($program?->exists ? 'required|date' : 'required|date|after_or_equal:today'), 'ends_on' => 'required|date|after_or_equal:starts_on', 'schedule' => 'required|string|max:200', 'fee' => 'required|numeric|min:0|max:1000000', 'status' => ['required', Rule::in(['draft', 'pending_review', 'published', 'closed'])]]);
         if (! $this->staff($r)) {
             $data['status'] = $data['status'] === 'closed' ? 'closed' : 'pending_review';

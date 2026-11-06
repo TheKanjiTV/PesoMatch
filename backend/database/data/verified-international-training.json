@@ -1,0 +1,23 @@
+[
+  {
+    "title": "JLPT N3 Examination Preparation · OFWs in Japan",
+    "provider": "MWO Osaka and TESDA National Language Skills Center",
+    "location": "Western and central Japan · OFW eligibility applies",
+    "mode": "Confirm delivery mode",
+    "description": "Official TESDA-linked Japanese-language review for eligible OFWs in MWO Osaka jurisdiction. The announcement states that registration is ongoing, with screening and orientation before training in November 2026, in preparation for the 6 December 2026 JLPT N3 examination. Reconfirm whether registration and places remain available. The separately announced January 2027 A1 program is not treated as an open intake.",
+    "requirements": "For OFWs in western and central Japan. Interview, screening and orientation apply. Check the official announcement for registration instructions. Maximum announced cohort size is 75; this is not a count of remaining places.",
+    "schedule": "November 2026 · exact training dates and intake must be confirmed",
+    "fee": 0,
+    "skills": [
+      "Japanese Language"
+    ],
+    "capacity": null,
+    "starts_on": null,
+    "ends_on": null,
+    "source_name": "MWO Osaka · TESDA National Language Skills Center",
+    "source_url": "https://mwo-osaka.dmw.gov.ph/2026/09/26/free-jlpt-n3-examination-preparation-training-program/",
+    "checked_at": "2026-11-06T22:57:49+08:00",
+    "record_type": "overseas_training",
+    "evidence_sha256": "64b54c035d8797252355691a77e2017b1c5fbe8f74828c363eb932a81ce4f3ee"
+  }
+]

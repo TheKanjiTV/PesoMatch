@@ -146,7 +146,10 @@ def main():
         (evidence / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if args.write:
         data = ROOT / "backend/database/data"
-        (data / "verified-vacancies.json").write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        current = json.loads((data / "verified-vacancies.json").read_text(encoding="utf-8"))
+        other_sources = [r for r in current if urllib.parse.urlsplit(r['source_url']).hostname != 'pasay.gov.ph']
+        merged = {r['source_url']:r for r in other_sources + rows}
+        (data / "verified-vacancies.json").write_text(json.dumps(list(merged.values()), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         (data / "verified-peso-vacancy-coverage.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))
 

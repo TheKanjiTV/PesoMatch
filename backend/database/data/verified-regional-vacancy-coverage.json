@@ -1,0 +1,20 @@
+{
+  "review_date": "2026-11-06",
+  "sources": [
+    {
+      "name": "PESO Negros Occidental",
+      "official_endorsement": "https://www.negros-occ.gov.ph/negros-jobs/",
+      "observed_detail_urls": 54,
+      "included": 54
+    },
+    {
+      "name": "PESO Cauayan City",
+      "source_url": "https://jobs.cityofcauayan.gov.ph/pages/jobs.php",
+      "public_job_cards": 1,
+      "included": 0,
+      "limitation": "Detail access requires sign-in; no application deadline confirmed"
+    }
+  ],
+  "excluded": [],
+  "search_errors": []
+}

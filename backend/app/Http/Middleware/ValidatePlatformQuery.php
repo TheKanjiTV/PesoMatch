@@ -18,6 +18,8 @@ class ValidatePlatformQuery
                 'status' => ['sometimes', 'nullable', 'string', Rule::in(['all', 'draft', 'pending_review', 'published', 'closed'])],
                 'saved' => 'sometimes|boolean',
                 'include_samples' => 'sometimes|boolean',
+                'catalog' => ['sometimes', Rule::in(['all', 'online_course', 'registered_program', 'overseas_training', 'partner_program'])],
+                'availability' => ['sometimes', Rule::in(['all', 'source_lists_open'])],
             ], [
                 'search.max' => 'Use 200 characters or fewer.',
                 'search.not_regex' => 'Remove line breaks or control characters from your search.',
