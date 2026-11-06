@@ -1,9 +1,17 @@
 import { useState } from "react"
+
 import { CollectionNotice } from "./CollectionNotice.jsx"
+
 import { Link, useSearchParams } from "react-router"
+
 import { useAuth } from "../context/AuthContext.jsx"
+
 import { api, useResource } from "./api.js"
+
 import { ResourceState } from "./ResourceState.jsx"
+
+import { RecordsSkeleton } from "./LoadingStates.jsx"
+
 import {
   Badge,
   date,
@@ -20,98 +28,148 @@ import {
 
 const field = (name, label, type = "text", extra = {}) => ({
   name,
+
   label,
+
   type,
+
   ...extra,
 })
+
 const notes = field("notes", "Notes / reason", "textarea", { minLength: 5 })
+
 const configs = {
   referrals: {
     title: "Job Matching & Referral",
+
     description:
       "PESO reviews requests, refers candidates, and follows employer interview and offer updates.",
   },
+
   enrollments: {
     title: "Training Enrollment",
+
     description:
       "Follow enrollment review, confirmation, training progress, and provider-recorded completion.",
   },
+
   placements: {
     title: "Employment Facilitation & Placement",
+
     description:
       "Placements are recorded by PESO after an employer offer and evidence of the employment start.",
   },
+
   outcomes: {
     title: "Monitoring of Jobseeker Employment Outcomes",
+
     description:
       "Report current employment status. PESO verification is shown separately from self-reported information.",
   },
+
   services: {
     title: "PESO Services",
+
     description:
       "Request career counseling, assessments, orientation, livelihood referrals, reintegration, or employment program support.",
   },
 }
+
 const outcomeFields = [
   field("status", "Employment status", "text", {
     options: [
       "employed",
+
       "self_employed",
+
       "unemployed",
+
       "underemployed",
+
       "in_training",
+
       "not_in_labor_force",
     ],
   }),
+
   field("reported_on", "Status as of", "date"),
+
   field("organization", "Employer / business", "text", { required: false }),
+
   field("job_title", "Job title / occupation", "text", { required: false }),
+
   notes,
 ]
+
 const referralNext = {
   requested: ["referred", "not_selected"],
+
   referred: ["interviewing", "offered", "not_selected"],
+
   interviewing: ["offered", "not_selected"],
+
   offered: ["not_selected"],
 }
+
 const enrollmentNext = {
   requested: ["confirmed", "rejected"],
+
   confirmed: ["in_progress"],
+
   in_progress: ["completed"],
 }
+
 const serviceNext = {
   requested: ["scheduled", "in_progress", "cancelled"],
+
   scheduled: ["in_progress", "completed", "cancelled"],
+
   in_progress: ["completed", "cancelled"],
 }
+
 const terminal = [
   "placed",
+
   "not_selected",
+
   "withdrawn",
+
   "completed",
+
   "rejected",
+
   "cancelled",
 ]
+
 export function RecordsPage({ kind }) {
   const { user } = useAuth(),
     staff = staffRole(user.role),
     jobseeker = user.role === "jobseeker"
+
   const r = useResource(`/${kind}`)
+
   const [editor, setEditor] = useState(null),
     [message, setMessage] = useState(""),
     [search, setSearch] = useState("")
+
   const registry = useResource(
     staff && kind === "outcomes" ? "/jobseekers" : "/summary",
   )
+
   const summary = useResource("/summary")
+
   const config = configs[kind]
+
   const placements = useResource(
     kind === "outcomes" ? "/placements" : "/summary",
   )
+
   const [params] = useSearchParams()
+
   const records = (r.data?.data || []).filter((row) =>
     JSON.stringify(row).toLowerCase().includes(search.toLowerCase()),
   )
+
   function start(row, action = "update") {
     let fields = [],
       initial = {},
@@ -119,176 +177,254 @@ export function RecordsPage({ kind }) {
       method = "PATCH",
       heading = "Update record",
       help = "Every update is saved to Laravel and recorded in the audit log."
+
     if (kind === "referrals") {
       if (action === "placement") {
         path += "/placement"
+
         method = "POST"
+
         heading = "Verify employment placement"
+
         fields = [
           field("started_on", "Employment start date", "date"),
+
           field("employment_type", "Employment type", "text", {
             options: [
               "Full-time",
+
               "Part-time",
+
               "Contractual",
+
               "Seasonal",
+
               "Internship",
             ],
           }),
+
           field("follow_up_on", "Follow-up date", "date"),
+
           field("evidence", "Verification evidence / source", "textarea", {
             minLength: 10,
           }),
         ]
+
         help =
           "Confirm employment with the employer or jobseeker before recording placement. Record the evidence source."
       } else {
         let options = jobseeker ? ["withdrawn"] : referralNext[row.status] || []
+
         if (user.role === "employer")
           options = options.filter((s) => s !== "referred")
+
         heading = "Update referral"
+
         fields = [
           field("status", "Next referral status", "text", { options }),
+
           field(
             "interview_at",
+
             "Interview date & time (Philippine time)",
+
             "datetime-local",
+
             { required: false },
           ),
+
           notes,
         ]
+
         initial = { status: options[0] }
       }
     } else if (kind === "enrollments") {
       heading = "Update training enrollment"
+
       const options = jobseeker
         ? ["withdrawn"]
         : enrollmentNext[row.status] || []
+
       fields = [
         field("status", "Enrollment status", "text", { options }),
+
         field(
           "certificate_reference",
+
           "Provider completion reference",
+
           "text",
+
           { required: false },
         ),
+
         notes,
       ]
+
       initial = { status: options[0] }
+
       help =
         "Provider completion reference is required when marking training completed. This record does not issue a TESDA National Certificate."
     } else if (kind === "outcomes") {
       if (action === "verify") {
         path += "/verify"
+
         heading = "Verify employment outcome"
+
         fields = [
           field(
             "verification_notes",
+
             "Evidence / verification source",
+
             "textarea",
+
             { minLength: 10 },
           ),
         ]
       } else {
         heading = "Report employment status"
+
         path = "/outcomes"
+
         method = "POST"
+
         fields = [
           ...(staff
             ? [
                 field("user_id", "Jobseeker", "text", {
                   options: (registry.data?.data || []).map((u) => ({
                     value: u.id,
+
                     label: u.name,
                   })),
                 }),
               ]
             : []),
+
           field("placement_id", "Related placement (optional)", "text", {
             required: false,
+
             options: (placements.data?.data || []).map((p) => ({
               value: p.id,
+
               label: `#${p.id} · ${p.user?.name} · ${p.referral?.vacancy?.title}`,
             })),
           }),
+
           ...outcomeFields,
         ]
+
         initial = {
           reported_on: new Date().toLocaleDateString("en-CA", {
             timeZone: "Asia/Manila",
           }),
+
           placement_id: params.get("placement") || "",
+
           user_id: params.get("jobseeker") || "",
         }
+
         help =
           "Report the current status and how it was obtained. Link a placement to complete its due follow-up. A report remains unverified until a PESO officer verifies it."
       }
     } else if (kind === "services") {
       if (!row) {
         heading = "Request PESO assistance"
+
         path = "/services"
+
         method = "POST"
+
         fields = [
           field("service", "PESO service", "text", {
             options: summary.data?.services_catalog || [],
           }),
+
           field("details", "Tell PESO what support you need", "textarea", {
             minLength: 10,
           }),
         ]
       } else {
         heading = "Update PESO service request"
+
         fields = [
           field("status", "Service status", "text", {
             options: jobseeker ? ["cancelled"] : serviceNext[row.status],
           }),
+
           ...(staff
             ? [
                 field("assigned_to", "Assigned PESO officer ID", "number", {
                   required: false,
+
                   min: 1,
                 }),
+
                 field(
                   "appointment_at",
+
                   "Appointment (Philippine time)",
+
                   "datetime-local",
+
                   { required: false },
                 ),
               ]
             : []),
+
           field(
             "staff_notes",
+
             jobseeker
               ? "Cancellation reason"
               : "Service notes / referral destination",
+
             "textarea",
           ),
         ]
+
         initial = {
           status: jobseeker ? "cancelled" : serviceNext[row.status]?.[0],
         }
       }
     }
+
     setEditor({
       key: `${row?.id || "new"}-${action}`,
+
       title: heading,
+
       fields,
+
       initial,
+
       path,
+
       method,
+
       help,
     })
   }
+
   async function save(data) {
     const body = { ...data }
+
     if (body.interview_at) body.interview_at += ":00+08:00"
+
     if (body.appointment_at) body.appointment_at += ":00+08:00"
+
     if (body.assigned_to === "") body.assigned_to = null
+
     if (body.placement_id === "") body.placement_id = null
+
     await api(editor.path, editor.method, body)
+
     setMessage("Record saved successfully.")
+
     await r.reload()
   }
+
   return (
     <>
       <Heading
@@ -350,7 +486,7 @@ export function RecordsPage({ kind }) {
           onChange={(e) => setSearch(e.target.value)}
         />
       </label>
-      <ResourceState resource={r}>
+      <ResourceState resource={r} skeleton={<RecordsSkeleton kind={kind} />}>
         {!records.length ? (
           <Empty title="No service records found">
             {kind === "referrals" ? (
@@ -394,7 +530,9 @@ export function RecordsPage({ kind }) {
                       : kind === "outcomes"
                         ? row.placement?.referral?.vacancy
                         : null
+
               const heading = related?.title || row.service || human(row.status)
+
               return (
                 <article
                   key={row.id}

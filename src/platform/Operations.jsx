@@ -16,6 +16,12 @@ import { searchSuggestions } from "./search.js"
 
 import { ResourceState } from "./ResourceState.jsx"
 
+import {
+  EventsSkeleton,
+  LaborMarketSkeleton,
+  RegistrySkeleton,
+  TableSkeleton,
+} from "./LoadingStates.jsx"
 
 import {
   Badge,
@@ -142,7 +148,7 @@ export function EventsPage() {
           onSave={save}
         />
       )}
-      <ResourceState resource={r}>
+      <ResourceState resource={r} skeleton={<EventsSkeleton />}>
         {!r.data?.data.length ? (
           <Empty title="No events published yet" />
         ) : (
@@ -297,6 +303,7 @@ export function LaborMarketPage() {
       />
       <ResourceState
         resource={r}
+        skeleton={<LaborMarketSkeleton staff={staff} />}
       >
         {r.data && (
           <>
@@ -552,7 +559,7 @@ export function RegistryPage() {
           )}
         />
       </div>
-      <ResourceState resource={r}>
+      <ResourceState resource={r} skeleton={<RegistrySkeleton />}>
         {!rows.length ? (
           <Empty title="No registered jobseekers found" />
         ) : (
@@ -753,6 +760,7 @@ export function AccessPage() {
       )}
       <ResourceState
         resource={r}
+        skeleton={<TableSkeleton kind="access" columns={4} />}
       >
         <div className="overflow-x-auto rounded-lg border border-border bg-card">
           <table className="w-full min-w-[600px] text-left text-sm">
@@ -803,6 +811,7 @@ export function AuditPage() {
       />
       <ResourceState
         resource={r}
+        skeleton={<TableSkeleton kind="audit" columns={5} />}
       >
         {!r.data?.data.length ? (
           <Empty title="No audited changes yet" />

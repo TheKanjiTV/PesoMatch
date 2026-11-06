@@ -1,7 +1,15 @@
-import { Loading, Notice, secondaryStyle } from "./ui.jsx"
+import { Notice, secondaryStyle } from "./ui.jsx"
+import { PageSkeleton } from "./LoadingStates.jsx"
+import { useLocation } from "react-router"
 
-export function ResourceState({ resource, children, paginate = true }) {
-  if (resource.loading) return <Loading />
+export function ResourceState({
+  resource,
+  children,
+  paginate = true,
+  skeleton,
+}) {
+  const { pathname } = useLocation()
+  if (resource.loading) return skeleton || <PageSkeleton pathname={pathname} />
 
   if (resource.error)
     return (

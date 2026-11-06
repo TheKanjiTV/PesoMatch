@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router"
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useNavigation,
+} from "react-router"
+import { PageSkeleton } from "./LoadingStates.jsx"
+import { usesLogoLoading } from "./loading.js"
 
 import {
   ArrowUpRight,
@@ -104,12 +113,16 @@ const nav = [
 ]
 
 // CSS visibility transitions may still be hidden in the first animation frame.
+
 // Keep focus synchronized with the existing motion and cancel on navigation.
+
 function focusAfterLayout(resolveTarget) {
   let frame,
     attempts = 0
+
   const focus = () => {
     const target = resolveTarget()
+
     if (
       target?.isConnected &&
       target.getClientRects().length &&
@@ -117,15 +130,20 @@ function focusAfterLayout(resolveTarget) {
       !target.closest("[inert]")
     ) {
       target.focus({ preventScroll: true })
+
       if (document.activeElement === target) return
     }
+
     if (++attempts < 30) frame = requestAnimationFrame(focus)
   }
+
   frame = requestAnimationFrame(focus)
+
   return () => cancelAnimationFrame(frame)
 }
 
 export function PlatformLayout() {
+  const navigation = useNavigation()
   const { user, logout } = useAuth()
 
   const [open, setOpen] = useState(false),
@@ -133,25 +151,34 @@ export function PlatformLayout() {
 
   const location = useLocation(),
     navigate = useNavigate()
+
   const drawerRef = useRef(null)
+
   const [mobile, setMobile] = useState(
     () => matchMedia("(max-width: 1023px)").matches,
   )
+
   const triggerRef = useRef(null)
+
   const modalOpen = open && mobile
 
   function toggleNavigation(event) {
     if (!open) triggerRef.current = event.currentTarget
+
     setOpen(!open)
   }
 
   useEffect(() => {
     const query = matchMedia("(max-width: 1023px)")
+
     const resize = () => {
       setMobile(query.matches)
+
       setOpen(false)
     }
+
     query.addEventListener("change", resize)
+
     return () => query.removeEventListener("change", resize)
   }, [])
 
@@ -159,9 +186,11 @@ export function PlatformLayout() {
     const cancelFocusMain = open
       ? focusAfterLayout(() => {
           const main = document.querySelector("#workspace-main")
+
           if (main) {
             main.tabIndex = -1
           }
+
           return main
         })
       : null
@@ -171,6 +200,7 @@ export function PlatformLayout() {
     window.scrollTo(0, 0)
 
     const pathname = location.pathname
+
     const pageTitle =
       nav.find((n) => n[1] === pathname)?.[0] ||
       (pathname.startsWith("/jobs/")
@@ -180,7 +210,9 @@ export function PlatformLayout() {
           : pathname === "/profile"
             ? "My Jobseeker Profile"
             : "Account Settings")
+
     document.title = `${pageTitle} | PESO Employment Services`
+
     return () => {
       cancelFocusMain?.()
     }
@@ -190,12 +222,16 @@ export function PlatformLayout() {
     if (!modalOpen) return
 
     const openedPath = window.location.pathname
+
     const focusable = () =>
       [
         ...drawerRef.current.querySelectorAll("a[href], button:not(:disabled)"),
       ].filter((element) => element.getClientRects().length)
+
     // The opener becomes inert in this commit. Focus after the click's default
+
     // action and the drawer's visibility transition have been applied.
+
     const cancelFocus = focusAfterLayout(() => focusable()[0])
 
     const close = (e) => {
@@ -204,16 +240,19 @@ export function PlatformLayout() {
 
         e.preventDefault()
       }
+
       if (e.key === "Tab") {
         const elements = focusable(),
           first = elements[0],
           last = elements.at(-1)
+
         if (
           e.shiftKey &&
           (document.activeElement === first ||
             !drawerRef.current.contains(document.activeElement))
         ) {
           e.preventDefault()
+
           last?.focus()
         } else if (
           !e.shiftKey &&
@@ -221,6 +260,7 @@ export function PlatformLayout() {
             !drawerRef.current.contains(document.activeElement))
         ) {
           e.preventDefault()
+
           first?.focus()
         }
       }
@@ -235,8 +275,11 @@ export function PlatformLayout() {
 
     return () => {
       cancelFocus()
+
       document.removeEventListener("keydown", close)
+
       document.body.style.overflow = previousOverflow
+
       if (
         window.location.pathname === openedPath &&
         triggerRef.current?.isConnected
@@ -386,7 +429,15 @@ export function PlatformLayout() {
           className="mx-auto max-w-[1500px] px-5 py-8 sm:px-9 lg:py-10"
         >
           {error && <Notice error>{error}</Notice>}
-          <Outlet />
+          {navigation.state === "loading" &&
+          !usesLogoLoading(navigation.location?.pathname) ? (
+            <PageSkeleton
+              pathname={navigation.location?.pathname}
+              role={user.role}
+            />
+          ) : (
+            <Outlet />
+          )}
         </main>
         <footer className="mx-5 mt-10 border-t border-border py-6 text-[11px] leading-5 text-muted-foreground sm:mx-9">
           <p className="max-w-2xl">{title}</p>
@@ -398,8 +449,11 @@ export function PlatformLayout() {
             <span>© {new Date().getFullYear()} PesoMatch</span>
             {[
               ["Privacy", "/privacy"],
+
               ["Terms", "/terms"],
+
               ["Cookies", "/cookies"],
+
               ["Official help", "/help"],
             ].map(([label, to]) => (
               <Link key={to} to={to} className="underline underline-offset-4">

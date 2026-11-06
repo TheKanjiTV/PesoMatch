@@ -1,5 +1,7 @@
 import { Link } from "react-router"
+
 import { useState } from "react"
+
 import {
   ArrowRight,
   BookOpen,
@@ -8,9 +10,19 @@ import {
   LifeBuoy,
   TrendingUp,
 } from "lucide-react"
+
 import { useAuth } from "../context/AuthContext.jsx"
+
 import { useResource } from "./api.js"
+
 import { ResourceState } from "./ResourceState.jsx"
+
+import {
+  OverviewSkeleton,
+  StatsSkeleton,
+  EventsSkeleton,
+} from "./LoadingStates.jsx"
+
 import {
   ActionLink,
   Badge,
@@ -27,26 +39,38 @@ import {
 
 export function OverviewPage() {
   const [pathwayOpen, setPathwayOpen] = useState(false)
+
   const { user } = useAuth(),
     staff = staffRole(user.role)
+
   const r = useResource("/summary"),
     events = useResource("/events")
+
   const partner = ["employer", "training_provider"].includes(user.role)
+
   const tasks = staff
     ? [
         [
           "Review the jobseeker registry",
+
           "Open profiles, skills, and preferences to support an informed referral.",
+
           "/jobseekers",
         ],
+
         [
           "Process employment referrals",
+
           "Review requests, schedule interviews, and verify placement evidence.",
+
           "/referrals",
         ],
+
         [
           "Follow up employment outcomes",
+
           "Check reported status, verify evidence, and review due follow-ups.",
+
           "/outcomes",
         ],
       ]
@@ -54,17 +78,25 @@ export function OverviewPage() {
       ? [
           [
             "Manage your vacancies",
+
             "Submit a vacancy for PESO review and keep its requirements current.",
+
             "/jobs",
           ],
+
           [
             "Coordinate referred candidates",
+
             "Record interview schedules, hiring offers, and selection results.",
+
             "/referrals",
           ],
+
           [
             "Review recorded placements",
+
             "PESO verifies the employment start and schedules follow-up.",
+
             "/placements",
           ],
         ]
@@ -72,37 +104,56 @@ export function OverviewPage() {
         ? [
             [
               "Manage training programs",
+
               "Publish requirements, skills, schedules, fees, and capacity for PESO review.",
+
               "/training",
             ],
+
             [
               "Review enrollment requests",
+
               "Confirm eligible learners, update progress, and record completion.",
+
               "/enrollments",
             ],
+
             [
               "Coordinate community programs",
+
               "View scheduled orientations, livelihood activities, and job fairs.",
+
               "/events",
             ],
           ]
         : [
             [
               "Find work that fits your profile",
+
               "Review match explanations and ask PESO to facilitate a referral.",
+
               "/matches",
             ],
+
             [
               "Build skills for your next opportunity",
+
               "Explore training and request enrollment with a provider.",
+
               "/training",
             ],
+
             [
               "Keep your employment status current",
+
               "Report changes so PESO can provide useful follow-up support.",
+
               "/outcomes",
             ],
           ]
+
+  if (r.loading || events.loading) return <OverviewSkeleton role={user.role} />
+
   return (
     <>
       <div data-tour="overview-heading">
@@ -202,9 +253,13 @@ export function OverviewPage() {
           >
             {[
               "Registration & profiling",
+
               "Vacancies, matching & referral",
+
               "Training enrollment & upskilling",
+
               "Employment facilitation & placement",
+
               "Employment outcome monitoring",
             ].map((s, i) => (
               <li key={s} className="flex items-start gap-3">
@@ -218,26 +273,38 @@ export function OverviewPage() {
         </div>
       </div>
       {!partner && (
-        <ResourceState resource={r}>
+        <ResourceState resource={r} skeleton={<StatsSkeleton />}>
           <div className="overview-stats mb-10 grid grid-cols-2 xl:grid-cols-4">
             {[
               ["Referrals", r.data?.referrals, "/referrals", FileCheck2],
+
               [
                 "Training enrollments",
+
                 r.data?.enrollments,
+
                 "/enrollments",
+
                 BookOpen,
               ],
+
               [
                 "Verified placements",
+
                 r.data?.placements,
+
                 "/placements",
+
                 BriefcaseBusiness,
               ],
+
               [
                 "Open service requests",
+
                 r.data?.services,
+
                 "/services",
+
                 LifeBuoy,
               ],
             ].map(([label, value, to, Icon]) => (
@@ -291,10 +358,16 @@ export function OverviewPage() {
               View all
             </Link>
           </div>
-          <ResourceState resource={events}>
+          <ResourceState
+            resource={events}
+            skeleton={<EventsSkeleton overview />}
+          >
             {events.data?.data
+
               .filter((e) => e.status === "published")
+
               .slice(0, 3)
+
               .map((e) => (
                 <article
                   key={e.id}

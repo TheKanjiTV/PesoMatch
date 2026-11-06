@@ -1,16 +1,26 @@
 import { useState } from "react"
+
 import { Link } from "react-router"
+
 import { api, useResource } from "./api.js"
+
 import { ResourceState } from "./ResourceState.jsx"
+
+import { PrivacySkeleton } from "./LoadingStates.jsx"
+
 import { Badge, Editor, Notice, human, date, secondaryStyle } from "./ui.jsx"
 
 export function PrivacyRequests({ administration = false }) {
   const r = useResource(
     administration ? "/privacy/requests?scope=all" : "/privacy/requests",
+
     "/api",
   )
+
   const [editor, setEditor] = useState(null)
+
   const [message, setMessage] = useState("")
+
   return (
     <section className="mt-8 rounded-lg border border-border bg-card p-6">
       <h2 className="text-base font-semibold text-primary">
@@ -53,36 +63,54 @@ export function PrivacyRequests({ administration = false }) {
               ? [
                   {
                     name: "status",
+
                     label: "Review status",
+
                     options: ["in_review", "completed", "declined"].map(
                       (value) => ({ value, label: human(value) }),
                     ),
                   },
+
                   {
                     name: "response",
+
                     label: "Response and action taken",
+
                     type: "textarea",
+
                     minLength: 10,
+
                     maxLength: 2000,
                   },
                 ]
               : [
                   {
                     name: "kind",
+
                     label: "Request type",
+
                     options: [
                       "access",
+
                       "correction",
+
                       "deletion",
+
                       "restriction",
+
                       "question",
                     ].map((value) => ({ value, label: human(value) })),
                   },
+
                   {
                     name: "details",
+
                     label: "Details (optional)",
+
                     type: "textarea",
+
                     required: false,
+
                     maxLength: 2000,
                   },
                 ]
@@ -93,21 +121,26 @@ export function PrivacyRequests({ administration = false }) {
               administration
                 ? `/privacy/requests/${editor.id}`
                 : "/privacy/requests",
+
               administration ? "PATCH" : "POST",
+
               v,
+
               "/api",
             )
+
             setMessage(
               administration
                 ? "Privacy response recorded."
                 : "Privacy request recorded. You can follow its status here.",
             )
+
             await r.reload()
           }}
         />
       )}
       <div className="mt-5">
-        <ResourceState resource={r}>
+        <ResourceState resource={r} skeleton={<PrivacySkeleton />}>
           {!r.data?.data?.length ? (
             <p className="text-sm text-muted-foreground">
               No privacy requests yet.

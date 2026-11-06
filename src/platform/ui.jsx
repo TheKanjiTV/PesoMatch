@@ -2,10 +2,11 @@ import { useEffect, useId, useRef, useState } from "react"
 
 import { Link } from "react-router"
 
-import { ArrowRight, Check, CircleAlert, LoaderCircle, X } from "lucide-react"
+import { ArrowRight, Check, CircleAlert, X } from "lucide-react"
 
 import { PesoMark } from "./Logo.jsx"
 
+export { LogoLoading } from "./LoadingStates.jsx"
 
 export const title =
   "AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO)"
@@ -208,18 +209,6 @@ export function Empty({ title = "No records yet", children, action }) {
       </p>
       {action && <div className="mt-5">{action}</div>}
     </div>
-  )
-}
-
-export function Loading() {
-  return (
-    <p
-      role="status"
-      className="flex items-center gap-3 py-12 text-sm text-muted-foreground"
-    >
-      <LoaderCircle className="size-5 animate-spin" />
-      Loading your service records…
-    </p>
   )
 }
 

@@ -7,6 +7,10 @@ import {
   useLocation,
 } from "react-router"
 
+import { RouteScreen } from "./platform/RouteScreen.jsx"
+import { PageSkeleton } from "./platform/LoadingStates.jsx"
+import { usesLogoLoading } from "./platform/loading.js"
+
 import {
   AuthProvider,
   destinationFor,
@@ -15,14 +19,21 @@ import {
 
 import { PlatformLayout } from "./platform/Layout.jsx"
 
-import { ActionLink, Loading, Notice, secondaryStyle } from "./platform/ui.jsx"
+import {
+  ActionLink,
+  LogoLoading,
+  Notice,
+  secondaryStyle,
+} from "./platform/ui.jsx"
 
 import { AppearanceProvider } from "./platform/Appearance.jsx"
 
 import { ConnectionStatus, AppUpdate } from "./platform/AppRuntime.jsx"
 
 import { PageMotion } from "./platform/PageMotion.jsx"
+
 import { RouteMetadata } from "./platform/RouteMetadata.jsx"
+
 import { RouteErrorPage } from "./platform/RouteError.jsx"
 
 function Root() {
@@ -33,17 +44,18 @@ function Root() {
         <RouteMetadata />
         <ConnectionStatus />
         <AppUpdate />
-        <Outlet />
+        <RouteScreen />
       </AuthProvider>
     </AppearanceProvider>
   )
 }
 
 function Session() {
-  const { error, refresh } = useAuth()
+  const { user, error, refresh } = useAuth()
+  const { pathname } = useLocation()
 
   return (
-    <main className="mx-auto max-w-xl px-6 py-24">
+    <main className="mx-auto max-w-[1500px] px-6 py-10">
       {error ? (
         <>
           <Notice error>{error}</Notice>
@@ -54,8 +66,10 @@ function Session() {
             Retry connection
           </button>
         </>
+      ) : usesLogoLoading(pathname) ? (
+        <LogoLoading fullScreen />
       ) : (
-        <Loading />
+        <PageSkeleton pathname={pathname} role={user?.role} />
       )}
     </main>
   )
@@ -65,6 +79,7 @@ function RequireAccount({ onboardingFlow = false }) {
   const { user, onboarding, loading, error } = useAuth()
 
   const { step } = useParams()
+
   const { pathname } = useLocation()
 
   if (loading || (!user && error)) return <Session />
@@ -118,10 +133,13 @@ function Destination() {
 }
 
 // Coarse feature boundaries: keep path matching/role gates synchronous while
+
 // React Router waits for the selected feature before committing navigation.
+
 function feature(load, name = "default", props = {}, roles) {
   return async () => {
     const Page = (await load())[name]
+
     return {
       Component: () =>
         roles ? (
@@ -137,71 +155,108 @@ function feature(load, name = "default", props = {}, roles) {
 
 function PageLoading() {
   return (
-    <main className="mx-auto max-w-xl px-6 py-24">
-      <Loading />
+    <main className="mx-auto max-w-[1500px] px-6 py-10">
+      {usesLogoLoading(window.location.pathname) ? (
+        <LogoLoading fullScreen />
+      ) : (
+        <PageSkeleton pathname={window.location.pathname} />
+      )}
     </main>
   )
 }
 
 const auth = () => import("./app/auth/AuthPages.jsx")
+
 const catalog = () => import("./platform/Catalog.jsx")
+
 const records = () => import("./platform/Records.jsx")
+
 const operations = () => import("./platform/Operations.jsx")
+
 const account = () => import("./platform/Account.jsx")
+
 const staff = ["peso_staff", "admin"],
   jobstaff = ["jobseeker", ...staff]
 
 const router = createBrowserRouter([
   {
     Component: Root,
+
     ErrorBoundary: RouteErrorPage,
+
     HydrateFallback: PageLoading,
+
     children: [
       ...["/", "/home"].map((path) => ({
         path,
+
         lazy: feature(() => import("./platform/Landing.jsx")),
       })),
+
       {
         path: "/app",
+
         lazy: feature(() => import("./platform/Install.jsx"), "InstallPage"),
       },
+
       {
         element: <RequireAccount />,
+
         children: [
           {
             Component: PlatformLayout,
+
+            handle: { workspace: true },
+
             children: [
               {
                 path: "/dashboard",
+
                 lazy: feature(
                   () => import("./platform/Overview.jsx"),
+
                   "OverviewPage",
                 ),
               },
+
               ...["/jobs", "/jobs/:id"].map((path) => ({
                 path,
+
                 lazy: feature(catalog, "CatalogPage"),
               })),
+
               ...["/training", "/training/:id"].map((path) => ({
                 path,
+
                 lazy: feature(catalog, "CatalogPage", { kind: "training" }),
               })),
+
               {
                 path: "/matches",
+
                 lazy: feature(catalog, "MatchesPage", {}, ["jobseeker"]),
               },
+
               ...[
                 "referrals",
+
                 "enrollments",
+
                 "placements",
+
                 "outcomes",
+
                 "services",
               ].map((kind) => ({
                 path: "/" + kind,
+
                 lazy: feature(
                   records,
+
                   "RecordsPage",
+
                   { kind },
+
                   kind === "enrollments"
                     ? [...jobstaff, "training_provider"]
                     : ["referrals", "placements"].includes(kind)
@@ -209,87 +264,133 @@ const router = createBrowserRouter([
                       : jobstaff,
                 ),
               })),
+
               { path: "/events", lazy: feature(operations, "EventsPage") },
+
               {
                 path: "/labor-market",
+
                 lazy: feature(operations, "LaborMarketPage"),
               },
+
               {
                 path: "/jobseekers",
+
                 lazy: feature(operations, "RegistryPage", {}, staff),
               },
+
               {
                 path: "/users",
+
                 lazy: feature(operations, "AccessPage", {}, ["admin"]),
               },
+
               {
                 path: "/audit",
+
                 lazy: feature(operations, "AuditPage", {}, ["admin"]),
               },
+
               {
                 path: "/profile",
+
                 lazy: feature(account, "ProfilePage", {}, ["jobseeker"]),
               },
+
               { path: "/settings", lazy: feature(account, "AccountPage") },
             ],
           },
         ],
       },
+
       {
         path: "/jobseeker/onboarding/:step",
+
         element: <RequireAccount onboardingFlow />,
+
         children: [
           {
             index: true,
+
             lazy: feature(
               () => import("./pages/onboarding/OnboardingPage.jsx"),
+
               "OnboardingPage",
             ),
           },
         ],
       },
+
       ...[
         "/jobseeker/onboarding",
+
         "/profile-setup",
+
         "/welcome",
+
         "/verified",
+
         "/staff",
+
         "/staff/*",
+
         "/businesses",
+
         "/businesses/*",
       ].map((path) => ({ path, Component: Destination })),
+
       {
         path: "/jobseeker/profile",
+
         element: <Navigate to="/profile" replace />,
       },
+
       { path: "/jobseeker/*", element: <Navigate to="/dashboard" replace /> },
+
       ...[
         ["/assistance", "/services"],
+
         ["/peso-assistance", "/services"],
+
         ["/skill-analysis", "/matches"],
+
         ["/settings/*", "/settings"],
+
         ["/messages", "/services"],
+
         ["/notifications", "/dashboard"],
+
         ["/search", "/jobs"],
       ].map(([path, to]) => ({ path, element: <Navigate to={to} replace /> })),
+
       {
         lazy: feature(auth, "AuthRoutesLayout"),
+
         children: [
           { path: "/login", lazy: feature(auth, "LoginPage") },
+
           {
             path: "/staff/login",
+
             lazy: feature(auth, "LoginPage", { staffPortal: true }),
           },
+
           { path: "/register", lazy: feature(auth, "RegisterPage") },
+
           { path: "/help", lazy: feature(auth, "HelpPage") },
+
           { path: "/verify-email", lazy: feature(auth, "VerificationPage") },
+
           ...["/forgot-password", "/reset-password", "/password-updated"].map(
             (path) => ({ path, lazy: feature(auth, "ForgotPasswordPage") }),
           ),
+
           ...["/privacy", "/terms", "/cookies"].map((path) => ({
             path,
+
             lazy: feature(auth, "LegalPage"),
           })),
+
           { path: "*", lazy: feature(auth, "NotFoundPage") },
         ],
       },

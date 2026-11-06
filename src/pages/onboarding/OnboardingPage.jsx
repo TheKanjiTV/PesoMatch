@@ -1,3 +1,7 @@
+import { withMinimumLoading } from "../../platform/loading.js"
+
+import { OnboardingSkeleton } from "../../platform/LoadingStates.jsx"
+
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import {
@@ -25,12 +29,7 @@ import { safeAssistanceReturn } from "../../services/assistanceService.js"
 
 import { Alert, AuthButton } from "../../app/auth/components.jsx"
 
-import {
-  Button,
-  Modal,
-  ProgressBar,
-  Skeleton,
-} from "../../components/common/UI.jsx"
+import { Button, Modal, ProgressBar } from "../../components/common/UI.jsx"
 
 import {
   FeedbackProvider,
@@ -40,6 +39,7 @@ import {
 import { useAuth } from "../../context/AuthContext.jsx"
 
 import { ResumePanel } from "../../platform/Resume.jsx"
+
 import { CollectionNotice } from "../../platform/CollectionNotice.jsx"
 
 import { Brand } from "../../platform/ui.jsx"
@@ -187,11 +187,13 @@ function OnboardingFlow() {
     setLoadError("")
 
     try {
-      const [profile, skillResult] = await Promise.all([
-        getOnboarding(),
+      const [profile, skillResult] = await withMinimumLoading(() =>
+        Promise.all([
+          getOnboarding(),
 
-        step === 3 ? getSkills() : Promise.resolve({ data: [] }),
-      ])
+          step === 3 ? getSkills() : Promise.resolve({ data: [] }),
+        ]),
+      )
 
       if (version !== loadVersion.current) return
 
@@ -674,7 +676,7 @@ function OnboardingFlow() {
                 </div>
                 {loading ? (
                   <div className="p-5 sm:p-8">
-                    <Skeleton kind="profile" />
+                    <OnboardingSkeleton step={step} />
                   </div>
                 ) : loadError ? (
                   <div className="space-y-5 p-5 sm:p-8">

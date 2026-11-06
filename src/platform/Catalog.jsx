@@ -33,6 +33,7 @@ import {
 
 import { ResourceState } from "./ResourceState.jsx"
 
+import { CatalogSkeleton, MatchesSkeleton } from "./LoadingStates.jsx"
 
 import { SearchInput } from "./SearchInput.jsx"
 
@@ -393,6 +394,7 @@ export function CatalogPage({ kind = "vacancies" }) {
       )}
       <ResourceState
         resource={r}
+        skeleton={<CatalogSkeleton detail={Boolean(id)} training={training} />}
       >
         {id && !detail ? (
           <Empty title="Record unavailable">
@@ -787,6 +789,7 @@ export function MatchesPage() {
       <ResourceState
         resource={r}
         paginate={tab === "jobs"}
+        skeleton={<MatchesSkeleton training={tab !== "jobs"} />}
       >
         {tab === "jobs" ? (
           <div className="space-y-4">

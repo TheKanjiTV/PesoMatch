@@ -5,10 +5,16 @@ import { FileText, Upload, Trash2 } from "lucide-react"
 import { accountRequest } from "../services/account.js"
 
 import { Notice, primaryStyle, secondaryStyle } from "./ui.jsx"
+
+import { ResumeSkeleton } from "./LoadingStates.jsx"
+
+import { withMinimumLoading } from "./loading.js"
+
 import { CollectionNotice } from "./CollectionNotice.jsx"
 
 export function ResumePanel({ onApplied }) {
   const [resume, setResume] = useState(null),
+    [loading, setLoading] = useState(true),
     [selected, setSelected] = useState([]),
     [file, setFile] = useState(null),
     [busy, setBusy] = useState(false),
@@ -18,19 +24,29 @@ export function ResumePanel({ onApplied }) {
 
   function accept(row) {
     setResume(row)
+
     setSelected(row?.detected.skills.map((s) => s.id) || [])
+
     setMobile(false)
   }
 
   useEffect(() => {
     let active = true
-    accountRequest("/api/jobseeker/resume")
+
+    withMinimumLoading(() => accountRequest("/api/jobseeker/resume"))
+
       .then((r) => {
         if (active) accept(r.data)
       })
+
       .catch((e) => {
         if (active) setError(e.message)
       })
+
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
     return () => {
       active = false
     }
@@ -38,20 +54,27 @@ export function ResumePanel({ onApplied }) {
 
   async function run(action) {
     setBusy(true)
+
     setError("")
+
     setMessage("")
+
     try {
       await action()
     } catch (e) {
       setError(
         Object.values(e.errors || {})
+
           .flat()
+
           .join(" ") || e.message,
       )
     } finally {
       setBusy(false)
     }
   }
+
+  if (loading) return <ResumeSkeleton />
 
   return (
     <section
@@ -102,12 +125,17 @@ export function ResumePanel({ onApplied }) {
         onClick={() =>
           run(async () => {
             const body = new FormData()
+
             body.append("resume", file)
+
             const r = await accountRequest("/api/jobseeker/resume", {
               method: "POST",
+
               body,
             })
+
             accept(r.data)
+
             setMessage(
               "PDF analyzed. Review the evidence before adding skills.",
             )
@@ -202,9 +230,12 @@ export function ResumePanel({ onApplied }) {
 
           {[
             ["Education", resume.detected.education_excerpt],
+
             ["Work experience", resume.detected.experience_excerpt],
           ]
+
             .filter((x) => x[1])
+
             .map(([label, value]) => (
               <details className="mt-4 text-sm" key={label}>
                 <summary className="cursor-pointer font-semibold">
@@ -229,13 +260,18 @@ export function ResumePanel({ onApplied }) {
                 run(async () => {
                   const r = await accountRequest(
                     "/api/jobseeker/resume/apply",
+
                     {
                       method: "POST",
+
                       body: { skills: selected, apply_mobile: mobile },
                     },
                   )
+
                   setResume(r.data)
+
                   setMessage(r.message)
+
                   await onApplied?.(selected)
                 })
               }
@@ -251,8 +287,11 @@ export function ResumePanel({ onApplied }) {
                   await accountRequest("/api/jobseeker/resume", {
                     method: "DELETE",
                   })
+
                   accept(null)
+
                   setFile(null)
+
                   setMessage(
                     "Résumé deleted. Previously added profile skills remain.",
                   )

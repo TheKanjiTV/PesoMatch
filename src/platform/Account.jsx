@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react"
 
+import { withMinimumLoading } from "./loading.js"
+
+import { useResource } from "./api.js"
+
+import { ResourceState } from "./ResourceState.jsx"
+
 import { Link, useNavigate } from "react-router"
 
 import { useAuth } from "../context/AuthContext.jsx"
@@ -23,12 +29,13 @@ import {
   Contact,
   Editor,
   Heading,
-  Loading,
   Notice,
   primaryStyle,
   roles,
   secondaryStyle,
 } from "./ui.jsx"
+
+import { ProfileSkeleton, SettingsSkeleton } from "./LoadingStates.jsx"
 
 export function ProfilePage() {
   const { user, onboarding } = useAuth()
@@ -38,15 +45,25 @@ export function ProfilePage() {
     [skills, setSkills] = useState([])
 
   useEffect(() => {
-    Promise.all([getProfile(), getSkills()])
+    let alive = true
+
+    withMinimumLoading(() => Promise.all([getProfile(), getSkills()]))
 
       .then(([p, s]) => {
+        if (!alive) return
+
         setProfile(p.data)
 
         setSkills(s.data)
       })
 
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        if (alive) setError(e.message)
+      })
+
+    return () => {
+      alive = false
+    }
   }, [])
 
   return (
@@ -58,12 +75,13 @@ export function ProfilePage() {
       <ResumePanel
         onApplied={async () => {
           const r = await getProfile()
+
           setProfile(r.data)
         }}
       />
       {error && <Notice error>{error}</Notice>}
       {!profile && !error ? (
-        <Loading />
+        <ProfileSkeleton />
       ) : (
         profile && (
           <>
@@ -252,16 +270,15 @@ export function AccountPage() {
     navigate = useNavigate()
 
   const [editor, setEditor] = useState(null),
-    [message, setMessage] = useState(""),
-    [mobile, setMobile] = useState("")
+    [message, setMessage] = useState("")
 
-  useEffect(() => {
-    if (user.role === "jobseeker")
-      getProfile()
-        .then((d) => setMobile(d.data.personal.mobile_number))
+  const contact = useResource(
+    user.role === "jobseeker" ? "/jobseeker/profile" : "/auth/user",
 
-        .catch(() => {})
-  }, [user.role])
+    "/api",
+  )
+
+  const mobile = contact.data?.data?.personal?.mobile_number || ""
 
   const fields = {
     account: [
@@ -337,7 +354,7 @@ export function AccountPage() {
         ),
       )
 
-      setMobile(body.mobile_number)
+      await contact.reload()
 
       await refresh()
     }
@@ -348,6 +365,9 @@ export function AccountPage() {
         : "Account information saved.",
     )
   }
+
+  if (!contact.data)
+    return <ResourceState resource={contact} skeleton={<SettingsSkeleton />} />
 
   return (
     <>

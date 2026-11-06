@@ -17,6 +17,8 @@ import {
 
 import { accountRequest } from "../services/account.js"
 
+import { withMinimumLoading } from "./loading.js"
+
 import {
   Brand,
   title,
@@ -26,6 +28,7 @@ import {
   date,
   primaryStyle,
   secondaryStyle,
+  LogoLoading,
 } from "./ui.jsx"
 
 import { AppearanceControls } from "./Appearance.jsx"
@@ -58,21 +61,36 @@ export default function Landing() {
   useEffect(() => {
     document.title = title
 
-    accountRequest("/api/public/catalog")
-      .then(setCatalog)
+    let alive = true
 
-      .catch((e) => setError(e.message))
+    withMinimumLoading(() => accountRequest("/api/public/catalog"))
+
+      .then((data) => {
+        if (alive) setCatalog(data)
+      })
+
+      .catch((e) => {
+        if (alive) setError(e.message)
+      })
+
+    return () => {
+      alive = false
+    }
   }, [])
 
   useEffect(() => {
     if (!open) return
+
     const close = (event) => {
       if (event.key === "Escape") {
         setOpen(false)
+
         document.querySelector('[aria-label="Toggle navigation"]')?.focus()
       }
     }
+
     document.addEventListener("keydown", close)
+
     return () => document.removeEventListener("keydown", close)
   }, [open])
 
@@ -302,7 +320,7 @@ export default function Landing() {
               .
             </p>
           )}
-          {!catalog && !error && <p role="status">Loading opportunities…</p>}
+          {!catalog && !error && <LogoLoading label="Loading opportunities…" />}
           <div className="grid gap-4 md:grid-cols-2">
             {catalog?.vacancies.slice(0, 4).map((v) => (
               <article

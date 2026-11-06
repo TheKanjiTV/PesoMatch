@@ -14,6 +14,8 @@ import {
   registerAccount,
 } from "../services/account.js"
 
+import { withMinimumLoading } from "../platform/loading.js"
+
 const AuthContext = createContext(null)
 
 export function destinationFor(onboarding, user) {
@@ -36,7 +38,7 @@ export function AuthProvider({ children }) {
     const request = ++generation.current
 
     try {
-      const result = await getAccount()
+      const result = await withMinimumLoading(getAccount)
 
       if (request === generation.current) {
         setSession({ user: result.user, onboarding: result.onboarding })
