@@ -1,7 +1,7 @@
 import { test, expect, apiCall } from "./helpers.js"
 import AxeBuilder from "@axe-core/playwright"
 
-test("official nationwide vacancies show provenance, honest metadata and a working saved list", async ({
+test("official PESO vacancies show provenance, honest metadata and a working saved list", async ({
   page,
   account,
 }) => {
@@ -12,9 +12,9 @@ test("official nationwide vacancies show provenance, honest metadata and a worki
     (v) => !v.is_sample && v.external_application,
   )
   expect(official.length).toBeGreaterThanOrEqual(10)
-  const vacancy = official.find((v) => v.source_salary)
+  const vacancy = official[0]
   expect(vacancy.source_url).toMatch(
-    /^https:\/\/philjobnet.gov.ph\/job-vacancies\/job\//,
+    /^https:\/\/pasay.gov.ph\/peso-jobs\//,
   )
   expect(vacancy.deadline).toBeNull()
   expect(vacancy.slots).toBeNull()
@@ -22,13 +22,14 @@ test("official nationwide vacancies show provenance, honest metadata and a worki
   await page.goto(`/jobs/${vacancy.id}`)
   await expect(
     page.getByRole("link", {
-      name: /^(View official listing & apply|Retry original PhilJobNet listing|Open original PhilJobNet listing)$/,
+      name: "View official PESO listing & apply",
     }),
   ).toHaveAttribute("href", vacancy.source_url)
   await expect(
     page.getByText("Not stated · confirm with employer", { exact: true }),
   ).toBeVisible()
-  await expect(page.getByText(/confirm pay period with employer/)).toBeVisible()
+  await expect(page.getByText("Listed pay", { exact: true })).toBeVisible()
+  await expect(page.getByText("Not stated", { exact: true })).toHaveCount(2)
   const checked = new Date(vacancy.source_checked_at).toLocaleDateString(
     "en-PH",
     {

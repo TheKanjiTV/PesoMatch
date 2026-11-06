@@ -1,5 +1,7 @@
 # Public-source refresh — November 3, 2026
 
+Historical report: its vacancy provider was retired on November 6, 2026. See [current PESO vacancy sources](PESO-VACANCY-SOURCES.md); these earlier vacancy totals are not current browse totals.
+
 Requested posting/event window: **October 14–November 3, 2026, inclusive**. This adds public opportunity records to the existing Laragon app. No people, applications, messages, referrals, enrollment, placements or employment outcomes are fabricated.
 
 ## Catalog totals

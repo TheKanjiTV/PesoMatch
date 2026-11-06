@@ -27,7 +27,7 @@ await Promise.all(
       const parsed = new URL(url)
       if (
         parsed.protocol !== "https:" ||
-        !/^(philjobnet\.gov\.ph|e-tesda\.gov\.ph|ble\.dole\.gov\.ph|www\.tesda\.gov\.ph|privacy\.gov\.ph|ro11\.dole\.gov\.ph|openstat\.psa\.gov\.ph)$/.test(
+        !/^(pasay\.gov\.ph|e-tesda\.gov\.ph|ble\.dole\.gov\.ph|www\.tesda\.gov\.ph|privacy\.gov\.ph|ro11\.dole\.gov\.ph|openstat\.psa\.gov\.ph|docs\.google\.com)$/.test(
           parsed.hostname,
         )
       )

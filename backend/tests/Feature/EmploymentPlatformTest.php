@@ -207,8 +207,10 @@ class EmploymentPlatformTest extends TestCase
     public function test_source_catalog_uses_posted_dates_instead_of_bulk_import_order(): void
     {
         $this->vacancy(['title' => 'Earlier posting imported later', 'external_application' => true,
+            'source_url' => 'https://pasay.gov.ph/peso-jobs/earlier-posting/',
             'source_checked_at' => now(), 'source_posted_on' => today()->subDay(), 'created_at' => now()]);
         $latest = $this->vacancy(['title' => 'Latest source posting', 'external_application' => true,
+            'source_url' => 'https://pasay.gov.ph/peso-jobs/latest-posting/',
             'source_checked_at' => now(), 'source_posted_on' => today(), 'created_at' => now()->subDay()]);
         $this->program(['title' => 'Zulu course']);
         $alpha = $this->program(['title' => 'Alpha course']);

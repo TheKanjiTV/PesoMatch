@@ -79,7 +79,7 @@ class EmploymentController extends Controller
 
     public function vacancies(Request $r)
     {
-        $q = Vacancy::query();
+        $q = Vacancy::currentSource();
         if (! $r->filled('id') && ! ($r->boolean('include_samples') && app()->environment(['local', 'testing']))) {
             $q->where('is_sample', false);
         }
@@ -91,7 +91,7 @@ class EmploymentController extends Controller
         } elseif (! $this->staff($r)) {
             $q->available();
         }
-        $this->searchCatalog($q, $r, ['title', 'organization', 'location', 'skills']);
+        $this->searchCatalog($q, $r, ['title', 'organization', 'location', 'skills', 'description']);
         if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
             $q->where('status', $r->query('status'));
         }
@@ -185,6 +185,7 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['jobseeker']);
         abort_unless($vacancy->status === 'published', 404);
+        abort_if($r->method() !== 'DELETE' && ! Vacancy::currentSource()->whereKey($vacancy->id)->exists(), 404);
         $q = DB::table('saved_vacancies')->where('user_id', $r->user()->id)->where('vacancy_id', $vacancy->id);
         if ($r->method() === 'DELETE') {
             $q->delete();
@@ -526,7 +527,7 @@ class EmploymentController extends Controller
             $services->where('user_id', $own);
         }
 
-        return response()->json(['referrals' => $referrals->count(), 'enrollments' => $enrollments->count(), 'placements' => $placements->count(), 'services' => $services->whereNotIn('status', ['completed', 'cancelled'])->count(), 'saved' => DB::table('saved_vacancies')->where('user_id', $own)->pluck('vacancy_id'), 'profile' => $r->user()->jobseekerProfile?->onboarding(), 'services_catalog' => self::SERVICES]);
+        return response()->json(['referrals' => $referrals->count(), 'enrollments' => $enrollments->count(), 'placements' => $placements->count(), 'services' => $services->whereNotIn('status', ['completed', 'cancelled'])->count(), 'saved' => DB::table('saved_vacancies')->where('user_id', $own)->whereIn('vacancy_id', Vacancy::currentSource()->select('id'))->pluck('vacancy_id'), 'profile' => $r->user()->jobseekerProfile?->onboarding(), 'services_catalog' => self::SERVICES]);
     }
 
     public function laborMarket(Request $r)

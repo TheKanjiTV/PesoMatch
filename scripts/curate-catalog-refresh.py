@@ -93,6 +93,7 @@ def training():
 
 
 def vacancies():
+    raise RuntimeError('This vacancy provider was retired. Use scripts/refresh-peso-vacancies.py --write instead.')
     coverage = read(EVIDENCE / 'coverage.json')  # Require completed date-window traversal.
     receipts = {r['source_url']: r for r in read(EVIDENCE / 'detail-receipts.json')}
     previous = {r['source_url']: r for r in read(DATA / 'verified-vacancies.json')}
@@ -145,6 +146,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('catalog', choices=['training', 'vacancies', 'all'])
     args = parser.parse_args()
+    if args.catalog in ['vacancies', 'all']:
+        parser.error('Vacancy provider retired; use scripts/refresh-peso-vacancies.py --write. Training-only review remains available.')
     if args.catalog in ['training', 'all']:
         training()
     if args.catalog in ['vacancies', 'all']:

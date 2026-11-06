@@ -1,0 +1,20 @@
+{
+  "review_date": "2026-11-06",
+  "source_url": "https://pasay.gov.ph/job-openings/",
+  "source_name": "Pasay City PESO",
+  "api_pages_reviewed": 4,
+  "candidate_records": 349,
+  "verified_detail_records": 347,
+  "excluded": [
+    {
+      "url": "https://pasay.gov.ph/peso-jobs/public-area-attendant/",
+      "excluded_reason": "Detail identity/field layout needs manual review"
+    },
+    {
+      "url": "https://pasay.gov.ph/peso-jobs/assistant-store-manager-selling/",
+      "excluded_reason": "Detail identity/field layout needs manual review"
+    }
+  ],
+  "coverage": "Pasay PESO public listings, not nationwide coverage or a live feed",
+  "limits": "No dedicated work-site field; consult the retained qualifications for any location conditions. Employment terms are mapped only when explicit. No salary, deadline, slot count or skills are invented. Page access does not confirm an unfilled position."
+}

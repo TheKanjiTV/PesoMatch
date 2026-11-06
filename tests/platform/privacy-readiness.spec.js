@@ -70,7 +70,7 @@ publicTest(
         page.getByText(/does not identify them as PesoMatch's operator/),
       ).toBeVisible()
       await expect(
-        page.locator('a[href="mailto:support@philjobnet.gov.ph"]'),
+        page.locator('a[href="https://pasay.gov.ph/job-openings/"]'),
       ).toBeVisible()
       await expect(
         page.locator('a[href="mailto:contactcenter@tesda.gov.ph"]'),

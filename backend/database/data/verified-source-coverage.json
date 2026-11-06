@@ -46,7 +46,9 @@
     ],
     "without_mapped_skills": 513,
     "first_list_checked_at": "2026-11-03T06:42:38.056790+00:00",
-    "last_list_checked_at": "2026-11-03T07:22:36.708346+00:00"
+    "last_list_checked_at": "2026-11-03T07:22:36.708346+00:00",
+    "status": "Historical provider retired on 2026-11-06; excluded from active catalogs and matching",
+    "current_manifest": "verified-peso-vacancy-coverage.json"
   },
   "training": {
     "source_url": "https://e-tesda.gov.ph/course/index.php?perpage=1000",

@@ -6,13 +6,11 @@ use App\Http\Controllers\EmploymentController as Employment;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ResumeController;
-use App\Http\Controllers\VacancySourceStatusController;
 use App\Http\Middleware\ValidatePlatformQuery;
 use App\Models\Skill;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/public/catalog', [Employment::class, 'publicCatalog'])->middleware('throttle:60,1');
-Route::get('/public/vacancy-source-status', VacancySourceStatusController::class)->middleware('throttle:60,1');
 
 Route::prefix('platform')->middleware(['auth:sanctum', 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
     Route::get('/summary', [Employment::class, 'summary']);

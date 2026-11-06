@@ -10,6 +10,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+raise SystemExit('Historical curator retired. Use scripts/refresh-peso-vacancies.py --write for current PESO vacancies.')
+
 root = Path(__file__).resolve().parent.parent
 evidence = root / ".local/source-review"
 data = root / "backend/database/data"

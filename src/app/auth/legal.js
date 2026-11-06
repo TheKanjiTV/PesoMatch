@@ -25,7 +25,7 @@ export const legalNotices = {
       ],
       [
         "External services",
-        "Source links take you to PhilJobNet, TESDA or another named provider. Visiting or applying there is governed by their notices. PesoMatch does not automatically send your profile to those sites or certify an external enrollment. Fonts and scripts are served locally; no analytics, advertising, marketing email or payment processor is enabled in the active application. The hosting location, processor agreements and any cross-border transfers still need operator assessment.",
+        "Source links take you to official PESO job boards, TESDA or another named provider. Visiting or applying there is governed by their notices. PesoMatch does not automatically send your profile to those sites or certify an external enrollment. Fonts and scripts are served locally; no analytics, advertising, marketing email or payment processor is enabled in the active application. The hosting location, processor agreements and any cross-border transfers still need operator assessment.",
       ],
       [
         "Storage and retention",

@@ -14,7 +14,7 @@ const descriptions = {
   "/register":
     "Create a free jobseeker account and begin your employment profile. Public registration is for jobseekers.",
   "/help":
-    "Find source-linked nationwide PESO, PhilJobNet, TESDA and privacy assistance contacts. These agencies are external resources.",
+    "Find official PESO job listings, the PESO office directory, TESDA and privacy assistance contacts. These agencies are external resources.",
   "/privacy":
     "Read the draft PesoMatch privacy notice covering personal information, resume processing, recipients, retention and privacy requests.",
   "/terms":

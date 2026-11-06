@@ -20,7 +20,8 @@ class VerifiedVacanciesTest extends TestCase
         $sourceRows = collect(json_decode(file_get_contents(database_path('data/verified-vacancies.json')), true))->keyBy('source_url');
         foreach (Vacancy::all() as $v) {
             $this->assertSame(CarbonImmutable::parse($sourceRows[$v->source_url]['checked_at'])->timestamp, $v->source_checked_at->timestamp);
-            $this->assertSame('philjobnet.gov.ph', parse_url($v->source_url, PHP_URL_HOST));
+            $this->assertSame('pasay.gov.ph', parse_url($v->source_url, PHP_URL_HOST));
+            $this->assertStringStartsWith('/peso-jobs/', parse_url($v->source_url, PHP_URL_PATH));
             $this->assertFalse($v->is_sample);
             $this->assertTrue($v->external_application);
             $this->assertNull($v->owner_id);

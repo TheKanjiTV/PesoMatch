@@ -35,25 +35,12 @@ TESDA describes TOP as free online courses: [official program description](https
 
 Run `php artisan peso:import-verified-training` from backend/ to import/update the committed researched dataset by unique source URL. It is intentionally not an unattended scraper. Recheck the official source before changing the checked timestamp or publishing changed information. No fabricated users, learner progress, referrals, placements or employment outcomes are seeded.
 
-## Nationwide source-listed vacancies
+## Reviewed official PESO vacancies
 
-Ten real PhilJobNet listing identities were inspected on October 10, 2026. PhilJobNet is the Bureau of Local Employment's official source. These records cover Luzon, Visayas and Mindanao; they are a researched selection rather than a complete national vacancy feed. Short descriptions and skill mappings are authored summaries and interpretations. No employer partnership, reserved opening, guaranteed suitability or current unfilled position is implied.
+The active vacancy dataset now comes from the [Pasay City PESO job board](https://pasay.gov.ph/job-openings/), reviewed on November 6, 2026. See [current source coverage and replacement](PESO-VACANCY-SOURCES.md) and `backend/database/data/verified-peso-vacancy-coverage.json`. This is a local PESO selection, not nationwide coverage or a live vacancy feed.
 
-| Listing | Employer | Location | Source posted date |
-| --- | --- | --- | --- |
-| [STORE SUPERVISOR](https://philjobnet.gov.ph/job-vacancies/job/store-supervisor-1485835) | ROBINSONS HANDYMAN INC | Oroquieta City, Misamis Occidental | 2026-10-09 |
-| [DRAFTSMAN (GENERAL)](https://philjobnet.gov.ph/job-vacancies/job/draftsman-general-1485834) | KC WONDERLAND CORPORATION | Mandaluyong City, NCR | 2026-10-09 |
-| [ELECTRONICS TECHNICIAN](https://philjobnet.gov.ph/job-vacancies/job/electronics-technician-1485833) | KC WONDERLAND CORPORATION | Mandaluyong City, NCR | 2026-10-09 |
-| [SERVICE CREW](https://philjobnet.gov.ph/job-vacancies/job/service-crew-1485832) | KC WONDERLAND CORPORATION | Manila City, NCR | 2026-10-09 |
-| [ACCOUNTS COORDINATOR](https://philjobnet.gov.ph/job-vacancies/job/accounts-coordinator-1485831) | ASSURE QUALITY SERVICES, INC. | Bacolod City, Negros Occidental | 2026-10-09 |
-| [DATA ANALYST](https://philjobnet.gov.ph/job-vacancies/job/data-analyst-1485827) | ARCH GLOBAL SERVICES (PHILIPPINES) INC | Taguig City, NCR | 2026-10-09 |
-| [FINANCE OFFICER](https://philjobnet.gov.ph/job-vacancies/job/finance-officer-1485826) | ARCH GLOBAL SERVICES (PHILIPPINES) INC | Taguig City, NCR | 2026-10-09 |
-| [HUMAN RESOURCE SUPERVISOR](https://philjobnet.gov.ph/job-vacancies/job/human-resource-supervisor-1476055) | VIENOVO PHILIPPINES INC. | Cebu City, Cebu | 2026-09-25 |
-| [COMPUTER ENGINEER](https://philjobnet.gov.ph/job-vacancies/job/computer-engineer-1471205) | TECDIA CEBU, INC. | Lapu-Lapu City, Cebu | 2026-09-18 |
-| [COOK (GENERAL)](https://philjobnet.gov.ph/job-vacancies/job/cook-general-1466691) | HOME OF CEBUANO CUISINE CORPORATION | Cebu City, Cebu | 2026-09-13 |
+Each imported record has its own HTTPS official PESO detail/application URL, source-posted date and actual detail-review timestamp. Qualifications are summarized from the source. Work locations are confirmed through the retained source qualifications, and explicit employment terms are preserved. Undisclosed salaries, deadlines and slot counts remain unknown. No skills are inferred from a job title or employer. Opening an application page does not submit a local referral or transmit a profile.
 
-The detail view displays the source and checked date, official application link, original listed pay amount when supplied, and explicit unknowns. No deadline, position count or pay period was invented. External applications happen on PhilJobNet; opening the link does not create a local referral or claim the employer participates in this platform. General PESO guidance and private bookmarks remain available. External source listings are excluded from local partner position/demand totals, with a separate source-listing count.
+Run `python scripts/refresh-peso-vacancies.py --write` to review the current public source, inspect its coverage/exclusions, then `php artisan peso:import-verified-vacancies` from `backend/` to import it. Imports validate exact official detail URL patterns, update by source URL and preserve all account and workflow relationships. External records expire from browse/matching after 30 days without a new review, or sooner if a known deadline passes.
 
-Run `php artisan peso:import-verified-vacancies` from backend/ to update the researched dataset by unique source URL. Published source listings expire from browse and matching 30 days after their checked timestamp unless re-researched, or sooner when a known deadline passes. This is a stale-data safeguard, not a live availability check. Some candidate pages had past start dates or returned 404 on recheck and were excluded. Existing sample vacancies and local programs remain labeled illustrative samples.
-
-The imported real catalog totals 28 records: ten PhilJobNet vacancies and eighteen TESDA courses. Source records create no users, applications, referrals, learner progress, placements or employment outcomes. Local partner management continues through the authorized review workflow.
+The former PhilJobNet dataset has been removed from active imports, browse, recommendations and the help page. Its existing database rows remain solely to preserve foreign keys and historical bookmarks. A provider's retirement does not mark every job as closed. Employer-owned vacancy management and its reviewed local referral workflow remain available.

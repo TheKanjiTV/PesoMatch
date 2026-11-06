@@ -16,13 +16,10 @@ const resources = [
     dial: "+63285280087",
   },
   {
-    name: "PhilJobNet support",
+    name: "Pasay City PESO job board",
     detail:
-      "Help with your PhilJobNet account and official-source job listings.",
-    source: "https://philjobnet.gov.ph/contact/",
-    email: "support@philjobnet.gov.ph",
-    phone: "+63 2 8527 2543",
-    dial: "+63285272543",
+      "Official PESO vacancy details and application forms. Confirm the work location and current availability on each listing.",
+    source: "https://pasay.gov.ph/job-openings/",
   },
   {
     name: "TESDA public assistance",
@@ -79,8 +76,8 @@ export function OfficialHelp() {
           this page. Only share information needed for your inquiry.
         </p>
         <p className="mt-2 text-xs">
-          Sources checked 13 October 2026. Confirm current channels on each
-          official page.
+          General contacts checked 13 October 2026; Pasay PESO job board checked
+          6 November 2026. Confirm current channels on each official page.
         </p>
         <ul className="mt-5 space-y-5">
           {resources.map((resource) => (

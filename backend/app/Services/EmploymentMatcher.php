@@ -39,7 +39,7 @@ class EmploymentMatcher
         $query = implode(' ', array_merge($own, $preferences?->occupations->pluck('value')->all() ?? [], [$preferences?->preferred_industry ?? '']));
         $document = $vacancy->title.' '.$vacancy->industry.' '.$vacancy->description.' '.implode(' ', $required);
         if ($weights === null) {
-            $corpus ??= Vacancy::where('status', 'published')->get()->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
+            $corpus ??= Vacancy::currentSource()->where('status', 'published')->get()->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
             $weights = $this->weights($corpus);
         }
         $a = array_count_values($this->tokens($query));

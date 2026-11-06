@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\VacancySources;
 use Illuminate\Database\Eloquent\Model;
 
 class Vacancy extends Model
@@ -15,9 +16,19 @@ class Vacancy extends Model
 
     public function scopeAvailable($query)
     {
-        return $query->where('status', 'published')->where(function ($q) {
+        return $query->currentSource()->where('status', 'published')->where(function ($q) {
             $q->where(fn ($local) => $local->where('external_application', false)->whereDate('deadline', '>=', today()))
                 ->orWhere(fn ($external) => $external->where('external_application', true)->where('source_checked_at', '>=', now()->subDays(30))->where(fn ($date) => $date->whereNull('deadline')->orWhereDate('deadline', '>=', today())));
+        });
+    }
+
+    public function scopeCurrentSource($query)
+    {
+        // Retire the removed provider from every catalog role and matching.
+        // Keep its rows and foreign keys intact for saved/referral history.
+        return $query->where(function ($q) {
+            $q->where('external_application', false)
+                ->orWhere('source_url', 'like', VacancySources::DETAIL_PREFIX.'%');
         });
     }
 }

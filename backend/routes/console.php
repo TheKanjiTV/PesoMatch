@@ -6,6 +6,7 @@ use App\Models\Skill;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
+use App\Services\VacancySources;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -90,7 +91,7 @@ Artisan::command('peso:import-verified-vacancies', function () {
     $rows = json_decode(file_get_contents(database_path('data/verified-vacancies.json')), true, 512, JSON_THROW_ON_ERROR);
     DB::transaction(function () use ($rows) {
         foreach ($rows as $row) {
-            if (parse_url($row['source_url'], PHP_URL_HOST) !== 'philjobnet.gov.ph') {
+            if (! VacancySources::allows($row['source_url'])) {
                 throw new RuntimeException('Unexpected source host.');
             }
             foreach ($row['skills'] as $skill) {
@@ -99,7 +100,7 @@ Artisan::command('peso:import-verified-vacancies', function () {
             Vacancy::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => null, 'deadline' => null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true]);
         }
     });
-    $this->info(count($rows).' source-checked listings imported. Availability must be confirmed on PhilJobNet; no partner relationship or referral was fabricated.');
+    $this->info(count($rows).' reviewed Pasay PESO listings imported. Confirm availability and application requirements on each official source page. No local partner account or referral was fabricated.');
 })->purpose('Import researched official-source job listings without inventing deadlines, positions or PESO relationships');
 
 Artisan::command('peso:import-verified-public-resources', function () {

@@ -2,23 +2,26 @@ import { test, expect } from "@playwright/test"
 import AxeBuilder from "@axe-core/playwright"
 import fs from "node:fs/promises"
 
-test("source outages preserve imported details, offer guidance, and recover after a status recheck", async ({
+test("official PESO details keep application links, provenance and mobile accessibility without a legacy source probe", async ({
   page,
 }) => {
-  let sourceState = "unavailable"
+  const sourceRequests = []
+  page.on("request", (request) => {
+    if (request.url().includes("vacancy-source-status") || request.url().includes("philjobnet.gov.ph")) sourceRequests.push(request.url())
+  })
   const original =
-    "https://philjobnet.gov.ph/job-vacancies/job/source-review-1234567"
+    "https://pasay.gov.ph/peso-jobs/utility-helper/"
   const vacancy = {
     id: 900001,
-    title: "Source availability review",
+    title: "PESO source review",
     organization: "Browser fixture organization",
     location: "Manila",
     industry: "Services",
     employment_type: "Full-time",
-    description: "A browser fixture used only to check outage handling.",
+    description: "A browser fixture used only to check official PESO source presentation.",
     skills: [],
     source_url: original,
-    source_name: "PhilJobNet",
+    source_name: "Pasay City PESO",
     source_checked_at: "2026-11-03T08:00:00+08:00",
     source_posted_on: "2026-11-03",
     external_application: true,
@@ -43,15 +46,6 @@ test("source outages preserve imported details, offer guidance, and recover afte
           onboarding: { completed: true, current_step: 5 },
         },
       })
-    if (path === "/api/public/vacancy-source-status")
-      return route.fulfill({
-        json: {
-          status: sourceState,
-          checked_at: "2026-11-06T20:00:00+08:00",
-          http_status: sourceState === "reachable" ? 200 : 403,
-          url: "https://philjobnet.gov.ph/job-vacancies/",
-        },
-      })
     if (path === "/api/platform/summary")
       return route.fulfill({ json: { saved: [] } })
     return route.fulfill({
@@ -62,36 +56,19 @@ test("source outages preserve imported details, offer guidance, and recover afte
   page.on("pageerror", (error) => errors.push(error.message))
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto("/jobs/900001")
-  await expect(
-    page.getByText("PhilJobNet is currently unavailable from PesoMatch.", {
-      exact: true,
-    }),
-  ).toBeVisible()
-  await expect(
-    page.getByRole("link", {
-      name: "Retry original PhilJobNet listing",
-      exact: true,
-    }),
-  ).toHaveAttribute("href", original)
-  await expect(
-    page.getByRole("link", {
-      name: "Ask PESO for application guidance",
-      exact: true,
-    }),
-  ).toHaveAttribute("href", "/services")
-  await expect(
-    page.getByRole("link", {
-      name: "View official listing & apply",
-      exact: true,
-    }),
-  ).toHaveCount(0)
+  await expect(page.getByText("Reviewed listings from Pasay City PESO", { exact: true })).toBeVisible()
+  await expect(page.getByRole("link", { name: "View official PESO listing & apply", exact: true })).toHaveAttribute("href", original)
+  await expect(page.getByRole("link", { name: "View official PESO listing & apply", exact: true })).toHaveAttribute("rel", "noopener noreferrer")
+  await expect(page.getByRole("link", { name: "Ask PESO for application guidance", exact: true })).toHaveAttribute("href", "/services")
+  await expect(page.getByText(/not all Philippine/)).toBeVisible()
+  await expect(page.getByText(/No skill requirements mapped/)).toBeVisible()
   await expect(
     page.getByText(vacancy.description, { exact: true }),
   ).toBeVisible()
   await expect(page.getByText(/Checked Nov 3, 2026/)).toBeVisible()
-  await fs.mkdir("artifacts/source-status", { recursive: true })
+  await fs.mkdir("artifacts/peso-sources", { recursive: true })
   await page.screenshot({
-    path: "artifacts/source-status/unavailable-desktop.png",
+    path: "artifacts/peso-sources/peso-desktop.png",
     fullPage: true,
   })
   await page.setViewportSize({ width: 390, height: 844 })
@@ -110,21 +87,11 @@ test("source outages preserve imported details, offer guidance, and recover afte
     })),
   ).toEqual([])
   await page.screenshot({
-    path: "artifacts/source-status/unavailable-mobile.png",
+    path: "artifacts/peso-sources/peso-mobile.png",
     fullPage: true,
   })
-  sourceState = "reachable"
-  await page.evaluate(() => window.dispatchEvent(new Event("focus")))
-  await expect(
-    page.getByRole("link", {
-      name: "View official listing & apply",
-      exact: true,
-    }),
-  ).toHaveAttribute("href", original)
-  await expect(
-    page.getByText("PhilJobNet is currently unavailable from PesoMatch.", {
-      exact: true,
-    }),
-  ).toHaveCount(0)
+  await page.getByRole("link", { name: "View official PESO listing & apply", exact: true }).focus()
+  await expect(page.getByRole("link", { name: "View official PESO listing & apply", exact: true })).toBeFocused()
+  expect(sourceRequests).toEqual([])
   expect(errors).toEqual([])
 })
