@@ -111,6 +111,53 @@ export function MobileNavigationSkeleton() {
   )
 }
 
+export function WorkspaceHeaderSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading workspace header"
+      aria-busy="true"
+      data-skeleton="workspace-header"
+      className="workspace-topbar flex min-h-20 flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-3 sm:px-9"
+    >
+      <span className="sr-only">Loading account and workspace actions…</span>
+      <div
+        aria-hidden="true"
+        className="workspace-identity flex min-w-0 items-center gap-3 motion-safe:animate-pulse"
+      >
+        <Bar className="size-10 shrink-0 rounded-full" />
+        <div className="space-y-2">
+          <Bar className="h-4 w-32" />
+          <Bar className="h-3 w-20" />
+        </div>
+      </div>
+      <div
+        aria-hidden="true"
+        className="workspace-actions flex items-center gap-3 motion-safe:animate-pulse"
+      >
+        <Bar className="size-10 rounded-full" />
+        <Bar className="hidden h-12 w-24 rounded-lg lg:block" />
+        <Bar className="hidden h-3 w-24 lg:block" />
+      </div>
+    </div>
+  )
+}
+
+export function WorkspaceBrandSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      className="flex items-center gap-3 motion-safe:animate-pulse"
+    >
+      <Bar className="size-10" />
+      <div className="space-y-2">
+        <Bar className="h-6 w-20" />
+        <Bar className="h-3 w-28" />
+      </div>
+    </div>
+  )
+}
+
 export function WorkspaceShellSkeleton({ pathname, role = "jobseeker" }) {
   if (pathname?.startsWith("/jobseeker/onboarding"))
     return (
@@ -132,20 +179,18 @@ export function WorkspaceShellSkeleton({ pathname, role = "jobseeker" }) {
       className="platform-shell min-h-dvh bg-background"
       data-skeleton="workspace-shell"
     >
+      <div
+        aria-hidden="true"
+        className="mobile-app-header flex min-h-20 items-center justify-between border-b border-border bg-card px-4 lg:hidden"
+      >
+        <WorkspaceBrandSkeleton />
+        <Bar className="size-6" />
+      </div>
       <aside className="workspace-sidebar fixed inset-y-0 left-0 hidden w-[272px] flex-col border-r border-border lg:flex">
         <SidebarSkeleton items={counts[role] || 11} role={role} />
       </aside>
       <div className="lg:pl-[272px]">
-        <div
-          aria-hidden="true"
-          className="flex min-h-20 items-center gap-3 border-b border-border bg-card px-5 sm:px-9"
-        >
-          <Bar className="size-10 rounded-full" />
-          <div className="space-y-3">
-            <Bar className="h-4 w-36" />
-            <Bar className="h-3 w-24" />
-          </div>
-        </div>
+        <WorkspaceHeaderSkeleton />
         <main className="mx-auto max-w-[1500px] px-5 py-8 sm:px-9 lg:py-10">
           <PageSkeleton pathname={pathname} role={role} />
         </main>

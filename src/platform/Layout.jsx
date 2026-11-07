@@ -13,9 +13,14 @@ import {
   PageSkeleton,
   SidebarSkeleton,
   MobileNavigationSkeleton,
+  WorkspaceHeaderSkeleton,
+  WorkspaceBrandSkeleton,
 } from "./LoadingStates.jsx"
 
-import { useWorkspaceLoading } from "./WorkspaceLoading.jsx"
+import {
+  WorkspaceLoadingProvider,
+  useWorkspaceLoading,
+} from "./WorkspaceLoading.jsx"
 
 import { usesLogoLoading } from "./loading.js"
 
@@ -151,12 +156,25 @@ function focusAfterLayout(resolveTarget) {
 }
 
 export function PlatformLayout() {
+  const { user } = useAuth()
+  const navigation = useNavigation()
+
+  return (
+    <WorkspaceLoadingProvider
+      key={`${user.id}:${user.role}`}
+      routePending={navigation.state !== "idle"}
+    >
+      <WorkspaceFrame />
+    </WorkspaceLoadingProvider>
+  )
+}
+
+function WorkspaceFrame() {
   const navigation = useNavigation()
 
   const workspaceLoading = useWorkspaceLoading()
 
-  const sidebarLoading =
-    navigation.state === "loading" || workspaceLoading?.loading
+  const shellLoading = workspaceLoading.initialLoading
 
   const { user, logout, sessionNotice } = useAuth()
 
@@ -323,7 +341,11 @@ export function PlatformLayout() {
       </a>
       <header className="mobile-app-header flex min-h-20 items-center justify-between gap-2 border-b border-border bg-card px-4 lg:hidden">
         <span inert={modalOpen}>
-          <Brand to="/dashboard" />
+          {shellLoading ? (
+            <WorkspaceBrandSkeleton />
+          ) : (
+            <Brand to="/dashboard" />
+          )}
         </span>
         <button
           onClick={toggleNavigation}
@@ -352,7 +374,7 @@ export function PlatformLayout() {
           open ? "drawer-open" : "drawer-closed"
         } workspace-sidebar fixed inset-y-0 left-0 z-30 flex w-[272px] flex-col border-r border-border lg:flex max-lg:top-20`}
       >
-        {sidebarLoading ? (
+        {shellLoading ? (
           <>
             <div className="flex justify-end px-3 pt-3 lg:hidden">
               <button
@@ -436,30 +458,34 @@ export function PlatformLayout() {
         )}
       </aside>
       <div inert={modalOpen} className="lg:pl-[272px]">
-        <div className="workspace-topbar flex min-h-20 flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-3 sm:px-9">
-          <div className="workspace-identity flex min-w-0 items-center gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-primary">
-              <UserRound size={19} />
-            </span>
-            <div className="min-w-0">
-              <p className="font-semibold text-foreground">{user.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {roles[user.role]}
-              </p>
+        {shellLoading ? (
+          <WorkspaceHeaderSkeleton />
+        ) : (
+          <div className="workspace-topbar flex min-h-20 flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-3 sm:px-9">
+            <div className="workspace-identity flex min-w-0 items-center gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-primary">
+                <UserRound size={19} />
+              </span>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground">{user.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {roles[user.role]}
+                </p>
+              </div>
+            </div>
+            <div className="workspace-actions flex flex-wrap items-center gap-3">
+              <AppearanceControls />
+              <InstallButton compact />
+              <Link
+                to="/?public=1"
+                className="inline-flex items-center gap-2 text-xs font-medium text-primary"
+              >
+                Public home
+                <ArrowUpRight size={14} />
+              </Link>
             </div>
           </div>
-          <div className="workspace-actions flex flex-wrap items-center gap-3">
-            <AppearanceControls />
-            <InstallButton compact />
-            <Link
-              to="/?public=1"
-              className="inline-flex items-center gap-2 text-xs font-medium text-primary"
-            >
-              Public home
-              <ArrowUpRight size={14} />
-            </Link>
-          </div>
-        </div>
+        )}
         <main
           id="workspace-main"
           className="mx-auto max-w-[1500px] px-5 py-8 sm:px-9 lg:py-10"
@@ -513,7 +539,7 @@ export function PlatformLayout() {
         aria-label="Mobile app navigation"
         className="app-bottom-nav lg:hidden"
       >
-        {sidebarLoading ? (
+        {shellLoading ? (
           <MobileNavigationSkeleton />
         ) : (
           <>

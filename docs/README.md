@@ -2,6 +2,8 @@
 
 Current readability revision: subdued green/neutral/wine-red controls with readable labels, white Dark Mode headings and no fabricated placement example; see [design](DESIGN.md).
 
+Current loading revision: sidebar, mobile tabs and the complete account/action header use skeletons during initial workspace/session loading. Later module changes, searches and retries keep the loaded shell usable and show skeletons only for pending content; see [loading states](LOADING-STATES.md).
+
 Current functional revision: [PESO Bansud workspace update — November 7, 2026](WORKSPACE-UPDATE-2026-11-07.md).
 
 | Area | Current documentation |

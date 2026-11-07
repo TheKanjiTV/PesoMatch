@@ -12,7 +12,6 @@ import {
   PageSkeleton,
   WorkspaceShellSkeleton,
 } from "./platform/LoadingStates.jsx"
-import { WorkspaceLoadingProvider } from "./platform/WorkspaceLoading.jsx"
 import { usesLogoLoading } from "./platform/loading.js"
 
 import {
@@ -44,13 +43,11 @@ function Root() {
   return (
     <AppearanceProvider>
       <AuthProvider>
-        <WorkspaceLoadingProvider>
-          <PageMotion />
-          <RouteMetadata />
-          <ConnectionStatus />
-          <AppUpdate />
-          <RouteScreen />
-        </WorkspaceLoadingProvider>
+        <PageMotion />
+        <RouteMetadata />
+        <ConnectionStatus />
+        <AppUpdate />
+        <RouteScreen />
       </AuthProvider>
     </AppearanceProvider>
   )

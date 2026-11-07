@@ -16,6 +16,8 @@ async function workspace(
 
     hold,
 
+    holdPaths: ["/api/platform/vacancies"],
+
     pending: [],
 
     writes: [],
@@ -86,7 +88,7 @@ async function workspace(
         },
       })
 
-    if (path === "/api/platform/vacancies" && state.hold)
+    if (state.holdPaths.includes(path) && state.hold)
       await new Promise((resolve) => state.pending.push(resolve))
 
     if (path === "/api/platform/vacancies" && state.failed)
@@ -219,7 +221,7 @@ async function workspace(
   return state
 }
 
-test("sidebar and mobile menu mirror workspace loading and recover after request failure", async ({
+test("initial shell includes identity and actions, then navigation stays usable during retry", async ({
   context,
 
   page,
@@ -236,6 +238,19 @@ test("sidebar and mobile menu mirror workspace loading and recover after request
 
   await expect(skeleton).toBeVisible()
 
+  await expect(
+    page.getByRole("status", { name: "Loading workspace header" }),
+  ).toBeVisible()
+  await expect(
+    page.getByText("Isolated Guide User", { exact: true }),
+  ).toHaveCount(0)
+  await expect(
+    page.getByRole("link", { name: "Install", exact: true }),
+  ).toHaveCount(0)
+  await expect(
+    page.getByRole("link", { name: "Public home", exact: true }),
+  ).toHaveCount(0)
+
   await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(0)
 
   await expect(
@@ -247,7 +262,7 @@ test("sidebar and mobile menu mirror workspace loading and recover after request
   await page.screenshot({
     path: "artifacts/workspace-guide/sidebar-loading.png",
 
-    fullPage: true,
+    fullPage: false,
   })
 
   await page.setViewportSize({ width: 390, height: 844 })
@@ -255,6 +270,14 @@ test("sidebar and mobile menu mirror workspace loading and recover after request
   await expect(
     page.locator('[data-skeleton="mobile-navigation"]'),
   ).toBeVisible()
+
+  await page.screenshot({
+    path: "artifacts/workspace-guide/initial-shell-mobile.png",
+  })
+  const accessibility = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa"])
+    .analyze()
+  expect(accessibility.violations).toEqual([])
 
   await page
 
@@ -283,12 +306,38 @@ test("sidebar and mobile menu mirror workspace loading and recover after request
   ).toBeVisible()
 
   state.failed = false
+  state.hold = true
 
   await page.getByRole("button", { name: "Retry loading", exact: true }).click()
 
+  await expect.poll(() => state.pending.length).toBeGreaterThan(0)
   await expect(
-    page.locator('[data-skeleton="mobile-navigation"]'),
+    page.locator('[data-skeleton-layout="vacancy-catalog"]'),
   ).toBeVisible()
+  await expect(page.locator('[data-skeleton="workspace-header"]')).toHaveCount(
+    0,
+  )
+  await expect(page.locator(".workspace-identity")).toContainText(
+    "Isolated Guide User",
+  )
+  await expect(
+    page.locator(".workspace-topbar").getByText("Install", { exact: true }),
+  ).toBeAttached()
+  await expect(
+    page.getByRole("link", { name: "Public home", exact: true }),
+  ).toBeHidden()
+  await expect(
+    page.getByRole("button", { name: "Open all services" }),
+  ).toBeEnabled()
+  await expect(page.locator('[data-skeleton="sidebar"]')).toHaveCount(0)
+  await expect(page.locator('[data-skeleton="mobile-navigation"]')).toHaveCount(
+    0,
+  )
+  await page.screenshot({
+    path: "artifacts/workspace-guide/content-only-mobile.png",
+  })
+  state.hold = false
+  state.pending.splice(0).forEach((resolve) => resolve())
 
   await expect(
     page.getByRole("button", { name: "Retry loading", exact: true }),
@@ -309,6 +358,148 @@ test("sidebar and mobile menu mirror workspace loading and recover after request
   ).toHaveCount(11)
 
   await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
+})
+
+test("loaded shell stays stable across module navigation, searches and cancelled requests", async ({
+  context,
+  page,
+}) => {
+  const state = await workspace(context)
+  await page.emulateMedia({ reducedMotion: "reduce" })
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto("/jobs")
+  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(11)
+  await expect(
+    page.locator('[data-skeleton-layout="vacancy-catalog"]'),
+  ).toHaveCount(0)
+
+  // Record transient regressions too, even if they disappear before assertions.
+  await page.evaluate(() => {
+    window.shellRegressions = []
+    const selector =
+      '[data-skeleton="sidebar"], [data-skeleton="workspace-header"], [data-skeleton="mobile-navigation"]'
+    new MutationObserver((records) => {
+      for (const record of records)
+        for (const node of record.addedNodes) {
+          if (
+            node.nodeType === 1 &&
+            (node.matches(selector) || node.querySelector(selector))
+          )
+            window.shellRegressions.push(node.outerHTML.slice(0, 150))
+        }
+    }).observe(document.querySelector(".platform-shell"), {
+      childList: true,
+      subtree: true,
+    })
+  })
+
+  state.holdPaths = ["/api/platform/training", "/api/platform/vacancies"]
+  state.hold = true
+  await page
+    .getByRole("navigation", { name: "Employment services", exact: true })
+    .getByRole("link", { name: "Training & Skills Development", exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/training$/)
+  await expect.poll(() => state.pending.length).toBeGreaterThan(0)
+  await expect(
+    page.locator('[data-skeleton-layout="training-catalog"]'),
+  ).toBeVisible()
+  await expect(page.locator(".workspace-identity")).toContainText(
+    "Isolated Guide User",
+  )
+  await expect(
+    page.getByRole("link", { name: "Public home", exact: true }),
+  ).toBeVisible()
+  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(11)
+  await page.screenshot({
+    path: "artifacts/workspace-guide/content-only-desktop.png",
+  })
+
+  // A pending destination must not trap the user in that module.
+  await page
+    .getByRole("navigation", { name: "Employment services", exact: true })
+    .getByRole("link", { name: "Vacancy Management", exact: true })
+    .click()
+  await expect(page).toHaveURL(/\/jobs$/)
+  await expect(
+    page.locator('[data-skeleton-layout="vacancy-catalog"]'),
+  ).toBeVisible()
+  state.hold = false
+  state.pending.splice(0).forEach((resolve) => resolve())
+  await expect(
+    page.locator('[data-skeleton-layout="vacancy-catalog"]'),
+  ).toHaveCount(0)
+
+  state.hold = true
+  const search = page.getByRole("combobox", {
+    name: "Search vacancies",
+    exact: true,
+  })
+  await search.fill("office")
+  await expect.poll(() => state.pending.length).toBeGreaterThan(0)
+  await expect(
+    page.locator('[data-skeleton-layout="vacancy-catalog"]'),
+  ).toBeVisible()
+  await expect(search).toBeFocused()
+  await expect(search).toHaveValue("office")
+  await expect(
+    page.locator(".workspace-topbar").getByText("Install", { exact: true }),
+  ).toBeVisible()
+  state.hold = false
+  state.pending.splice(0).forEach((resolve) => resolve())
+  await expect(
+    page.locator('[data-skeleton-layout="vacancy-catalog"]'),
+  ).toHaveCount(0)
+  expect(await page.evaluate(() => window.shellRegressions)).toEqual([])
+  expect(state.writes).toEqual([])
+})
+
+test("guide counter follows Back and Previous while a destination request is still pending", async ({
+  context,
+  page,
+}) => {
+  const state = await workspace(context, {
+    role: "admin",
+    newUser: true,
+    hold: true,
+  })
+  await page.emulateMedia({ reducedMotion: "reduce" })
+  await page.goto("/dashboard")
+  const dialog = page.getByRole("dialog")
+  const next = dialog.getByRole("button", { name: "Next", exact: true })
+  const previous = dialog.getByRole("button", {
+    name: "Previous tutorial step",
+    exact: true,
+  })
+  await expect(next).toBeEnabled()
+  await next.click()
+  await expect(page).toHaveURL(/\/jobseekers$/)
+  await expect(next).toBeEnabled()
+
+  for (const back of ["previous", "browser", "previous"]) {
+    await next.click()
+    await expect(page).toHaveURL(/\/jobs$/)
+    await expect(
+      dialog.getByText("Workspace guide · 3 of 14", { exact: true }),
+    ).toBeVisible()
+    await expect.poll(() => state.pending.length).toBeGreaterThan(0)
+    await expect(next).toBeDisabled()
+    if (back === "browser") await page.goBack()
+    else await previous.click()
+    await expect(page).toHaveURL(/\/jobseekers$/)
+    await expect(
+      dialog.getByText("Workspace guide · 2 of 14", { exact: true }),
+    ).toBeVisible()
+    state.pending.splice(0).forEach((resolve) => resolve())
+    await expect(next).toBeEnabled()
+    await expect(
+      dialog.getByText("Workspace guide · 2 of 14", { exact: true }),
+    ).toBeVisible()
+  }
+  expect(state.writes).toEqual([])
+  await dialog
+    .getByRole("button", { name: "Close tutorial", exact: true })
+    .click()
 })
 
 const seekerPaths = [

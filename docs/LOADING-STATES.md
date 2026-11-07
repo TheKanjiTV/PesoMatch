@@ -4,15 +4,16 @@
 
 New source-request, intake, reference-link and removal controls preserve the existing 400 ms minimum resource skeleton behavior. Dashboard routes remain skeleton-only; the PESO logo loader is limited to public/authentication loading and sign-in. Delete countdowns are a separate deliberate five-second confirmation requirement, not a resource-loading delay. See [current workspace update](WORKSPACE-UPDATE-2026-11-07.md).
 
-Only home, login (including staff login), and registration route transitions show the PESO logo loader. Submitting sign-in also shows it until authentication and the handoff finish. Workspace navigation, initial session restoration and lazy modules use destination-specific skeletons plus matching sidebar/mobile navigation skeletons; the workspace shell is never covered by a logo loader. Data skeletons retain the 400 ms minimum and remain until the request settles.
+Only home, login (including staff login), and registration route transitions show the PESO logo loader. Submitting sign-in also shows it until authentication and the handoff finish. Initial workspace/session loading uses matching sidebar, mobile navigation and complete header skeletons (avatar, name, role, appearance control, Install and Public home). Subsequent page/lazy-module navigation uses destination-specific content skeletons while the loaded shell remains usable. The workspace is never covered by a logo loader. Data skeletons retain the 400 ms minimum and remain until the request settles.
 
 Pending page data uses the matching layout in `src/platform/LoadingStates.jsx`. Placeholders remain until the real request settles; an error replaces them with the existing recovery UI. Search inputs stay mounted during result loading, and superseded requests are aborted and ignored. Motion respects device and application preferences.
 
 | Surface | Structure represented |
 | --- | --- |
 | Home, login, registration and active sign-in | PESO logo and loading indicator; no generic card skeleton |
-| Workspace session restoration and lazy navigation | Sidebar, identity header and destination-page skeleton; no PESO loading overlay |
-| Sidebar and mobile navigation | Role-specific icon/text rows, branding/footer placeholders and five mobile tabs; restored when private page requests settle |
+| Initial workspace/session restoration | Sidebar, complete identity/action header and destination-page skeleton; no PESO loading overlay |
+| Sidebar, header and mobile navigation | Initial-only role-specific icon/text rows, branding/footer, identity/actions and five tabs; responsive placeholders match the controls normally visible at that viewport |
+| Subsequent navigation, searches and retries | Matching pending content skeleton; loaded sidebar, identity/header actions and mobile tabs remain usable |
 | Overview | Heading/action, split banner and pathway, four counters for non-partner roles, task rows and event column |
 | Vacancy/training catalog | Two-column cards with badges, title, organization, location, description, skills and footer |
 | Catalog detail | Main article and planning sidebar; training requirements are included for training |
@@ -38,6 +39,8 @@ Before changes it writes and decrypt-verifies a complete encrypted row snapshot 
 
 ## Shared workspace navigation loading
 
-`WorkspaceLoadingProvider` tracks private page resources, including the manually loaded profile/résumé sections. The sidebar and mobile tabs use the same pending lifetime as the content (minimum 400 ms, and longer while the request remains unfinished). Public source-coverage requests keep their local fallback without locking workspace navigation. Role-known sidebar skeletons use the actual visible navigation count; initial session restoration shows anonymous placeholders until identity is resolved. A failed request restores the menu alongside the existing error/retry state; cancelled/unmounted resources release their loading registration. Mobile drawers retain a Close control while their menu is a skeleton.
+`WorkspaceLoadingProvider` belongs to the authenticated layout and is keyed by account ID and role. It tracks private resources, including manually loaded profile/résumé sections, for the guide and first workspace load. Its separate initial-readiness latch opens when the first route and its resources settle, including errors. Later page requests do not reset it. Therefore switching modules, searching, pagination and retrying an error never replace the loaded navigation or header with placeholders. Changing the authenticated identity/role starts a fresh shell lifecycle; no private records or credentials are cached by this mechanism.
 
-The full workspace guide waits for route/data loading before enabling Next and positioning its spotlight. It does not substitute a logo overlay on dashboard routes. See `tests/platform/workspace-guide.spec.js` for sidebar/mobile failure recovery and the role-specific guide journeys.
+Public source-coverage requests retain their local fallback without blocking the shell. Role-known sidebar skeletons use the actual visible navigation count; session restoration shows anonymous placeholders until identity resolves. The shared header skeleton also covers the account name, role, Install and Public home instead of leaving live text above loading navigation. Mobile placeholders follow the existing compact header rules, and drawers retain a Close control during initial loading. Cancelled/unmounted resources release their loading registration. Content retains its existing 400 ms minimum.
+
+The full workspace guide still waits for each route/data request before enabling Next and positioning its spotlight, independently of initial shell readiness. Its step is derived from the committed route, avoiding a separate counter drifting during lazy navigation or browser Back. It does not substitute a logo overlay on dashboard routes. `tests/platform/workspace-guide.spec.js` covers initial header/sidebar/mobile loading, failure/retry, navigation away from a pending module, content search and transient shell regressions, plus the role-specific guide journeys.

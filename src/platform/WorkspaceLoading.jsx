@@ -10,8 +10,17 @@ import {
 
 const WorkspaceLoading = createContext(null)
 
-export function WorkspaceLoadingProvider({ children }) {
+export function WorkspaceLoadingProvider({ children, routePending = false }) {
   const [pending, setPending] = useState(() => new Set())
+  const [mounted, setMounted] = useState(false)
+  const [ready, setReady] = useState(false)
+
+  // Child resources register in layout effects before the first paint. Give
+  // them a commit before deciding that an otherwise idle shell is ready.
+  useLayoutEffect(() => setMounted(true), [])
+  useLayoutEffect(() => {
+    if (mounted && !routePending && pending.size === 0) setReady(true)
+  }, [mounted, routePending, pending.size])
 
   const track = useCallback((id) => {
     setPending((current) => new Set(current).add(id))
@@ -27,9 +36,9 @@ export function WorkspaceLoadingProvider({ children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ loading: pending.size > 0, track }),
+    () => ({ loading: pending.size > 0, initialLoading: !ready, track }),
 
-    [pending, track],
+    [pending, ready, track],
   )
 
   return (

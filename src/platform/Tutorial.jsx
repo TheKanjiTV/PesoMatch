@@ -23,8 +23,7 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
     restore = useRef(null),
     card = useRef(null)
 
-  const [step, setStep] = useState(0),
-    [active, setActive] = useState(false)
+  const [active, setActive] = useState(false)
 
   const [position, setPosition] = useState(null)
 
@@ -35,9 +34,15 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
   const navigation = useNavigation()
 
   const workspace = useWorkspaceLoading()
-  const routeStarted = useRef(false)
 
   const steps = useMemo(() => tutorialSteps(user.role), [user.role])
+
+  // The committed route is the step. A separate optimistic counter can race
+  // with lazy navigation or Back and attach the next action to an old page.
+  const step = Math.max(
+    0,
+    steps.findIndex((item) => item.path === pathname),
+  )
 
   const current = steps[step]
 
@@ -48,8 +53,6 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
 
   function go(index) {
     setPosition(null)
-
-    setStep(index)
 
     navigate(steps[index].path)
   }
@@ -98,8 +101,6 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
           ? document.querySelector("[data-tour-launcher]")
           : document.activeElement
 
-      setStep(0)
-
       setActive(true)
 
       if (!dialog.current.open) dialog.current.showModal()
@@ -109,16 +110,6 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
 
     return () => dialog.current?.close()
   }, [user.id, requested])
-
-  useEffect(() => {
-    if (!active || navigation.state !== "idle") return
-    if (!routeStarted.current) {
-      if (pathname === steps[0].path) routeStarted.current = true
-      return
-    }
-    const index = steps.findIndex((item) => item.path === pathname)
-    if (index >= 0) setStep(index)
-  }, [pathname, active, navigation.state, steps])
 
   useLayoutEffect(() => {
     if (!active || pagePending) {
