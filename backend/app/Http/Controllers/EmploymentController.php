@@ -151,6 +151,9 @@ class EmploymentController extends Controller
         } elseif ($r->query('catalog') === 'partner_program') {
             $q->where('external_enrollment', false);
         }
+        if ($r->filled('source_program_id')) {
+            $q->where('source_program_id', $r->integer('source_program_id'));
+        }
         if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
             $q->where('status', $r->query('status'));
         }
@@ -214,14 +217,13 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['jobseeker']);
         abort_unless($r->user()->jobseekerProfile?->profile_completed_at, 422, 'Complete your jobseeker profile first.');
-        abort_if($vacancy->external_application, 422, 'Apply through the official source. This listing is not a connected PESO partner vacancy.');
         $data = $r->validate(['notes' => 'nullable|string|max:2000']);
 
         return DB::transaction(function () use ($r, $vacancy, $matcher, $data) {
             $vacancy = Vacancy::whereKey($vacancy->id)->lockForUpdate()->firstOrFail();
-            abort_unless($vacancy->status === 'published' && $vacancy->deadline >= today()->toDateString(), 422, 'This vacancy is no longer accepting requests.');
+            abort_unless(Vacancy::available()->whereKey($vacancy->id)->exists(), 422, 'This vacancy is no longer accepting requests.');
             abort_if(Referral::where('user_id', $r->user()->id)->where('vacancy_id', $vacancy->id)->exists(), 409, 'You already have a referral request for this vacancy.');
-            $row = Referral::create(['user_id' => $r->user()->id, 'vacancy_id' => $vacancy->id, 'notes' => $data['notes'] ?? null, 'match_snapshot' => $matcher->assess($r->user(), $vacancy)]);
+            $row = Referral::create(['status' => 'requested', 'user_id' => $r->user()->id, 'vacancy_id' => $vacancy->id, 'notes' => $data['notes'] ?? null, 'match_snapshot' => $matcher->assess($r->user(), $vacancy)]);
             $this->audit($r, 'referral.requested', $row);
 
             return response()->json(['data' => $row], 201);
@@ -244,7 +246,7 @@ class EmploymentController extends Controller
     public function updateReferral(Request $r, Referral $referral)
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin', 'employer']);
-        $data = $r->validate(['status' => ['required', Rule::in(['referred', 'interviewing', 'offered', 'not_selected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'interview_at' => 'nullable|date|after:now']);
+        $data = $r->validate(['status' => ['required', Rule::in(['referred', 'interviewing', 'offered', 'not_selected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'interview_at' => 'nullable|date|after:now', 'source_confirmation' => 'nullable|string|min:20|max:2000']);
 
         return DB::transaction(function () use ($r, $referral, $data) {
             $row = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
@@ -254,6 +256,13 @@ class EmploymentController extends Controller
             } elseif ($r->user()->role === 'employer') {
                 abort_unless($row->vacancy->owner_id === $r->user()->id && in_array($data['status'], ['interviewing', 'offered', 'not_selected']), 403);
             }
+            if ($row->vacancy->external_application && $data['status'] === 'referred') {
+                abort_unless($this->staff($r) && ! empty($data['source_confirmation']), 422, 'PESO must record employer contact, current availability and application instructions before referring this source-listed vacancy.');
+                $snapshot = $row->match_snapshot ?? [];
+                $snapshot['source_confirmation'] = ['evidence' => $data['source_confirmation'], 'verified_by' => $r->user()->id, 'verified_at' => now()->toIso8601String()];
+                $row->match_snapshot = $snapshot;
+            }
+            unset($data['source_confirmation']);
             $this->transition($row->status, $data['status'], ['requested' => ['referred', 'not_selected', 'withdrawn'], 'referred' => ['interviewing', 'offered', 'not_selected', 'withdrawn'], 'interviewing' => ['offered', 'not_selected', 'withdrawn'], 'offered' => ['not_selected', 'withdrawn']]);
             if ($data['status'] === 'interviewing' && empty($data['interview_at'])) {
                 throw ValidationException::withMessages(['interview_at' => ['Set an interview schedule.']]);
@@ -265,18 +274,31 @@ class EmploymentController extends Controller
         });
     }
 
+    public function createIntake(Request $r, TrainingProgram $program)
+    {
+        $this->roles($r, ['peso_staff', 'admin']);
+        abort_unless($program->external_enrollment, 422, 'Choose a source-listed program.');
+        $data = $r->validate(['provider' => 'required|string|max:160', 'location' => 'required|string|max:160', 'mode' => ['required', Rule::in(['In person', 'Online', 'Blended'])], 'capacity' => 'required|integer|min:1|max:10000', 'starts_on' => 'required|date|after_or_equal:today', 'ends_on' => 'required|date|after_or_equal:starts_on', 'schedule' => 'required|string|max:200', 'fee' => 'required|numeric|min:0|max:1000000', 'intake_verification' => 'required|string|min:20|max:4000']);
+
+        return DB::transaction(function () use ($r, $program, $data) {
+            $row = TrainingProgram::create($data + ['title' => $program->title, 'source_program_id' => $program->id, 'owner_id' => $r->user()->id, 'description' => $program->description, 'requirements' => $program->requirements, 'skills' => $program->skills, 'status' => 'published', 'is_sample' => $program->is_sample, 'external_enrollment' => false]);
+            $this->audit($r, 'training.intake_verified', $row, $data);
+
+            return response()->json(['data' => $row], 201);
+        });
+    }
+
     public function enroll(Request $r, TrainingProgram $program)
     {
         $this->roles($r, ['jobseeker']);
         abort_unless($r->user()->jobseekerProfile?->profile_completed_at, 422, 'Complete your profile before enrolling.');
-        abort_if($program->external_enrollment, 422, 'Enroll through the official provider website. PESO cannot confirm an external enrollment.');
         $data = $r->validate(['consent' => 'required|accepted', 'notes' => 'nullable|string|max:2000', 'consent_notice_version' => ['sometimes', 'nullable', 'string', Rule::in([config('security.enrollment_notice_version')])]]);
 
         return DB::transaction(function () use ($r, $program, $data) {
             $program = TrainingProgram::whereKey($program->id)->lockForUpdate()->firstOrFail();
-            abort_unless($program->status === 'published' && $program->starts_on >= today()->toDateString(), 422, 'Enrollment is closed for this program.');
-            abort_if(Enrollment::where('user_id', $r->user()->id)->where('training_program_id', $program->id)->exists(), 409, 'An enrollment already exists for this program.');
-            $row = Enrollment::create(['user_id' => $r->user()->id, 'training_program_id' => $program->id, 'notes' => $data['notes'] ?? null, 'consent_accepted_at' => now(), 'consent_notice_version' => $data['consent_notice_version'] ?? null, 'consent_recipient' => $program->provider]);
+            abort_unless(TrainingProgram::available()->whereKey($program->id)->exists(), 422, 'Enrollment requests are closed for this program.');
+            abort_if(Enrollment::withTrashed()->where('user_id', $r->user()->id)->where('training_program_id', $program->id)->exists(), 409, 'An enrollment already exists for this program. Ask PESO to review a withdrawn request or select a new intake.');
+            $row = Enrollment::create(['status' => 'requested', 'user_id' => $r->user()->id, 'training_program_id' => $program->id, 'notes' => $data['notes'] ?? null, 'consent_accepted_at' => now(), 'consent_notice_version' => $data['consent_notice_version'] ?? null, 'consent_recipient' => $program->provider]);
             $this->audit($r, 'enrollment.requested', $row, ['consent' => true]);
 
             return response()->json(['data' => $row], 201);
@@ -299,7 +321,7 @@ class EmploymentController extends Controller
     public function updateEnrollment(Request $r, Enrollment $enrollment)
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin', 'training_provider']);
-        $data = $r->validate(['status' => ['required', Rule::in(['confirmed', 'in_progress', 'completed', 'rejected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'certificate_reference' => 'nullable|string|max:200']);
+        $data = $r->validate(['status' => ['required', Rule::in(['confirmed', 'in_progress', 'completed', 'rejected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'certificate_reference' => 'nullable|string|max:200', 'intake_program_id' => 'nullable|integer|min:1']);
 
         return DB::transaction(function () use ($r, $enrollment, $data) {
             $program = TrainingProgram::whereKey($enrollment->training_program_id)->lockForUpdate()->firstOrFail();
@@ -310,11 +332,20 @@ class EmploymentController extends Controller
             } elseif ($r->user()->role === 'training_provider') {
                 abort_unless($program->owner_id === $r->user()->id, 403);
             }
+            if ($program->external_enrollment && $data['status'] === 'confirmed') {
+                abort_unless($this->staff($r) && ! empty($data['intake_program_id']), 422, 'Create and select a verified local intake before confirming this source-program request.');
+                $intake = TrainingProgram::whereKey($data['intake_program_id'])->lockForUpdate()->firstOrFail();
+                abort_unless(! $intake->external_enrollment && $intake->source_program_id === $program->id && $intake->intake_verification && $intake->starts_on >= today()->toDateString(), 422, 'Select an upcoming verified intake for this exact source program.');
+                abort_if(Enrollment::withTrashed()->where('user_id', $row->user_id)->where('training_program_id', $intake->id)->where('id', '!=', $row->id)->exists(), 409, 'This jobseeker already has a request for that intake.');
+                $row->training_program_id = $intake->id;
+                $program = $intake;
+            }
+            unset($data['intake_program_id']);
             $this->transition($row->status, $data['status'], ['requested' => ['confirmed', 'rejected', 'withdrawn'], 'confirmed' => ['in_progress', 'withdrawn'], 'in_progress' => ['completed', 'withdrawn']]);
             if ($data['status'] === 'confirmed') {
                 $used = Enrollment::where('training_program_id', $program->id)->whereIn('status', ['confirmed', 'in_progress', 'completed'])->count();
                 abort_if($used >= $program->capacity, 422, 'All training places are reserved.');
-                abort_unless($program->status === 'published', 422, 'Reopen the program before confirming enrollment.');
+                abort_unless(! $program->trashed() && $program->status === 'published', 422, 'Use a published, undeleted intake before confirming enrollment.');
             }
             if ($data['status'] === 'completed' && empty($data['certificate_reference'])) {
                 throw ValidationException::withMessages(['certificate_reference' => ['Record the provider completion reference. This is not a TESDA National Certificate.']]);
@@ -349,7 +380,11 @@ class EmploymentController extends Controller
             $row = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
             abort_unless($row->status === 'offered', 422, 'Record an offer before verifying placement.');
             $count = Placement::whereHas('referral', fn ($q) => $q->where('vacancy_id', $vacancy->id))->count();
-            abort_if($count >= $vacancy->slots, 422, 'All vacancy positions have a recorded placement.');
+            if ($vacancy->external_application) {
+                abort_unless(! empty($row->match_snapshot['source_confirmation']), 422, 'Record PESO employer verification before placing a source-listed applicant.');
+            } else {
+                abort_if($count >= $vacancy->slots, 422, 'All vacancy positions have a recorded placement.');
+            }
             $placement = Placement::create([...$data, 'user_id' => $row->user_id, 'referral_id' => $row->id, 'verified_by' => $r->user()->id]);
             $row->update(['status' => 'placed', 'updated_by' => $r->user()->id]);
             $this->audit($r, 'placement.verified', $placement, $data);
@@ -463,7 +498,11 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['peso_staff', 'admin']);
         abort_if($event?->source_url, 422, 'Official-source events are maintained through the reviewed source import.');
-        $data = $r->validate(['title' => 'required|string|max:160', 'type' => ['required', Rule::in(['Job fair', 'Career guidance', 'Pre-employment orientation', 'Livelihood', 'SPES / GIP / JobStart', 'Reintegration'])], 'location' => 'required|string|max:160', 'starts_at' => ($event?->exists ? 'required|date' : 'required|date|after:now'), 'description' => 'required|string|max:4000', 'status' => ['required', Rule::in(['draft', 'published', 'cancelled', 'completed'])]]);
+        $data = $r->validate(['title' => 'required|string|max:160', 'type' => ['required', Rule::in(['Job fair', 'Career guidance', 'Pre-employment orientation', 'Livelihood', 'SPES / GIP / JobStart', 'Reintegration'])], 'location' => 'required|string|max:160', 'starts_at' => ($event?->exists ? 'required|date' : 'required|date|after:now'), 'description' => 'required|string|max:4000', 'status' => ['required', Rule::in(['draft', 'published', 'cancelled', 'completed'])], 'reference_name' => 'nullable|required_with:reference_url|string|max:160', 'reference_url' => 'nullable|required_with:reference_name|url:https|max:700']);
+        if (! empty($data['reference_url'])) {
+            $parts = parse_url($data['reference_url']);
+            abort_if(isset($parts['user']) || isset($parts['pass']), 422, 'Use a public HTTPS link without embedded credentials.');
+        }
 
         return DB::transaction(function () use ($r, $event, $data) {
             $row = $event?->exists ? $event : new ServiceEvent;

@@ -5,7 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmploymentController as Employment;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PrivacyController;
+use App\Http\Controllers\RemovalController;
 use App\Http\Controllers\ResumeController;
+use App\Http\Middleware\EnsureSessionIdentity;
 use App\Http\Middleware\ValidatePlatformQuery;
 use App\Models\Skill;
 use Illuminate\Support\Facades\Route;
@@ -13,7 +15,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/public/catalog', [Employment::class, 'publicCatalog'])->middleware('throttle:60,1');
 Route::get('/public/source-coverage', fn () => response()->json(json_decode(file_get_contents(database_path('data/catalog-source-coverage.json')), true, 512, JSON_THROW_ON_ERROR)))->middleware('throttle:60,1');
 
-Route::prefix('platform')->middleware(['auth:sanctum', 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
+Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
+    Route::post('/delete-intents', [RemovalController::class, 'intent']);
+    Route::delete('/remove/{type}/{id}', [RemovalController::class, 'destroy'])->whereNumber('id');
     Route::get('/summary', [Employment::class, 'summary']);
     Route::get('/vacancies', [Employment::class, 'vacancies']);
     Route::post('/vacancies', [Employment::class, 'saveVacancy']);
@@ -25,6 +29,7 @@ Route::prefix('platform')->middleware(['auth:sanctum', 'throttle:platform', Vali
     Route::post('/training', [Employment::class, 'saveProgram']);
     Route::patch('/training/{program}', [Employment::class, 'saveProgram']);
     Route::post('/training/{program}/enroll', [Employment::class, 'enroll']);
+    Route::post('/training/{program}/intakes', [Employment::class, 'createIntake']);
     Route::get('/matches', [Employment::class, 'matches']);
     Route::get('/referrals', [Employment::class, 'referrals']);
     Route::patch('/referrals/{referral}', [Employment::class, 'updateReferral']);
@@ -48,7 +53,7 @@ Route::prefix('platform')->middleware(['auth:sanctum', 'throttle:platform', Vali
     Route::get('/labor-market', [Employment::class, 'laborMarket']);
 });
 
-Route::middleware(['auth:sanctum', 'throttle:platform'])->group(function () {
+Route::middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platform'])->group(function () {
     Route::get('/privacy/requests', [PrivacyController::class, 'index'])->middleware(ValidatePlatformQuery::class);
     Route::post('/privacy/requests', [PrivacyController::class, 'store'])->middleware('throttle:6,1');
     Route::patch('/privacy/requests/{privacyRequest}', [PrivacyController::class, 'update'])->middleware('throttle:30,1');

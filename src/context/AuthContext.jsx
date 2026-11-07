@@ -12,6 +12,7 @@ import {
   loginAccount,
   logoutAccount,
   registerAccount,
+  setExpectedAccount,
 } from "../services/account.js"
 
 import { withMinimumLoading } from "../platform/loading.js"
@@ -20,6 +21,7 @@ const AuthContext = createContext(null)
 
 export function destinationFor(onboarding, user) {
   if (user && user.role !== "jobseeker") return "/dashboard"
+
   return onboarding?.completed
     ? "/dashboard"
     : `/jobseeker/onboarding/${Math.min(5, Math.max(1, Number(onboarding?.current_step) || 1))}`
@@ -34,14 +36,54 @@ export function AuthProvider({ children }) {
 
   const generation = useRef(0)
 
+  const currentUser = useRef(null)
+
+  const channel = useRef(null)
+  const authenticating = useRef(false)
+
+  const [sessionNotice, setSessionNotice] = useState("")
+
+  const accept = useCallback((result) => {
+    const next = result?.user || null
+
+    if (
+      currentUser.current &&
+      next &&
+      (next.id !== currentUser.current.id ||
+        next.role !== currentUser.current.role)
+    ) {
+      setSessionNotice(
+        "The shared browser session changed in another tab. This workspace now shows the account signed in on the server.",
+      )
+    }
+
+    currentUser.current = next
+
+    setExpectedAccount(next)
+
+    setSession({ user: next, onboarding: result?.onboarding || null })
+  }, [])
+
+  const announce = () => {
+    channel.current?.postMessage("changed")
+
+    try {
+      localStorage.setItem(
+        "peso-session-event",
+        `${Date.now()}:${Math.random()}`,
+      )
+    } catch {}
+  }
+
   const refresh = useCallback(async () => {
+    if (authenticating.current) return null
     const request = ++generation.current
 
     try {
       const result = await withMinimumLoading(getAccount)
 
       if (request === generation.current) {
-        setSession({ user: result.user, onboarding: result.onboarding })
+        accept(result)
 
         setError("")
       }
@@ -50,7 +92,7 @@ export function AuthProvider({ children }) {
     } catch (failure) {
       if (request === generation.current) {
         if (failure.status === 401) {
-          setSession({ user: null, onboarding: null })
+          accept(null)
 
           setError("")
         } else {
@@ -67,7 +109,7 @@ export function AuthProvider({ children }) {
     } finally {
       if (request === generation.current) setLoading(false)
     }
-  }, [])
+  }, [accept])
 
   useEffect(() => {
     refresh().catch(() => {})
@@ -84,24 +126,72 @@ export function AuthProvider({ children }) {
       refresh().catch(() => {})
     }
 
+    const recheck = () => refresh().catch(() => {})
+
+    const visible = () => {
+      if (document.visibilityState === "visible") recheck()
+    }
+
+    const stale = () => {
+      setLoading(true)
+      recheck()
+    }
+
+    const storage = (event) => {
+      if (event.key === "peso-session-event") recheck()
+    }
+
+    if (typeof BroadcastChannel !== "undefined") {
+      channel.current = new BroadcastChannel("peso-session")
+
+      channel.current.onmessage = recheck
+    }
+
+    window.addEventListener("focus", recheck)
+
+    document.addEventListener("visibilitychange", visible)
+
+    window.addEventListener("storage", storage)
+
+    window.addEventListener("pesomatch:session-stale", stale)
+
     window.addEventListener("pesomatch:profile-updated", profileUpdated)
 
-    return () =>
+    return () => {
+      window.removeEventListener("focus", recheck)
+
+      document.removeEventListener("visibilitychange", visible)
+
+      window.removeEventListener("storage", storage)
+
+      window.removeEventListener("pesomatch:session-stale", stale)
+
       window.removeEventListener("pesomatch:profile-updated", profileUpdated)
+
+      channel.current?.close()
+
+      channel.current = null
+    }
   }, [refresh])
 
   const authenticate = async (action, payload) => {
+    authenticating.current = true
     ++generation.current
 
     try {
       const result = await action(payload)
 
-      setSession({ user: result.user, onboarding: result.onboarding })
+      accept(result)
+
+      setSessionNotice("")
+
+      announce()
 
       setError("")
 
       return result
     } finally {
+      authenticating.current = false
       setLoading(false)
     }
   }
@@ -115,7 +205,9 @@ export function AuthProvider({ children }) {
 
     ++generation.current
 
-    setSession({ user: null, onboarding: null })
+    accept(null)
+
+    announce()
 
     setError("")
 
@@ -126,6 +218,8 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         ...session,
+
+        sessionNotice,
 
         loading,
 

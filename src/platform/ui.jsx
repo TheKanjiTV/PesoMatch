@@ -59,6 +59,10 @@ export const primaryStyle =
 export const secondaryStyle =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-bold text-foreground hover:border-primary hover:text-primary disabled:opacity-50"
 
+export const dangerStyle = `${secondaryStyle} action-delete`
+
+export const addStyle = `${primaryStyle} action-add`
+
 export function Brand({ light = false, to = "/" }) {
   return (
     <Link
@@ -137,15 +141,21 @@ export function Badge({ children, sample = false }) {
 
   const tone = sample
     ? "sample"
-    : /completed|verified|placed|confirmed|published|employed|active|profile complete/.test(
+    : /unverified|not verified|unconfirmed|confirm intake|confirm availability|draft/.test(
           value,
         )
-      ? "success"
-      : /declined|rejected|cancelled|withdrawn|closed/.test(value)
-        ? "neutral"
-        : /pending|requested|review|offered|scheduled|progress/.test(value)
-          ? "pending"
-          : "info"
+      ? "pending"
+      : /completed|verified|placed|confirmed|published|employed|active|profile complete/.test(
+            value,
+          )
+        ? "success"
+        : /declined|rejected|error|failed/.test(value)
+          ? "error"
+          : /cancelled|withdrawn|closed|removed/.test(value)
+            ? "neutral"
+            : /pending|requested|review|offered|scheduled|progress/.test(value)
+              ? "pending"
+              : "info"
 
   return <span className={`status-badge status-${tone}`}>{children}</span>
 }
@@ -295,7 +305,9 @@ export function Field({
       </span>
       {options ? (
         <select {...shared}>
-          <option value="">Select…</option>
+          <option value="" disabled hidden>
+            Choose {label.toLowerCase()}
+          </option>
           {options.map((o) => (
             <option
               key={typeof o === "string" ? o : o.value}
@@ -487,7 +499,7 @@ export function Editor({
           </div>
         )}
         <div className="flex flex-wrap gap-3 border-t border-border pt-5 sm:col-span-2">
-          <button disabled={busy} className={primaryStyle}>
+          <button disabled={busy} className={addStyle}>
             {busy ? pendingLabel : submitLabel}
             <Check size={16} />
           </button>
@@ -495,7 +507,7 @@ export function Editor({
             type="button"
             disabled={busy}
             onClick={onClose}
-            className={secondaryStyle}
+            className={`${secondaryStyle} action-cancel`}
           >
             Cancel
           </button>

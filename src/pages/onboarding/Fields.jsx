@@ -58,7 +58,7 @@ export function FormField({
       </label>
       {options ? (
         <select {...shared}>
-          <option value="" disabled>
+          <option value="" disabled hidden>
             Choose an option
           </option>
           {options.map((option) =>

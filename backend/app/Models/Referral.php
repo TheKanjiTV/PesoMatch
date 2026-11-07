@@ -15,7 +15,7 @@ class Referral extends Model
 
     public function vacancy()
     {
-        return $this->belongsTo(Vacancy::class);
+        return $this->belongsTo(Vacancy::class)->withTrashed();
     }
 
     public function user()

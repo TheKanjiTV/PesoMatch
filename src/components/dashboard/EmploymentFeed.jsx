@@ -421,7 +421,7 @@ export function FeedPost({ post, detailed = false }) {
                   onChange={(e) => setReason(e.target.value)}
                   className="mt-2 h-11 w-full rounded-lg border border-border px-3"
                 >
-                  <option value="">Choose a reason</option>
+                  <option value="" disabled hidden>Choose a reason</option>
                   {[
                     "Misleading vacancy information",
 

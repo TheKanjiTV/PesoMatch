@@ -22,18 +22,18 @@
 }
 :root[data-contrast="hc2"] {
  color-scheme: dark;
- --background: #000000; --foreground: #ffffff;
- --card: #000000; --card-foreground: #ffffff;
- --primary: #ffffff; --primary-foreground: #000000;
- --secondary: #000000; --secondary-foreground: #ffffff;
- --muted: #000000; --muted-foreground: #ffffff;
- --accent: #ffffff; --accent-foreground: #000000;
- --border: #ffffff; --ring: #ffffff;
- --success-bg: #000000; --success-text: #ffffff;
- --pending-bg: #000000; --pending-text: #ffffff;
- --info-bg: #000000; --info-text: #ffffff;
- --neutral-bg: #000000; --neutral-text: #ffffff;
- --error-bg: #000000; --error-text: #ffffff;
+ --background: #18191a; --foreground: #e4e6eb;
+ --card: #242526; --card-foreground: #e4e6eb;
+ --primary: #91d5ab; --primary-foreground: #142c20;
+ --secondary: #3a3b3c; --secondary-foreground: #e4e6eb;
+ --muted: #303132; --muted-foreground: #b0b3b8;
+ --accent: #f7b928; --accent-foreground: #241b08;
+ --border: #3e4042; --ring: #91d5ab;
+ --success-bg: #203c2b; --success-text: #9ee5b2;
+ --pending-bg: #473b19; --pending-text: #ffda80;
+ --info-bg: #1c354a; --info-text: #94cdff;
+ --neutral-bg: #3a3b3c; --neutral-text: #e4e6eb;
+ --error-bg: #452631; --error-text: #ffadbc;
 }
 @theme inline {
  --font-sans: 'Public Sans', sans-serif;

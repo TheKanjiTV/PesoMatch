@@ -28,6 +28,53 @@ const json = (value) =>
     headers: { "Content-Type": "application/json" },
   })
 
+test("private calls identify the visible account while identity refresh never pins the old account", async (t) => {
+  const calls = []
+  const c = await client(t, async (url, options) => {
+    calls.push({ url, options })
+    return json({})
+  })
+  c.setExpectedAccount({ id: 17 })
+  await c.accountRequest("/api/platform/summary")
+  await c.getAccount()
+  c.setExpectedAccount({ id: 23 })
+  await c.accountRequest("/api/platform/summary")
+  assert.equal(calls[0].options.headers["X-Peso-User"], "17")
+  assert.equal(calls[1].options.headers["X-Peso-User"], undefined)
+  assert.equal(calls[2].options.headers["X-Peso-User"], "23")
+})
+
+test("a stale-account response announces refresh once without an unauthenticated identity-refresh loop", async (t) => {
+  const previous = globalThis.window
+  const events = []
+  globalThis.window = { dispatchEvent: (event) => events.push(event.type) }
+  t.after(() => {
+    if (previous === undefined) delete globalThis.window
+    else globalThis.window = previous
+  })
+  const c = await client(
+    t,
+    async (url) =>
+      new Response(
+        JSON.stringify(
+          url === "/api/auth/user"
+            ? { message: "Unauthenticated" }
+            : { message: "Account changed", code: "SESSION_CHANGED" },
+        ),
+        {
+          status: url === "/api/auth/user" ? 401 : 409,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+  )
+  await assert.rejects(
+    c.accountRequest("/api/platform/summary"),
+    (e) => e.status === 409,
+  )
+  await assert.rejects(c.getAccount(), (e) => e.status === 401)
+  assert.deepEqual(events, ["pesomatch:session-stale"])
+})
+
 test("guide preference sends its CSRF-protected keepalive write before navigation", async (t) => {
   const calls = []
   const c = await client(t, async (url, options) => {

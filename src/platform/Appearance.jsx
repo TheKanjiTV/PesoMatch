@@ -52,7 +52,7 @@ export function AppearanceProvider({ children }) {
       ?.setAttribute(
         "content",
 
-        appearance.theme === "hc2" ? "#000000" : "#123d35",
+        appearance.theme === "hc2" ? "#18191A" : "#123d35",
       )
 
     try {
@@ -112,7 +112,7 @@ export function AppearanceSettings() {
       <fieldset className="mt-5 border-b border-border pb-5">
         <legend className="font-semibold">Color theme</legend>
         <p className="mt-2 text-sm text-muted-foreground">
-          Light, or black-and-white dark mode. Saved on this device.
+          Light, or layered charcoal dark mode. Saved on this device.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           {[

@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Services\VacancySources;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vacancy extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = ['id'];
 
     protected $appends = ['availability_status'];

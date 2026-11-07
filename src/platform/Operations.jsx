@@ -1,3 +1,5 @@
+import { DeleteDialog } from "./DeleteDialog.jsx"
+
 import { PrivacyRequests } from "./PrivacyRequests.jsx"
 
 import { useState } from "react"
@@ -34,6 +36,8 @@ import {
   inputStyle,
   Notice,
   primaryStyle,
+  dangerStyle,
+  addStyle,
   roles,
   Sample,
   Source,
@@ -73,6 +77,28 @@ export function EventsPage() {
     },
 
     { name: "location", label: "Venue / location" },
+
+    {
+      name: "reference_name",
+
+      label: "Organizer / link display name",
+
+      required: false,
+
+      maxLength: 160,
+    },
+
+    {
+      name: "reference_url",
+
+      label: "Organizer / program link (HTTPS)",
+
+      type: "url",
+
+      required: false,
+
+      maxLength: 700,
+    },
 
     {
       name: "starts_at",
@@ -125,7 +151,7 @@ export function EventsPage() {
         action={
           staff && (
             <button
-              className={primaryStyle}
+              className={addStyle}
               onClick={() => setEditor({ status: "draft" })}
             >
               Add event / program
@@ -169,6 +195,17 @@ export function EventsPage() {
                 <p className="mt-3 text-sm text-muted-foreground">
                   {date(e.event_date || e.starts_at)} · {e.location}
                 </p>
+                {e.reference_url && (
+                  <a
+                    href={e.reference_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex min-h-11 items-center font-bold text-primary underline underline-offset-4"
+                  >
+                    {e.reference_name}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                )}
                 {e.source_url && (
                   <div className="mt-3">
                     <Source record={e} />
@@ -203,7 +240,7 @@ export function EventsPage() {
                     </button>
                   ) : e.source_url ? (
                     <a
-                      className={secondaryStyle}
+                      className={`${secondaryStyle} action-view`}
                       href={e.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -356,10 +393,20 @@ export function LaborMarketPage() {
               </section>
             ))}
             <Notice>
-              {r.data.scope} Sample vacancies are excluded from demand totals.
-              As of {date(r.data.as_of)}. {r.data.source_listed_vacancies || 0}{" "}
-              external source listings are available to explore; their
-              unspecified positions are excluded from verified demand totals.
+              <div>
+                <strong>
+                  PESO platform activity · as of {date(r.data.as_of)}.
+                </strong>
+                <p className="mt-2">
+                  {r.data.source_listed_vacancies || 0} official-source listings
+                  can receive PESO application requests. Official-source records
+                  are different from illustrative samples. Demand totals count
+                  published partner vacancies with known position counts;
+                  unknown external slot counts are not estimated. These figures
+                  describe platform records, not the municipal or national
+                  unemployment rate.
+                </p>
+              </div>
             </Notice>
             <div className="my-7 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
               {[
@@ -673,6 +720,8 @@ export function RegistryPage() {
 export function AccessPage() {
   const r = useResource("/users")
 
+  const [removing, setRemoving] = useState(null)
+
   const { user } = useAuth()
 
   const [editor, setEditor] = useState(null),
@@ -680,6 +729,18 @@ export function AccessPage() {
 
   return (
     <>
+      {removing && (
+        <DeleteDialog
+          type="account"
+          record={removing}
+          onClose={() => setRemoving(null)}
+          onDeleted={async () => {
+            setMessage("Account deleted and sessions revoked.")
+
+            await r.reload()
+          }}
+        />
+      )}
       <Heading
         title="Account Access & Responsibilities"
         description="Public accounts begin as jobseekers. Only administrators can provision staff and partner access."
@@ -788,6 +849,14 @@ export function AccessPage() {
                     >
                       {u.id === user.id ? "Current account" : "Manage access"}
                     </button>
+                    {u.id !== user.id && (
+                      <button
+                        className={`${dangerStyle} ml-2`}
+                        onClick={() => setRemoving(u)}
+                      >
+                        Delete account
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

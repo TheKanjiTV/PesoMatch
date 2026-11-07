@@ -1,15 +1,19 @@
 import { legalNotices } from "./legal.js"
+
 import { OfficialHelp } from "./OfficialHelp.jsx"
+
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 
-import { Link, Outlet, useLocation, useNavigate } from "react-router"
+import { Link, Navigate, Outlet, useLocation, useNavigate } from "react-router"
 
 import { ArrowRight, LockKeyhole, Mail } from "lucide-react"
 
 import { exitPanel } from "../motion.js"
 
 import { destinationFor, useAuth } from "../../context/AuthContext.jsx"
+
 import { LogoLoading } from "../../platform/LoadingStates.jsx"
+
 import { withMinimumLoading } from "../../platform/loading.js"
 
 import {
@@ -104,7 +108,7 @@ function usePanelNavigation() {
 export function LoginPage({ staffPortal = false }) {
   useTitle(staffPortal ? "PESO Staff & Partner Sign In" : "Log In")
 
-  const { login } = useAuth()
+  const { login, user, onboarding, loading } = useAuth()
 
   const { panelRef, continueTo } = usePanelNavigation()
 
@@ -160,7 +164,9 @@ export function LoginPage({ staffPortal = false }) {
       const session = await withMinimumLoading(() =>
         login({
           email: email.trim(),
+
           password,
+
           website: new FormData(event.currentTarget).get("website") || "",
         }),
       )
@@ -172,6 +178,11 @@ export function LoginPage({ staffPortal = false }) {
       setBusy(false)
     }
   }
+
+  if (loading && !busy) return <LogoLoading fullScreen />
+
+  if (user && !busy)
+    return <Navigate to={destinationFor(onboarding, user)} replace />
 
   return (
     <>
@@ -424,7 +435,9 @@ export function RegisterPage() {
         password: values.password,
 
         password_confirmation: values.confirm,
+
         terms_accepted: terms,
+
         website: new FormData(event.currentTarget).get("website") || "",
       })
 
@@ -709,8 +722,11 @@ export function VerificationPage() {
 
 export function LegalPage() {
   const { pathname } = useLocation()
+
   const notice = legalNotices[pathname] || legalNotices["/privacy"]
+
   useTitle(notice.title)
+
   return (
     <AuthLayout centered wide>
       <FormHeading
@@ -764,6 +780,7 @@ export function LegalPage() {
 
 export function HelpPage() {
   useTitle("Help & official contacts")
+
   return (
     <AuthLayout centered wide>
       <FormHeading
@@ -780,6 +797,7 @@ export function NotFoundPage() {
   useTitle("Page Not Found")
 
   const navigate = useNavigate()
+
   const { user, onboarding } = useAuth()
 
   return (

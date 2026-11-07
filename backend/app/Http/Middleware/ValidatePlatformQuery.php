@@ -17,6 +17,7 @@ class ValidatePlatformQuery
                 'search' => ['bail', 'sometimes', 'nullable', 'string', 'max:200', 'not_regex:/[\x00-\x1f\x7f]/u'],
                 'status' => ['sometimes', 'nullable', 'string', Rule::in(['all', 'draft', 'pending_review', 'published', 'closed'])],
                 'saved' => 'sometimes|boolean',
+                'source_program_id' => 'sometimes|integer|min:1',
                 'include_samples' => 'sometimes|boolean',
                 'catalog' => ['sometimes', Rule::in(['all', 'online_course', 'registered_program', 'overseas_training', 'partner_program'])],
                 'availability' => ['sometimes', Rule::in(['all', 'source_lists_open'])],

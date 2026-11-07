@@ -82,13 +82,13 @@ Artisan::command('peso:import-verified-vacancies', function () {
             if (! VacancySources::allows($row['source_url'])) {
                 throw new RuntimeException('Unexpected source host.');
             }
-            if (Vacancy::where('source_url', $row['source_url'])->where(fn ($q) => $q->whereNotNull('owner_id')->orWhere('external_application', false))->exists()) {
+            if (Vacancy::withTrashed()->where('source_url', $row['source_url'])->where(fn ($q) => $q->whereNotNull('owner_id')->orWhere('external_application', false))->exists()) {
                 throw new RuntimeException('A source identity conflicts with an owned vacancy.');
             }
             foreach ($row['skills'] as $skill) {
                 Skill::firstOrCreate(['name' => $skill]);
             }
-            Vacancy::updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => $row['slots'] ?? null, 'deadline' => $row['deadline'] ?? null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true, 'updated_at' => $importedAt]);
+            Vacancy::withTrashed()->updateOrCreate(['source_url' => $row['source_url']], ['title' => $row['title'], 'organization' => $row['organization'], 'location' => $row['location'], 'industry' => $row['industry'], 'employment_type' => $row['employment_type'], 'description' => $row['description'], 'skills' => $row['skills'], 'slots' => $row['slots'] ?? null, 'deadline' => $row['deadline'] ?? null, 'salary_min' => null, 'salary_max' => null, 'status' => 'published', 'is_sample' => false, 'source_name' => $row['source_name'], 'source_checked_at' => CarbonImmutable::parse($row['checked_at'])->setTimezone(config('app.timezone')), 'source_posted_on' => $row['source_posted_on'], 'source_salary' => $row['source_salary'], 'external_application' => true, 'updated_at' => $importedAt]);
         }
         Vacancy::currentSource()->where('external_application', true)->whereNull('owner_id')->where('status', 'published')->where('updated_at', '<', $importedAt)->update(['status' => 'draft']);
     });

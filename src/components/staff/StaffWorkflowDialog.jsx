@@ -22,7 +22,7 @@ export const actionLabels = {
 function Select({ label, options, ...props }) {
   return (
     <Field label={label} {...props}>
-      <option value="" disabled>
+      <option value="" disabled hidden>
         Choose an option
       </option>
       {options.map((option) => {

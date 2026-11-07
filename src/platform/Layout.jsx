@@ -8,7 +8,9 @@ import {
   useNavigate,
   useNavigation,
 } from "react-router"
+
 import { PageSkeleton } from "./LoadingStates.jsx"
+
 import { usesLogoLoading } from "./loading.js"
 
 import {
@@ -144,7 +146,8 @@ function focusAfterLayout(resolveTarget) {
 
 export function PlatformLayout() {
   const navigation = useNavigation()
-  const { user, logout } = useAuth()
+
+  const { user, logout, sessionNotice } = useAuth()
 
   const [open, setOpen] = useState(false),
     [error, setError] = useState("")
@@ -300,7 +303,7 @@ export function PlatformLayout() {
 
   return (
     <div className="platform-shell min-h-dvh bg-background">
-      <TutorialGate />
+      <TutorialGate key={`${user.id}:${user.role}`} />
       <a
         href="#workspace-main"
         className="fixed left-4 top-3 z-50 -translate-y-20 rounded bg-primary px-5 py-3 text-white focus:translate-y-0"
@@ -416,7 +419,7 @@ export function PlatformLayout() {
             <AppearanceControls />
             <InstallButton compact />
             <Link
-              to="/"
+              to="/?public=1"
               className="inline-flex items-center gap-2 text-xs font-medium text-primary"
             >
               Public home
@@ -436,7 +439,16 @@ export function PlatformLayout() {
               role={user.role}
             />
           ) : (
-            <Outlet />
+            <>
+              {sessionNotice && (
+                <div className="mb-5">
+                  <Notice>{sessionNotice}</Notice>
+                </div>
+              )}
+              <div key={`${user.id}:${user.role}`}>
+                <Outlet />
+              </div>
+            </>
           )}
         </main>
         <footer className="mx-5 mt-10 border-t border-border py-6 text-[11px] leading-5 text-muted-foreground sm:mx-9">

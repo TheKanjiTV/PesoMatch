@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react"
 
-import { Link } from "react-router"
+import { Link, Navigate, useSearchParams } from "react-router"
+import { useAuth, destinationFor } from "../context/AuthContext.jsx"
 
 import {
   ArrowDown,
@@ -54,6 +55,8 @@ const journey = [
 ]
 
 export default function Landing() {
+  const { user, onboarding, loading } = useAuth()
+  const [params] = useSearchParams()
   const [catalog, setCatalog] = useState(null),
     [error, setError] = useState(""),
     [open, setOpen] = useState(false)
@@ -94,6 +97,9 @@ export default function Landing() {
     return () => document.removeEventListener("keydown", close)
   }, [open])
 
+  if (loading) return <LogoLoading fullScreen />
+  if (user && params.get("public") !== "1")
+    return <Navigate to={destinationFor(onboarding, user)} replace />
   return (
     <div className="public-portal bg-background text-foreground">
       <a

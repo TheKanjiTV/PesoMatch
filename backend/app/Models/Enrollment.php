@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Enrollment extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = ['id'];
 
     protected function casts(): array
@@ -15,7 +18,7 @@ class Enrollment extends Model
 
     public function program()
     {
-        return $this->belongsTo(TrainingProgram::class, 'training_program_id');
+        return $this->belongsTo(TrainingProgram::class, 'training_program_id')->withTrashed();
     }
 
     public function user()

@@ -9,28 +9,48 @@ const ACCOUNT_ORIGIN = (import.meta.env.VITE_ACCOUNT_API_URL || "").replace(
 )
 
 let csrfRequest
+
+let expectedUserId = null
+
+export function setExpectedAccount(user) {
+  expectedUserId = user?.id == null ? null : String(user.id)
+
+  pendingReads.clear()
+}
+
 const xsrfCookie = () =>
   document.cookie.split("; ").find((cookie) => cookie.startsWith("XSRF-TOKEN="))
+
 // Concurrent identical reads only. No settled response or private data cache.
+
 const pendingReads = new Map()
 
 export function accountRequest(path, options = {}) {
   const method = (options.method || "GET").toUpperCase()
+
   if (!["GET", "HEAD"].includes(method)) {
     pendingReads.clear()
+
     return performAccountRequest(path, options).finally(() =>
       pendingReads.clear(),
     )
   }
+
   // A caller's AbortSignal/headers retain independent request semantics.
+
   const share =
     method === "GET" && Object.keys(options).every((key) => key === "method")
+
   if (!share) return performAccountRequest(path, options)
+
   if (pendingReads.has(path)) return pendingReads.get(path)
+
   const promise = performAccountRequest(path, options).finally(() => {
     if (pendingReads.get(path) === promise) pendingReads.delete(path)
   })
+
   pendingReads.set(path, promise)
+
   return promise
 }
 
@@ -53,6 +73,7 @@ async function csrfCookie() {
 
       headers: { Accept: "application/json" },
     })
+
       .then((response) => {
         if (!response.ok)
           throw new AccountError(
@@ -96,6 +117,12 @@ async function performAccountRequest(
 
         "X-Requested-With": "XMLHttpRequest",
 
+        ...(expectedUserId &&
+        path !== "/api/auth/user" &&
+        !["/api/auth/login", "/api/auth/register"].includes(path)
+          ? { "X-Peso-User": expectedUserId }
+          : {}),
+
         ...(body !== undefined && !multipart
           ? { "Content-Type": "application/json" }
           : {}),
@@ -114,6 +141,17 @@ async function performAccountRequest(
 
     const json =
       response.status === 204 ? {} : await response.json().catch(() => null)
+
+    if (
+      json?.code === "SESSION_CHANGED" ||
+      (response.status === 401 &&
+        !["/api/auth/user", "/api/auth/login", "/api/auth/register"].includes(
+          path,
+        ))
+    ) {
+      if (typeof window !== "undefined")
+        window.dispatchEvent(new Event("pesomatch:session-stale"))
+    }
 
     if (!response.ok)
       throw new AccountError(
@@ -136,9 +174,11 @@ async function performAccountRequest(
       )
 
     // A followed HTML redirect is not a successful account/API response.
+
     if (json === null)
       throw new AccountError(
         "We couldn't read the response from PesoMatch. Reload this page and try again.",
+
         response.status,
       )
 
@@ -168,16 +208,22 @@ export const logoutAccount = () =>
 
 export async function updateAccountPreferences(body) {
   // This tiny explicit preference write must survive immediate page navigation.
+
   // Use the session's existing CSRF token; the backend still validates it.
+
   const options = { method: "PATCH", body, keepalive: true }
+
   try {
     return await accountRequest("/api/auth/preferences", {
       ...options,
+
       reuseCsrf: true,
     })
   } catch (error) {
     if (error.status !== 419) throw error
+
     // A stale token gets the normal Sanctum refresh and one retry.
+
     return accountRequest("/api/auth/preferences", options)
   }
 }

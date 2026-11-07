@@ -10,6 +10,8 @@ import { api, useResource } from "./api.js"
 
 import { ResourceState } from "./ResourceState.jsx"
 
+import { DeleteDialog } from "./DeleteDialog.jsx"
+
 import { RecordsSkeleton } from "./LoadingStates.jsx"
 
 import {
@@ -21,6 +23,7 @@ import {
   human,
   Notice,
   primaryStyle,
+  dangerStyle,
   Sample,
   secondaryStyle,
   staffRole,
@@ -148,6 +151,16 @@ export function RecordsPage({ kind }) {
 
   const r = useResource(`/${kind}`)
 
+  const [removing, setRemoving] = useState(null)
+
+  const [intakeSource, setIntakeSource] = useState(null)
+
+  const intakePrograms = useResource(
+    staff && intakeSource
+      ? `/training?source_program_id=${intakeSource}`
+      : "/summary",
+  )
+
   const [editor, setEditor] = useState(null),
     [message, setMessage] = useState(""),
     [search, setSearch] = useState("")
@@ -171,6 +184,9 @@ export function RecordsPage({ kind }) {
   )
 
   function start(row, action = "update") {
+    if (kind === "enrollments")
+      setIntakeSource(row?.program?.external_enrollment ? row.program.id : null)
+
     let fields = [],
       initial = {},
       path = `/${kind}/${row?.id}`,
@@ -236,6 +252,19 @@ export function RecordsPage({ kind }) {
           notes,
         ]
 
+        if (row.vacancy?.external_application && staff)
+          fields.push(
+            field(
+              "source_confirmation",
+
+              "Employer contact, date, current opening and application instructions (required before referring)",
+
+              "textarea",
+
+              { required: false, minLength: 20, maxLength: 2000 },
+            ),
+          )
+
         initial = { status: options[0] }
       }
     } else if (kind === "enrollments") {
@@ -260,6 +289,19 @@ export function RecordsPage({ kind }) {
 
         notes,
       ]
+
+      if (row.program?.external_enrollment && staff)
+        fields.push(
+          field(
+            "intake_program_id",
+
+            "Verified local intake (required for confirmation)",
+
+            "text",
+
+            { required: false, options: [] },
+          ),
+        )
 
       initial = { status: options[0] }
 
@@ -414,6 +456,8 @@ export function RecordsPage({ kind }) {
 
     if (body.appointment_at) body.appointment_at += ":00+08:00"
 
+    if (body.intake_program_id === "") body.intake_program_id = null
+
     if (body.assigned_to === "") body.assigned_to = null
 
     if (body.placement_id === "") body.placement_id = null
@@ -454,13 +498,62 @@ export function RecordsPage({ kind }) {
           <Notice>{message}</Notice>
         </div>
       )}
+      {removing && (
+        <DeleteDialog
+          type="enrollment"
+          record={{ ...removing, title: removing.program?.title }}
+          onClose={() => setRemoving(null)}
+          onDeleted={async () => {
+            setMessage(
+              "Enrollment request removed; active requests are withdrawn.",
+            )
+
+            await r.reload()
+          }}
+        />
+      )}
+      {staff && intakeSource && editor && (
+        <div className="mb-5">
+          <Notice>
+            <div>
+              Create a provider-confirmed intake before confirming this request.{" "}
+              <Link
+                className="font-bold underline"
+                to={`/training/${intakeSource}`}
+              >
+                Open source program and create verified intake
+              </Link>
+              .
+            </div>
+          </Notice>
+        </div>
+      )}
       {editor && (
         <>
           <CollectionNotice kind="records" />
           <Editor
             key={editor.key}
             title={editor.title}
-            fields={editor.fields}
+            fields={editor.fields.map((f) =>
+              f.name === "intake_program_id"
+                ? {
+                    ...f,
+
+                    options: (intakePrograms.data?.data || [])
+
+                      .filter(
+                        (p) =>
+                          !p.external_enrollment && p.status === "published",
+                      )
+
+                      .map((p) => ({
+                        value: p.id,
+
+                        label: `${p.title} · ${date(p.starts_on)} · ${p.provider}`,
+                      })),
+                  }
+                : f,
+            )}
             initial={editor.initial}
             help={editor.help}
             onSave={save}
@@ -576,10 +669,10 @@ export function RecordsPage({ kind }) {
                   <div className="mt-5 grid gap-5 border-t border-border pt-5 text-sm sm:grid-cols-2">
                     {row.notes && (
                       <div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm font-bold text-foreground">
                           Latest notes
                         </p>
-                        <p className="mt-2 whitespace-pre-wrap leading-6">
+                        <p className="record-emphasis mt-2 whitespace-pre-wrap leading-6">
                           {row.notes}
                         </p>
                       </div>
@@ -608,7 +701,7 @@ export function RecordsPage({ kind }) {
                       <div>Assigned officer: {row.assignee.name}</div>
                     )}
                     {row.interview_at && (
-                      <div>
+                      <div className="record-emphasis">
                         Interview:{" "}
                         {new Date(row.interview_at).toLocaleString("en-PH", {
                           timeZone: "Asia/Manila",
@@ -668,9 +761,20 @@ export function RecordsPage({ kind }) {
                     )}
                   </div>
                   <div className="mt-5 flex flex-wrap gap-3">
+                    {kind === "enrollments" &&
+                      row.status !== "completed" &&
+                      (jobseeker ||
+                        ["withdrawn", "rejected"].includes(row.status)) && (
+                        <button
+                          className={dangerStyle}
+                          onClick={() => setRemoving(row)}
+                        >
+                          Delete enrollment request
+                        </button>
+                      )}
                     {related && (
                       <Link
-                        className={secondaryStyle}
+                        className={`${secondaryStyle} action-view`}
                         to={`/${
                           kind === "enrollments" ? "training" : "jobs"
                         }/${related.id}`}
@@ -714,6 +818,26 @@ export function RecordsPage({ kind }) {
               )
             })}
           </div>
+        )}
+        {kind === "placements" && !records.length && (
+          <article
+            aria-label="Placement workflow example"
+            className="mt-6 rounded-lg border border-border bg-card p-6"
+          >
+            <Badge sample>
+              Illustrative placement example · not a real employment record
+            </Badge>
+            <h2 className="mt-4 text-xl font-bold text-primary">
+              Office Assistant · one placement example
+            </h2>
+            <p className="mt-3 font-semibold">PESO Bansud, Oriental Mindoro</p>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              Employer offer → verified employment start → recorded placement →
+              scheduled follow-up. A real record appears here when PESO verifies
+              the offer and start-date evidence. No person, employer outcome or
+              verified placement count has been invented.
+            </p>
+          </article>
         )}
       </ResourceState>
     </>

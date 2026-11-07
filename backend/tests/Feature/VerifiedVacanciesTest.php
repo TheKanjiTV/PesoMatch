@@ -44,8 +44,8 @@ class VerifiedVacanciesTest extends TestCase
         $v = Vacancy::firstOrFail();
         $this->actingAs($u)->postJson("/api/platform/vacancies/{$v->id}/save")->assertOk();
         $this->assertDatabaseHas('saved_vacancies', ['user_id' => $u->id, 'vacancy_id' => $v->id]);
-        $this->postJson("/api/platform/vacancies/{$v->id}/referrals")->assertUnprocessable();
-        $this->assertDatabaseCount('referrals', 0);
+        $this->postJson("/api/platform/vacancies/{$v->id}/referrals")->assertCreated()->assertJsonPath('data.status', 'requested');
+        $this->assertDatabaseCount('referrals', 1);
         $this->getJson('/api/platform/labor-market')->assertOk()->assertJsonPath('active_vacancies', 0)->assertJsonPath('source_listed_vacancies', Vacancy::count());
     }
 

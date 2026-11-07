@@ -6,7 +6,7 @@ import {
   trainingConsentStatement,
 } from "./CollectionNotice.jsx"
 
-import { Link, useParams } from "react-router"
+import { Link, useParams, useNavigate } from "react-router"
 
 import { ArrowRight, Bookmark, CalendarDays, MapPin } from "lucide-react"
 
@@ -25,6 +25,8 @@ import {
   money,
   Notice,
   primaryStyle,
+  dangerStyle,
+  addStyle,
   Sample,
   Source,
   secondaryStyle,
@@ -38,6 +40,9 @@ import { CatalogSkeleton, MatchesSkeleton } from "./LoadingStates.jsx"
 import { SearchInput } from "./SearchInput.jsx"
 
 import { searchSuggestions } from "./search.js"
+
+import { DeleteDialog } from "./DeleteDialog.jsx"
+
 import { PesoVacancySource } from "./PesoVacancySource.jsx"
 
 const fieldLimits = {
@@ -74,15 +79,23 @@ const statusField = F("status", "Publication status", "text", {
 
 function Verification({ record }) {
   if (!record.external_application && !record.external_enrollment) return null
+
   const labels = {
     source_lists_open: "Source lists open · check remaining places",
+
     confirm_availability: "Availability needs confirmation",
+
     intake_unconfirmed: "Registered program · confirm intake",
+
     official_announcement: "Official overseas announcement · confirm intake",
+
     online_catalog: "Official online course",
+
     deadline_passed: "Application deadline passed",
+
     review_expired: "Source review expired",
   }
+
   return (
     <Badge>
       {labels[record.availability_status] || "Confirm availability with source"}
@@ -170,7 +183,14 @@ export function CatalogPage({ kind = "vacancies" }) {
   const { user } = useAuth(),
     { id } = useParams()
 
+  const navigate = useNavigate()
+
+  const [removing, setRemoving] = useState(null)
+
+  const [intake, setIntake] = useState(null)
+
   const training = kind === "training"
+
   const showSourceStatus =
     user.role !== (training ? "training_provider" : "employer")
 
@@ -304,6 +324,12 @@ export function CatalogPage({ kind = "vacancies" }) {
             : "Referral requested. PESO will review your profile.",
       )
 
+      if (!save) {
+        navigate(training ? "/enrollments" : "/referrals")
+
+        return
+      }
+
       if (save) {
         await summary.reload()
 
@@ -331,12 +357,85 @@ export function CatalogPage({ kind = "vacancies" }) {
         }
         action={
           canManage && (
-            <button className={primaryStyle} onClick={() => edit()}>
+            <button className={addStyle} onClick={() => edit()}>
               Add {training ? "training program" : "vacancy"}
             </button>
           )
         }
       />
+      {removing && (
+        <DeleteDialog
+          type={training ? "training" : "vacancy"}
+          record={removing}
+          onClose={() => setRemoving(null)}
+          onDeleted={async () => {
+            setMessage("Catalog item deleted. Linked history is preserved.")
+
+            if (id) navigate(training ? "/training" : "/jobs")
+            else await r.reload()
+          }}
+        />
+      )}
+      {canManage && detail && (
+        <div className="mb-5 flex flex-wrap gap-3">
+          {training && detail.external_enrollment && staffRole(user.role) && (
+            <button className={addStyle} onClick={() => setIntake(detail)}>
+              Create verified local intake
+            </button>
+          )}
+          <button className={dangerStyle} onClick={() => setRemoving(detail)}>
+            Delete {training ? "training" : "vacancy"}
+          </button>
+        </div>
+      )}
+      {intake && (
+        <Editor
+          title={`Verify local intake: ${intake.title}`}
+          initial={{ provider: intake.provider }}
+          fields={[
+            F("provider", "Confirmed training provider"),
+
+            F("location", "Actual training location"),
+
+            F("mode", "Delivery mode", "text", {
+              options: ["In person", "Online", "Blended"],
+            }),
+
+            F("capacity", "Confirmed intake capacity", "number", { min: 1 }),
+
+            F("starts_on", "Confirmed start date", "date"),
+
+            F("ends_on", "Confirmed end date", "date"),
+
+            F("schedule", "Confirmed training schedule"),
+
+            F("fee", "Confirmed fee (PHP)", "number", { min: 0, step: "0.01" }),
+
+            F(
+              "intake_verification",
+
+              "Provider contact, date, intake, fee and scholarship verification",
+
+              "textarea",
+
+              { minLength: 20, maxLength: 4000 },
+            ),
+          ]}
+          help="Record the provider's actual confirmation. This creates a separate PESO-managed intake and preserves the original TESDA registry evidence. Do not assume scholarships or places are available."
+          onClose={() => setIntake(null)}
+          onSave={async (body) => {
+            const result = await api(
+              `/training/${intake.id}/intakes`,
+
+              "POST",
+
+              body,
+            )
+
+            navigate(`/training/${result.data.id}`)
+          }}
+        />
+      )}
       {showSourceStatus &&
         (!id ||
           detail?.external_application ||
@@ -563,11 +662,19 @@ export function CatalogPage({ kind = "vacancies" }) {
                       </span>
                       <Link
                         to={`${training ? "/training" : "/jobs"}/${v.id}`}
-                        className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary"
+                        className="action-view inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold"
                       >
                         View {training ? "program" : "vacancy"}
                         <ArrowRight size={16} />
                       </Link>
+                      {canManage && (
+                        <button
+                          className={dangerStyle}
+                          onClick={() => setRemoving(v)}
+                        >
+                          Delete {training ? "training" : "vacancy"}
+                        </button>
+                      )}
                     </div>
                   </article>
                 ))}
@@ -726,25 +833,38 @@ function Detail({
               </div>
             ))}
         </dl>
-        {v.external_application ? (
-          <div className="mt-7 space-y-3">
-            <a
-              href={v.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${primaryStyle} w-full`}
-            >
-              View official listing & apply
-            </a>
-            <p className="text-xs leading-6 text-muted-foreground">
-              {v.source_posted_on
-                ? `Listed ${date(v.source_posted_on)}.`
-                : "Exact posting date not disclosed."}{" "}
-              Confirm current availability and requirements with the source.
-              This employer has no connected PESO referral account here.
-            </p>
-            {role === "jobseeker" && (
-              <>
+        <div className="mt-7 space-y-3">
+          {role === "jobseeker" && (
+            <>
+              <CollectionNotice kind={training ? "enrollment" : "referral"} />
+              {(v.external_application || v.external_enrollment) && (
+                <p className="record-emphasis text-sm leading-6">
+                  Submit here to PESO Bansud, Oriental Mindoro. PESO checks
+                  current availability and coordinates with the employer or
+                  provider before confirming the next step.
+                </p>
+              )}
+              {training && (
+                <label className="flex items-start gap-3 text-sm leading-6">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 shrink-0 accent-primary"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                  />
+                  {trainingConsentStatement}
+                </label>
+              )}
+              <button
+                disabled={busy || (training && !consent)}
+                className={`${primaryStyle} w-full`}
+                onClick={() => action(v)}
+              >
+                {training
+                  ? "Request enrollment through PESO"
+                  : "Apply through PESO · request referral"}
+              </button>
+              {!training && (
                 <button
                   disabled={busy}
                   className={`${secondaryStyle} w-full`}
@@ -753,86 +873,47 @@ function Detail({
                   <Bookmark size={16} />
                   {saved ? "Unsave vacancy" : "Save vacancy"}
                 </button>
-                <Link
-                  to="/services"
-                  className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline"
-                >
-                  Ask PESO for application guidance
-                </Link>
-              </>
-            )}
-          </div>
-        ) : v.external_enrollment ? (
-          <div className="mt-7">
+              )}
+              <Link
+                to={training ? "/enrollments" : "/referrals"}
+                className="block py-2 text-center text-sm font-semibold text-primary underline"
+              >
+                View my {training ? "enrollments" : "referrals"}
+              </Link>
+            </>
+          )}
+          {canManage && !v.external_application && !v.external_enrollment && (
+            <button
+              onClick={() => edit(v)}
+              className={`${primaryStyle} w-full`}
+            >
+              Edit record
+            </button>
+          )}
+          {v.source_url && (
             <a
               href={v.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${primaryStyle} w-full`}
+              className={`${secondaryStyle} w-full`}
             >
-              {v.catalog_type === "registered_program"
-                ? "Verify official registration & intake"
-                : v.catalog_type === "overseas_training"
-                  ? "Check official training announcement"
-                  : "Open official course & enroll"}
+              View official source information
             </a>
-            <p className="mt-3 text-xs leading-6 text-muted-foreground">
-              {v.catalog_type === "registered_program"
-                ? "This link opens the official registry, not an enrollment form. Confirm the provider's current registration, intake, fees and scholarship availability."
-                : "Follow the official provider's application instructions. Opening this link does not reserve a place or send your profile."}
+          )}
+          {(v.external_application || v.external_enrollment) && (
+            <p className="text-xs leading-6 text-muted-foreground">
+              The source link supports PESO review. Your request and progress
+              stay in this system. PESO must verify the current employer opening
+              or create a provider-confirmed local intake before approval; no
+              application is automatically sent to an external agency.
             </p>
-          </div>
-        ) : canManage ? (
-          <button
-            onClick={() => edit(v)}
-            className={`${primaryStyle} mt-7 w-full`}
-          >
-            Edit record
-          </button>
-        ) : role === "jobseeker" ? (
-          <div className="mt-7 space-y-3">
-            <CollectionNotice kind={training ? "enrollment" : "referral"} />
-            {training && (
-              <label className="flex items-start gap-3 text-xs leading-6">
-                <input
-                  type="checkbox"
-                  className="mt-1 size-4 shrink-0 accent-primary"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                />
-                {trainingConsentStatement}
-              </label>
-            )}
-            <button
-              disabled={busy || (training && !consent)}
-              className={`${primaryStyle} w-full`}
-              onClick={() => action(v)}
-            >
-              {training ? "Request enrollment" : "Request PESO referral"}
-            </button>
-            {!training && (
-              <button
-                disabled={busy}
-                className={`${secondaryStyle} w-full`}
-                onClick={() => action(v, true)}
-              >
-                <Bookmark size={16} />
-                {saved ? "Unsave vacancy" : "Save vacancy"}
-              </button>
-            )}
-            <Link
-              to={training ? "/enrollments" : "/referrals"}
-              className="block py-2 text-center text-xs font-semibold text-primary"
-            >
-              View my {training ? "enrollments" : "referrals"}
-            </Link>
-          </div>
-        ) : null}
+          )}
+        </div>
         <p className="mt-5 text-xs leading-6 text-muted-foreground">
           {training
             ? "Your request is reviewed before a place is confirmed. Program completion does not automatically issue a TESDA National Certificate."
             : v.external_application
-              ? "PESO guidance supports your application. Review the full qualifications on the official listing; the employer decides eligibility and hiring. A match or course does not guarantee employment."
+              ? "PESO reviews and coordinates your application; the employer decides eligibility and hiring. A match or course does not guarantee employment."
               : "A PESO referral is an employment facilitation step. The employer decides hiring; a match does not guarantee a job."}
         </p>
       </aside>

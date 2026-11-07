@@ -4,10 +4,15 @@ namespace App\Models;
 
 use App\Services\TrainingSources;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TrainingProgram extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = ['id'];
+
+    protected $hidden = ['intake_verification'];
 
     protected $appends = ['catalog_type', 'availability_status'];
 

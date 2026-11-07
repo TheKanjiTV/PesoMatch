@@ -75,7 +75,7 @@ class ReviewedTrainingImporter
                 if (! $batch) {
                     return;
                 }
-                if (TrainingProgram::whereIn('source_url', array_column($batch, 'source_url'))->where(fn ($q) => $q->whereNotNull('owner_id')->orWhere('external_enrollment', false))->exists()) {
+                if (TrainingProgram::withTrashed()->whereIn('source_url', array_column($batch, 'source_url'))->where(fn ($q) => $q->whereNotNull('owner_id')->orWhere('external_enrollment', false))->exists()) {
                     throw new RuntimeException('A source identity conflicts with an owned training record.');
                 }
                 TrainingProgram::upsert($batch, ['source_url'], array_diff(array_keys($batch[0]), ['source_url', 'created_at']));
