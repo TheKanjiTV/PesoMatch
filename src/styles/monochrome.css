@@ -6,19 +6,29 @@
 :root[data-contrast="hc2"] ::placeholder { color: var(--muted-foreground); opacity: 1; }
 :root[data-contrast="hc2"] [class*="border-[#"] { border-color: var(--border); }
 :root[data-contrast="hc2"] .sidebar-active,
-:root[data-contrast="hc2"] .app-tab-active { background: #3a3b3c; color: #a6e5bc; box-shadow: inset 3px 0 #31a24c; }
-:root[data-contrast="hc2"] .sidebar-active:hover { color: #c5f3d4; }
+:root[data-contrast="hc2"] .app-tab-active { background: #3a3b3c; color: #f0f2f5; box-shadow: inset 3px 0 #588b72; }
+:root[data-contrast="hc2"] .sidebar-active:hover { color: #ffffff; }
 :root[data-contrast="hc2"] ::selection { background: #316a4b; color: #f5fff8; }
 :root[data-contrast="hc2"] { scrollbar-color: #787b80 #242526; }
-:root { --action-add: #31a24c; --action-add-ink: #071e0d; --action-delete: #f02849; --action-delete-ink: #24030a; --action-view: #0084ff; --action-view-ink: #071826; }
-.action-add { background: var(--action-add); color: var(--action-add-ink); border-color: transparent; }
+:root {
+ --action-add: #123d35; --action-add-ink: #ffffff; --action-add-hover: #1c5146;
+ --action-delete: #9f2f46; --action-delete-ink: #ffffff; --action-delete-hover: #84253a;
+ --action-view: #e9edf0; --action-view-ink: #24342f; --action-view-hover: #dce3e6;
+}
+:root[data-contrast="hc2"] {
+ --action-add: #245c47; --action-add-ink: #ffffff; --action-add-hover: #2d6b53;
+ --action-delete: #8f2c40; --action-delete-ink: #ffffff; --action-delete-hover: #a5364b;
+ --action-view: #3a3b3c; --action-view-ink: #f0f2f5; --action-view-hover: #464849;
+}
+/* Primary-colored text becomes neutral white in dark mode. Brand/button
+   surfaces keep independent tokens so white headings cannot wash out buttons. */
+:root[data-contrast="hc2"] .text-primary { color: #ffffff; }
+.peso-primary,.action-add { background: var(--action-add); color: var(--action-add-ink); border-color: transparent; }
+.peso-primary:hover,.action-add:hover { background: var(--action-add-hover); color: var(--action-add-ink); filter: none; }
 .action-delete { background: var(--action-delete); color: var(--action-delete-ink); border-color: transparent; }
-.action-view { background: var(--action-view); color: var(--action-view-ink); border-color: transparent; }
-.action-add:hover { filter: brightness(1.08); color: var(--action-add-ink); }
-.action-delete:hover { filter: brightness(1.08); color: var(--action-delete-ink); }
-.action-view:hover { filter: brightness(1.08); color: var(--action-view-ink); }
-.action-cancel { background: #b0b3b8; color: #18191a; border-color: transparent; }
-.action-cancel:hover { color: #18191a; filter: brightness(1.08); }
+.action-delete:hover { background: var(--action-delete-hover); color: var(--action-delete-ink); filter: none; }
+.action-view,.action-cancel { background: var(--action-view); color: var(--action-view-ink); border: 1px solid var(--border); }
+.action-view:hover,.action-cancel:hover { background: var(--action-view-hover); color: var(--action-view-ink); border-color: var(--border); filter: none; }
 button:disabled { cursor: not-allowed; }
 .action-add:disabled,.action-delete:disabled,.action-view:disabled { background: var(--neutral-bg); color: var(--neutral-text); border-color: var(--border); opacity: 1; filter: none; }
 .status-error { color: var(--error-text); background: var(--error-bg); }

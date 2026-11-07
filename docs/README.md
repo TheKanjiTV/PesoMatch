@@ -1,5 +1,7 @@
 # Documentation index
 
+Current readability revision: subdued green/neutral/wine-red controls with readable labels, white Dark Mode headings and no fabricated placement example; see [design](DESIGN.md).
+
 Current functional revision: [PESO Bansud workspace update — November 7, 2026](WORKSPACE-UPDATE-2026-11-07.md).
 
 | Area | Current documentation |

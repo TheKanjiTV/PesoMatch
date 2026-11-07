@@ -16,6 +16,20 @@ const seeker = {
   dashboard_tour_completed_at: "2026-11-07T00:00:00Z",
 }
 
+function contrastRatio(a, b) {
+  const luminance = (value) => {
+    const channels = value
+      .match(/[\d.]+/g)
+      .slice(0, 3)
+      .map(Number)
+      .map((v) => v / 255)
+      .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+  }
+  const [low, high] = [luminance(a), luminance(b)].sort((x, y) => x - y)
+  return (high + 0.05) / (low + 0.05)
+}
+
 const admin = {
   ...seeker,
 
@@ -510,7 +524,7 @@ test("charcoal theme persists, disabled dropdown prompts cannot be selected, and
   ).toEqual([])
 })
 
-test("event display names become safe links and placement shows exactly one labeled example", async ({
+test("event display names become safe links and empty placements never fabricate an employment record", async ({
   context,
 
   page,
@@ -563,15 +577,25 @@ test("event display names become safe links and placement shows exactly one labe
 
   await expect(
     page.getByRole("article", { name: "Placement workflow example" }),
-  ).toHaveCount(1)
+  ).toHaveCount(0)
 
   await expect(
-    page.getByText(
-      "Illustrative placement example · not a real employment record",
-
-      { exact: true },
-    ),
+    page.getByRole("heading", {
+      name: "No verified employment records yet",
+      exact: true,
+    }),
   ).toBeVisible()
+
+  await expect(
+    page.getByRole("link", {
+      name: "Open referrals to record placement",
+      exact: true,
+    }),
+  ).toHaveAttribute("href", "/referrals")
+
+  await expect(
+    page.getByText("Office Assistant · one placement example", { exact: true }),
+  ).toHaveCount(0)
 })
 
 test("PESO creates a separate verified intake and selects it when confirming a pending source enrollment", async ({
@@ -749,6 +773,84 @@ test("both themes keep readable mobile details and emphasize interview notes wit
   await page.screenshot({
     path: "artifacts/facilitation/mobile-dark-notes.png",
 
+    fullPage: true,
+  })
+})
+
+test("quiet action buttons have readable labels in both themes and dark headings are white", async ({
+  context,
+  page,
+}) => {
+  const state = await mock(context, admin)
+  await page.emulateMedia({ reducedMotion: "reduce" })
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto("/jobs")
+  const add = page.getByRole("button", { name: "Add vacancy", exact: true })
+  const remove = page.getByRole("button", {
+    name: "Delete vacancy",
+    exact: true,
+  })
+  const view = page.getByRole("link", { name: "View vacancy", exact: true })
+  await expect(add).toHaveCSS("background-color", "rgb(18, 61, 53)")
+  await fs.mkdir("artifacts/quiet-controls", { recursive: true })
+  for (const mode of ["light", "dark"]) {
+    if (mode === "dark") {
+      await page
+        .getByRole("button", { name: "Switch to dark mode", exact: true })
+        .click()
+      await expect(add).toHaveCSS("background-color", "rgb(36, 92, 71)")
+    }
+    await expect(add).toHaveCSS("color", "rgb(255, 255, 255)")
+    await expect(remove).toHaveCSS("color", "rgb(255, 255, 255)")
+    for (const control of [add, remove, view]) {
+      const colors = await control.evaluate((el) => ({
+        ink: getComputedStyle(el).color,
+        fill: getComputedStyle(el).backgroundColor,
+      }))
+      expect(contrastRatio(colors.ink, colors.fill)).toBeGreaterThanOrEqual(4.5)
+    }
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+          .analyze()
+      ).violations,
+    ).toEqual([])
+    await page.screenshot({
+      path: `artifacts/quiet-controls/${mode}-actions.png`,
+      fullPage: true,
+    })
+  }
+  await page.goto("/dashboard")
+  await expect(
+    page.getByRole("heading", {
+      name: "Employment services, connected.",
+      exact: true,
+    }),
+  ).toHaveCSS("color", "rgb(255, 255, 255)")
+  state.user = seeker
+  await page.goto("/dashboard")
+  const matches = page.getByRole("link", {
+    name: "Explore my matches",
+    exact: false,
+  })
+  await expect(matches).toHaveCSS("color", "rgb(255, 255, 255)")
+  await expect(matches).toHaveCSS("background-color", "rgb(36, 92, 71)")
+  await page.setViewportSize({ width: 390, height: 844 })
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  ).toBe(true)
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([])
+  await page.screenshot({
+    path: "artifacts/quiet-controls/mobile-dark-overview.png",
     fullPage: true,
   })
 })

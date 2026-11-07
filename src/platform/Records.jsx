@@ -581,7 +581,22 @@ export function RecordsPage({ kind }) {
       </label>
       <ResourceState resource={r} skeleton={<RecordsSkeleton kind={kind} />}>
         {!records.length ? (
-          <Empty title="No service records found">
+          <Empty
+            title={
+              kind === "placements"
+                ? "No verified employment records yet"
+                : "No service records found"
+            }
+            action={
+              kind === "placements" ? (
+                <Link to="/referrals" className={primaryStyle}>
+                  {staff
+                    ? "Open referrals to record placement"
+                    : "View my referrals"}
+                </Link>
+              ) : undefined
+            }
+          >
             {kind === "referrals" ? (
               <>
                 Explore{" "}
@@ -605,7 +620,7 @@ export function RecordsPage({ kind }) {
                 and submit an enrollment request.
               </>
             ) : kind === "placements" ? (
-              "Verified placements will appear after a referral results in an employment offer."
+              "A placement is recorded after the employer offer and actual employment start are verified by PESO."
             ) : (
               "Submit a record to start tracking your progress."
             )}
@@ -818,26 +833,6 @@ export function RecordsPage({ kind }) {
               )
             })}
           </div>
-        )}
-        {kind === "placements" && !records.length && (
-          <article
-            aria-label="Placement workflow example"
-            className="mt-6 rounded-lg border border-border bg-card p-6"
-          >
-            <Badge sample>
-              Illustrative placement example · not a real employment record
-            </Badge>
-            <h2 className="mt-4 text-xl font-bold text-primary">
-              Office Assistant · one placement example
-            </h2>
-            <p className="mt-3 font-semibold">PESO Bansud, Oriental Mindoro</p>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              Employer offer → verified employment start → recorded placement →
-              scheduled follow-up. A real record appears here when PESO verifies
-              the offer and start-date evidence. No person, employer outcome or
-              verified placement count has been invented.
-            </p>
-          </article>
         )}
       </ResourceState>
     </>

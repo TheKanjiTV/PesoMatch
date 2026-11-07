@@ -54,10 +54,10 @@ export const inputStyle =
   "min-h-12 w-full rounded-lg border border-border bg-card px-3 py-3 text-base font-medium text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:bg-muted"
 
 export const primaryStyle =
-  "peso-primary inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition disabled:cursor-wait disabled:opacity-60"
+  "peso-primary inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition disabled:cursor-wait disabled:opacity-60"
 
 export const secondaryStyle =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-bold text-foreground hover:border-primary hover:text-primary disabled:opacity-50"
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary hover:text-primary disabled:opacity-50"
 
 export const dangerStyle = `${secondaryStyle} action-delete`
 
