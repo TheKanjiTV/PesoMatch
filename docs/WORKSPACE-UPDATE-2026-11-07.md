@@ -37,7 +37,7 @@ Providers and employers remain scoped to their own connected records. PESO handl
 Vacancies, training records, eligible enrollment requests and other users in Account Access have a named confirmation dialog. Cancel receives initial focus; Escape cancels while idle. A server-issued encrypted confirmation token is bound to the actor, target type/ID and session nonce. It unlocks after **five seconds**, expires after five minutes and is consumed by deletion. The API rechecks permissions and state. A forged token, changed target, early confirmation or expired intent is rejected.
 
 - Catalog deletion uses soft deletion. Items disappear from browse/matching and reject new requests; historical referrals/enrollments retain the related title and evidence. Imports preserve the deletion rather than recreating the source identity.
-- Jobseekers can remove their own unfinished enrollment requests; an active request is withdrawn before removal. Staff/providers can remove withdrawn/rejected requests within their authorized scope. Completed training remains history. Removal does not remove the Training Enrollment module.
+- Training Enrollment now exposes **Withdraw request** as the cancellation action and removes the duplicate **Delete enrollment request** button/dialog. Withdrawn and completed records remain history. Catalog and Account Access deletion controls remain available to their authorized roles.
 - Account Access deletion requires an administrator's current password, revokes the target's sessions and removes the account/private résumé and linked personal records using existing erasure relationships. Self-deletion is handled in Account Settings; the current account cannot be deleted through Account Access. Last-administrator protection remains. No real account was deleted as part of this implementation.
 
 ## UI details and reports
@@ -59,3 +59,10 @@ The additive migration `2026_11_07_000001_add_facilitation_intakes_and_catalog_r
 Before/after counts were identical: 13 users, one referral, one enrollment, zero real placements, one outcome, 3,199 vacancy rows and 22,089 training rows including existing samples. No existing request was converted, approved or deleted during implementation. PHPUnit uses SQLite `:memory:`; browser fixtures use intercepted responses and are not persisted to MySQL.
 
 Current verification results are maintained in [VERIFICATION.md](VERIFICATION.md). See [API.md](API.md) for exact request contracts and [NATIONAL-CATALOG-2026-11-06.md](NATIONAL-CATALOG-2026-11-06.md) for the dated source-review snapshot.
+
+
+## Full-guide and navigation-loading follow-up
+
+The sidebar/mobile menu now mirrors private page requests with role-appropriate icon/text/footer skeletons, including the existing 400 ms minimum. Session restoration includes anonymous shell skeletons; dashboard routes still do not use the PESO logo overlay. Error/retry and request cancellation release navigation loading normally.
+
+First-visit and replay tutorials now navigate through the real authorized modules instead of pointing only to Overview shortcuts. Jobseekers receive the complete service journey including Vacancy Management, Job Matching, Referrals, Training & Skills Development and Training Enrollment. Staff/admin and partner routes are filtered to existing permissions. The guide waits for each page, supports Previous/browser Back/Skip/Close/replay, and returns to Overview on Finish. It never submits applications, enrolls users, verifies outcomes or changes account roles; only the existing tutorial preference is saved.

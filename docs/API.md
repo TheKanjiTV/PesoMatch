@@ -120,3 +120,6 @@ Private requests can send `X-Peso-User`. A mismatch with the authenticated sessi
 - Event mutations accept optional paired `reference_name` (160 chars) and `reference_url` (HTTPS, 700 chars, no embedded credentials). These are user-entered references, not fabricated official-source verification.
 
 Existing role/ownership, notice, workflow, password, audit and privacy checks remain. See [November 7 update](WORKSPACE-UPDATE-2026-11-07.md).
+
+
+Current Training Enrollment UI uses the existing withdrawal PATCH transition only; its duplicate delete-request action/dialog has been removed. The generic guarded removal API is unchanged for compatibility. The full workspace guide performs page reads and saves only the existing tutorial preference; it never submits referral/enrollment/placement mutations or changes a role.

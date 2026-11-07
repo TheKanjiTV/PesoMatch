@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 
 import { X, ArrowRight, ArrowLeft } from "lucide-react"
 
@@ -6,9 +6,15 @@ import { useAuth } from "../context/AuthContext.jsx"
 
 import { updateAccountPreferences } from "../services/account.js"
 
-import { primaryStyle, secondaryStyle, staffRole } from "./ui.jsx"
+import { primaryStyle, secondaryStyle } from "./ui.jsx"
 
 import { reducedMotion } from "./motionPreference.js"
+
+import { useLocation, useNavigate, useNavigation } from "react-router"
+
+import { useWorkspaceLoading } from "./WorkspaceLoading.jsx"
+
+import { tutorialSteps } from "./tutorialSteps.js"
 
 export function WorkspaceTutorial({ requested = false, onDismiss }) {
   const { user, refresh } = useAuth()
@@ -22,64 +28,33 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
 
   const [position, setPosition] = useState(null)
 
-  const seeker = user.role === "jobseeker",
-    staff = staffRole(user.role)
+  const { pathname } = useLocation()
 
-  const steps = [
-    [
-      "overview-heading",
+  const navigate = useNavigate()
 
-      seeker
-        ? "Welcome to your PESO workspace"
-        : staff
-          ? "Your PESO service desk"
-          : "Your partner workspace",
+  const navigation = useNavigation()
 
-      "This is your Overview. Your account and role determine which employment services you can use.",
-    ],
+  const workspace = useWorkspaceLoading()
+  const routeStarted = useRef(false)
 
-    [
-      seeker ? "profile-entry" : "overview-task-0",
+  const steps = useMemo(() => tutorialSteps(user.role), [user.role])
 
-      seeker ? "Start with your résumé" : "Manage your records",
+  const current = steps[step]
 
-      seeker
-        ? "Use this profile link to upload a PDF, review detected skills and keep your employment profile current."
-        : "Open this service to review the records permitted for your role.",
-    ],
+  const pagePending =
+    navigation.state !== "idle" ||
+    !!workspace?.loading ||
+    pathname !== current.path
 
-    [
-      "overview-primary-action",
+  function go(index) {
+    setPosition(null)
 
-      seeker ? "Understand your matches" : "Take the next action",
+    setStep(index)
 
-      seeker
-        ? "This opens Job Matching. Compare matched skills, missing skills and training suggestions before requesting a referral."
-        : "This shortcut takes you to your main service queue.",
-    ],
+    navigate(steps[index].path)
+  }
 
-    [
-      "overview-task-1",
-
-      seeker ? "Build your skills" : "Coordinate progress",
-
-      seeker
-        ? "This opens training. Submit training requests here. PESO verifies the provider intake, then follows enrollment confirmation and progress in this workspace."
-        : "Use this service to coordinate the next stage with PESO.",
-    ],
-
-    [
-      "overview-task-2",
-
-      seeker ? "Keep PESO informed" : "Continue your follow-up",
-
-      seeker
-        ? "Report employment changes here. PESO checks evidence before an outcome is marked verified."
-        : "Review continuing progress and follow-up. Your role limits which actions you can take.",
-    ],
-  ]
-
-  function close() {
+  function close(returnOverview = false) {
     dialog.current?.close()
 
     setActive(false)
@@ -96,10 +71,15 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
 
     onDismiss?.()
 
+    if (returnOverview === true) navigate("/dashboard")
+
     requestAnimationFrame(() => {
       const target = restore.current?.isConnected
         ? restore.current
-        : document.querySelector("[data-tour-launcher]")
+        : document.querySelector("[data-tour-launcher]") ||
+          document.querySelector("#workspace-main h1")
+
+      if (target?.tagName === "H1") target.tabIndex = -1
 
       target?.focus({ preventScroll: true })
     })
@@ -123,17 +103,33 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
       setActive(true)
 
       if (!dialog.current.open) dialog.current.showModal()
+
+      if (pathname !== steps[0].path) navigate(steps[0].path)
     }
 
     return () => dialog.current?.close()
   }, [user.id, requested])
 
-  useLayoutEffect(() => {
-    if (!active) return
+  useEffect(() => {
+    if (!active || navigation.state !== "idle") return
+    if (!routeStarted.current) {
+      if (pathname === steps[0].path) routeStarted.current = true
+      return
+    }
+    const index = steps.findIndex((item) => item.path === pathname)
+    if (index >= 0) setStep(index)
+  }, [pathname, active, navigation.state, steps])
 
-    const target = document.querySelector(
-      `[data-tour="${steps[step][0]}"]${step === 0 ? " h1" : ""}`,
-    )
+  useLayoutEffect(() => {
+    if (!active || pagePending) {
+      setPosition(null)
+
+      return
+    }
+
+    const target =
+      document.querySelector("#workspace-main h1") ||
+      document.querySelector("#workspace-main")
 
     if (!target) return
 
@@ -213,7 +209,7 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
 
       window.removeEventListener("scroll", update, true)
     }
-  }, [active, step, user.role])
+  }, [active, step, user.role, pagePending, pathname])
 
   const p = position
 
@@ -277,14 +273,19 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
           aria-live="polite"
           className="mt-3 font-display text-2xl text-primary"
         >
-          {steps[step][1]}
+          {current.title}
         </h2>
         <p
           id="tour-description"
           className="mt-3 text-sm leading-7 text-muted-foreground"
         >
-          {steps[step][2]}
+          {current.text}
         </p>
+        {pagePending && (
+          <p role="status" className="mt-3 text-sm font-semibold">
+            Loading this page…
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <button
             className="min-h-11 text-sm font-semibold underline"
@@ -297,17 +298,16 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
               <button
                 className={secondaryStyle}
                 aria-label="Previous tutorial step"
-                onClick={() => setStep((value) => value - 1)}
+                onClick={() => go(step - 1)}
               >
                 <ArrowLeft size={17} />
               </button>
             )}
             <button
               className={primaryStyle}
+              disabled={pagePending || !position}
               onClick={() =>
-                step === steps.length - 1
-                  ? close()
-                  : setStep((value) => value + 1)
+                step === steps.length - 1 ? close(true) : go(step + 1)
               }
             >
               {step === steps.length - 1 ? "Finish" : "Next"}

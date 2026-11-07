@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react"
+
 import { useAuth } from "../context/AuthContext.jsx"
+
 import { useLocation, useNavigate } from "react-router"
 
 const Tutorial = lazy(() =>
@@ -8,33 +10,59 @@ const Tutorial = lazy(() =>
 
 export function TutorialGate() {
   const { user, onboarding } = useAuth()
+
   const { pathname, state } = useLocation()
+
   const navigate = useNavigate()
+
   const [requested, setRequested] = useState(false)
-  let eligible =
-    pathname === "/dashboard" &&
-    (user.role !== "jobseeker" || onboarding?.completed) &&
-    !user.dashboard_tour_completed_at
-  try {
-    eligible &&= sessionStorage.getItem(`peso-tour:${user.id}`) !== "dismissed"
-  } catch {}
-  useEffect(() => {
-    const replay = () =>
-      pathname === "/dashboard"
-        ? setRequested(true)
-        : navigate("/dashboard", { state: { replayTour: true } })
-    window.addEventListener("peso:open-tour", replay)
-    return () => window.removeEventListener("peso:open-tour", replay)
-  }, [pathname, navigate])
-  useEffect(() => {
-    if (pathname === "/dashboard" && state?.replayTour) {
-      setRequested(true)
-      navigate("/dashboard", { replace: true, state: null })
+
+  const [run, setRun] = useState(0)
+
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem(`peso-tour:${user.id}`) === "dismissed"
+    } catch {
+      return false
     }
+  })
+
+  const eligible =
+    (user.role !== "jobseeker" || onboarding?.completed) &&
+    !user.dashboard_tour_completed_at &&
+    !dismissed
+
+  useEffect(() => {
+    const replay = () => {
+      setRequested(true)
+      setRun((value) => value + 1)
+    }
+
+    window.addEventListener("peso:open-tour", replay)
+
+    return () => window.removeEventListener("peso:open-tour", replay)
+  }, [])
+
+  useEffect(() => {
+    if (!state?.replayTour) return
+
+    setRequested(true)
+
+    setRun((value) => value + 1)
+
+    navigate(pathname, { replace: true, state: null })
   }, [pathname, state, navigate])
-  return pathname === "/dashboard" && (eligible || requested) ? (
+
+  return eligible || requested ? (
     <Suspense fallback={null}>
-      <Tutorial requested={requested} onDismiss={() => setRequested(false)} />
+      <Tutorial
+        key={run}
+        requested
+        onDismiss={() => {
+          setRequested(false)
+          setDismissed(true)
+        }}
+      />
     </Suspense>
   ) : null
 }

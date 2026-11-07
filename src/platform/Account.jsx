@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 
 import { withMinimumLoading } from "./loading.js"
 
+import { useWorkspaceActivity } from "./WorkspaceLoading.jsx"
+
 import { useResource } from "./api.js"
 
 import { ResourceState } from "./ResourceState.jsx"
@@ -43,6 +45,8 @@ export function ProfilePage() {
   const [profile, setProfile] = useState(null),
     [error, setError] = useState(""),
     [skills, setSkills] = useState([])
+
+  useWorkspaceActivity(!profile && !error)
 
   useEffect(() => {
     let alive = true

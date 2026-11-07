@@ -17,3 +17,6 @@ Existing Laravel validation and saved-step progression are preserved. Public reg
 Completed users can review/edit sections from /profile. Profile editing persists through the existing APIs. Optional qualifications do not block completion. The new global type/color system applies to onboarding; the existing form validation and unsaved-change protection remain.
 
 PESO officers view relevant saved profiles through the registry. Partner accounts bypass jobseeker onboarding after an administrator provisions their role. Account changes require the current password. Password recovery/email verification delivery remain unconfigured and are identified in the account screens.
+
+
+After profile completion, the first-visit guide visits the actual role-authorized workspace modules. It is not limited to Overview. The jobseeker route includes Profile, Vacancies, Matching, Referrals, Training, Enrollment and the remaining service pages. Next waits for the destination to load; Previous, browser Back, Skip and Close remain available, and Settings/Overview replay starts the whole guide again. Completion/dismissal uses the existing server preference and per-user session dismissal. No service records are submitted by the guide.

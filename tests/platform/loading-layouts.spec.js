@@ -83,6 +83,7 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
     if (path === "/api/auth/user")
       return route.fulfill({
         status: 401,
+
         json: { message: "Unauthenticated." },
       })
 
@@ -94,6 +95,7 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
       return route.fulfill({
         json: {
           user: user("admin"),
+
           onboarding: { completed: true, current_step: 5 },
         },
       })
@@ -102,10 +104,13 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
     if (!releaseData) await new Promise((resolve) => pending.push(resolve))
 
     return route
+
       .fulfill({
         status: 503,
+
         json: { message: "Temporary loading review failure." },
       })
+
       .catch(() => {})
   })
 
@@ -116,7 +121,9 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
   await page.getByLabel("Email Address").fill("signin.review@example.test")
 
   await page
+
     .locator('input[autocomplete="current-password"]')
+
     .fill("Not-A-Real-Password-123!")
 
   await page.getByRole("button", { name: "Log In", exact: true }).click()
@@ -124,6 +131,7 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
   await expect(
     page.getByRole("status", { name: "PESO Signing in…" }),
   ).toBeVisible()
+
   await page.screenshot({ path: `${folder}/sign-in-logo.png` })
 
   await expect.poll(() => typeof finishLogin).toBe("function")
@@ -376,6 +384,22 @@ test("Overview mirrors its banner, pathway, four counters and two content column
     hold = true
 
     await page.goto("/jobs", { waitUntil: "domcontentloaded" })
+
+    // The menu itself is a skeleton until the current page settles. Release
+
+    // that page before using its real navigation, then hold the destination.
+
+    await expect(
+      page.locator('#service-drawer [data-skeleton="sidebar"]'),
+    ).toBeVisible()
+
+    hold = false
+
+    pending.splice(0).forEach((resolve) => resolve())
+
+    await expect(page.locator('[data-skeleton="sidebar"]')).toHaveCount(0)
+
+    hold = true
 
     await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
 

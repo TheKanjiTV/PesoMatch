@@ -10,6 +10,8 @@ import { ResumeSkeleton } from "./LoadingStates.jsx"
 
 import { withMinimumLoading } from "./loading.js"
 
+import { useWorkspaceActivity } from "./WorkspaceLoading.jsx"
+
 import { CollectionNotice } from "./CollectionNotice.jsx"
 
 export function ResumePanel({ onApplied }) {
@@ -21,6 +23,8 @@ export function ResumePanel({ onApplied }) {
     [error, setError] = useState(""),
     [message, setMessage] = useState(""),
     [mobile, setMobile] = useState(false)
+
+  useWorkspaceActivity(loading)
 
   function accept(row) {
     setResume(row)

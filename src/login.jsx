@@ -8,7 +8,11 @@ import {
 } from "react-router"
 
 import { RouteScreen } from "./platform/RouteScreen.jsx"
-import { PageSkeleton } from "./platform/LoadingStates.jsx"
+import {
+  PageSkeleton,
+  WorkspaceShellSkeleton,
+} from "./platform/LoadingStates.jsx"
+import { WorkspaceLoadingProvider } from "./platform/WorkspaceLoading.jsx"
 import { usesLogoLoading } from "./platform/loading.js"
 
 import {
@@ -40,11 +44,13 @@ function Root() {
   return (
     <AppearanceProvider>
       <AuthProvider>
-        <PageMotion />
-        <RouteMetadata />
-        <ConnectionStatus />
-        <AppUpdate />
-        <RouteScreen />
+        <WorkspaceLoadingProvider>
+          <PageMotion />
+          <RouteMetadata />
+          <ConnectionStatus />
+          <AppUpdate />
+          <RouteScreen />
+        </WorkspaceLoadingProvider>
       </AuthProvider>
     </AppearanceProvider>
   )
@@ -53,6 +59,8 @@ function Root() {
 function Session() {
   const { user, error, refresh } = useAuth()
   const { pathname } = useLocation()
+  if (!error && !usesLogoLoading(pathname))
+    return <WorkspaceShellSkeleton pathname={pathname} role={user?.role} />
 
   return (
     <main className="mx-auto max-w-[1500px] px-6 py-10">
@@ -154,6 +162,8 @@ function feature(load, name = "default", props = {}, roles) {
 }
 
 function PageLoading() {
+  if (!usesLogoLoading(window.location.pathname))
+    return <WorkspaceShellSkeleton pathname={window.location.pathname} />
   return (
     <main className="mx-auto max-w-[1500px] px-6 py-10">
       {usesLogoLoading(window.location.pathname) ? (

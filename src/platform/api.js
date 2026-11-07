@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react"
 import { accountRequest } from "../services/account.js"
 import { withMinimumLoading } from "./loading.js"
 import { normalizeSearch, searchError } from "./search.js"
+import { useWorkspaceLoading } from "./WorkspaceLoading.jsx"
 export const api = (
   path,
   method = "GET",
@@ -39,6 +47,14 @@ export function useResource(path, root = "/api/platform") {
   const page = pagination.path === path ? pagination.page : 1
   const requestPath = path + (path.includes("?") ? "&" : "?") + "page=" + page
   const key = root + requestPath
+  const loading = state.key !== key || state.loading
+  const workspace = useWorkspaceLoading()
+  const resourceId = useId()
+  const track = workspace?.track
+  useLayoutEffect(() => {
+    if (loading && track && !key.startsWith("/api/public/"))
+      return track(resourceId)
+  }, [loading, track, resourceId, key])
   const reload = useCallback(async () => {
     const request = ++generation.current
     controller.current?.abort()
@@ -67,7 +83,7 @@ export function useResource(path, root = "/api/platform") {
   return {
     data: state.key === key ? state.data : null,
     error: state.key === key ? state.error : "",
-    loading: state.key !== key || state.loading,
+    loading,
     reload,
     setPage: (page) => setPagination({ path, page }),
   }

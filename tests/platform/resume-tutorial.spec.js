@@ -10,9 +10,13 @@ function resumePdf() {
 
   const objects = [
     "<< /Type /Catalog /Pages 2 0 R >>",
+
     "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+
     "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+
     `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
   ]
 
@@ -21,6 +25,7 @@ function resumePdf() {
 
   objects.forEach((o, i) => {
     offsets.push(pdf.length)
+
     pdf += `${i + 1} 0 obj\n${o}\nendobj\n`
   })
 
@@ -42,10 +47,13 @@ async function accessible(page) {
   expect(
     (
       await new AxeBuilder({ page })
+
         .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+
         .analyze()
     ).violations.map((v) => ({
       id: v.id,
+
       nodes: v.nodes.map((n) => n.target),
     })),
   ).toEqual([])
@@ -57,8 +65,9 @@ async function accessible(page) {
   ).toBe(true)
 }
 
-test("PDF review persists skills and official courses have honest external enrollment", async ({
+test("PDF review persists skills and official courses expose local requests with source evidence", async ({
   page,
+
   account,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
@@ -67,7 +76,9 @@ test("PDF review persists skills and official courses have honest external enrol
 
   await page.getByLabel("Résumé PDF · up to 5 MB").setInputFiles({
     name: "local-resume.pdf",
+
     mimeType: "application/pdf",
+
     buffer: resumePdf(),
   })
 
@@ -79,7 +90,9 @@ test("PDF review persists skills and official courses have honest external enrol
 
   await expect(
     page
+
       .locator(".resume-panel")
+
       .getByRole("checkbox", { name: /Microsoft Excel/ }),
   ).toBeChecked()
 
@@ -101,19 +114,25 @@ test("PDF review persists skills and official courses have honest external enrol
 
   await page.screenshot({
     path: "artifacts/revisions/resume-mobile.png",
+
     fullPage: true,
   })
 
-  const resume = await (
-    await apiCall(account.request, "/api/jobseeker/resume")
-  ).json()
+  const resume = await (await apiCall(account.request, "/api/jobseeker/resume"))
+
+    .json()
 
   expect(resume.data.path).toBeUndefined()
 
   expect(resume.data.applied_at).toBeTruthy()
 
   const programs = (
-    await (await apiCall(account.request, "/api/platform/training")).json()
+    await (
+      await apiCall(
+        account.request,
+        "/api/platform/training?catalog=online_course",
+      )
+    ).json()
   ).data
 
   const official = programs.filter(
@@ -128,21 +147,25 @@ test("PDF review persists skills and official courses have honest external enrol
   await page.goto(`/training/${official[0].id}`)
 
   await expect(
-    page.getByRole("link", { name: "Open official course & enroll" }),
+    page.getByRole("link", { name: "View official source information" }),
   ).toHaveAttribute("href", official[0].source_url)
 
   await expect(
-    page.getByRole("button", { name: "Request enrollment" }),
-  ).toHaveCount(0)
+    page.getByRole("button", { name: "Request enrollment through PESO" }),
+  ).toBeDisabled()
 
   const checked = new Date(official[0].source_checked_at).toLocaleDateString(
     "en-PH",
+
     {
       month: "short",
+
       day: "numeric",
+
       year: "numeric",
     },
   )
+
   await expect(
     page.getByText(`Checked ${checked}`, { exact: false }),
   ).toBeVisible()
@@ -169,10 +192,13 @@ test.describe("New user guidance", () => {
 
   test("first-visit tutorial, replay, dismissal and mobile service transitions", async ({
     page,
+
     account,
   }) => {
     const errors = []
+
     page.on("pageerror", (error) => errors.push(error.message))
+
     // A fresh disposable account has no tutorial completion preference.
 
     await page.addInitScript(() => {
@@ -181,6 +207,7 @@ test.describe("New user guidance", () => {
       Element.prototype.animate = function (...args) {
         if (this.tagName === "MAIN")
           window.__pageMoves = (window.__pageMoves || 0) + 1
+
         return original.apply(this, args)
       }
     })
@@ -196,7 +223,9 @@ test.describe("New user guidance", () => {
     await page.goto("/settings")
 
     await page
+
       .getByRole("button", { name: "Replay workspace tutorial" })
+
       .click()
 
     await expect(page.getByRole("dialog")).toBeVisible()
@@ -209,27 +238,34 @@ test.describe("New user guidance", () => {
 
     await page.screenshot({
       path: "artifacts/revisions/tutorial-mobile.png",
+
       fullPage: true,
     })
 
     await page.getByRole("button", { name: "Next", exact: true }).click()
 
     await expect(
-      page.getByRole("heading", { name: "Start with your résumé" }),
+      page.getByRole("heading", { name: "Your profile and résumé" }),
     ).toBeVisible()
 
     await page
+
       .getByRole("button", { name: "Skip tutorial", exact: true })
+
       .click()
 
     await expect(page.getByRole("dialog")).not.toBeVisible()
 
     await expect(
-      page.getByRole("button", { name: "Replay workspace tutorial" }),
+      page.getByRole("heading", { name: "My Jobseeker Profile", exact: true }),
     ).toBeFocused()
 
+    await page.goto("/settings")
+
     await page
+
       .getByRole("button", { name: "Replay workspace tutorial" })
+
       .click()
 
     await page.getByRole("button", { name: "Close tutorial" }).click()
@@ -251,12 +287,16 @@ test.describe("New user guidance", () => {
 
     await expect(page.locator(".workspace-sidebar")).toHaveCSS(
       "transition-duration",
+
       "0.3s, 0.3s",
     )
 
     await page
+
       .getByRole("navigation", { name: "Employment services" })
+
       .getByRole("link", { name: "Job Matching", exact: true })
+
       .click()
 
     await expect(page).toHaveURL(/\/matches$/)
@@ -276,12 +316,14 @@ test.describe("New user guidance", () => {
     await expect(page.locator(".workspace-sidebar")).toHaveClass(
       /drawer-closed/,
     )
+
     expect(errors).toEqual([])
   })
 })
 
 test("staff entrance opens assigned employee and administrator workspaces", async ({
   page,
+
   account,
 }) => {
   await page.goto("/dashboard")
@@ -299,6 +341,7 @@ test("staff entrance opens assigned employee and administrator workspaces", asyn
 
     await page.setViewportSize({
       width: role === "admin" ? 390 : 1440,
+
       height: 900,
     })
 
@@ -306,13 +349,16 @@ test("staff entrance opens assigned employee and administrator workspaces", asyn
 
     await page.screenshot({
       path: `artifacts/revisions/staff-${role}.png`,
+
       fullPage: true,
     })
 
     await page.getByLabel("Email Address").fill(account.email)
 
     await page
+
       .locator('input[autocomplete="current-password"]')
+
       .fill(account.password)
 
     await page.getByRole("button", { name: "Log In", exact: true }).click()

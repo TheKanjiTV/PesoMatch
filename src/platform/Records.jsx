@@ -10,8 +10,6 @@ import { api, useResource } from "./api.js"
 
 import { ResourceState } from "./ResourceState.jsx"
 
-import { DeleteDialog } from "./DeleteDialog.jsx"
-
 import { RecordsSkeleton } from "./LoadingStates.jsx"
 
 import {
@@ -23,7 +21,6 @@ import {
   human,
   Notice,
   primaryStyle,
-  dangerStyle,
   Sample,
   secondaryStyle,
   staffRole,
@@ -150,8 +147,6 @@ export function RecordsPage({ kind }) {
     jobseeker = user.role === "jobseeker"
 
   const r = useResource(`/${kind}`)
-
-  const [removing, setRemoving] = useState(null)
 
   const [intakeSource, setIntakeSource] = useState(null)
 
@@ -498,20 +493,6 @@ export function RecordsPage({ kind }) {
           <Notice>{message}</Notice>
         </div>
       )}
-      {removing && (
-        <DeleteDialog
-          type="enrollment"
-          record={{ ...removing, title: removing.program?.title }}
-          onClose={() => setRemoving(null)}
-          onDeleted={async () => {
-            setMessage(
-              "Enrollment request removed; active requests are withdrawn.",
-            )
-
-            await r.reload()
-          }}
-        />
-      )}
       {staff && intakeSource && editor && (
         <div className="mb-5">
           <Notice>
@@ -776,17 +757,6 @@ export function RecordsPage({ kind }) {
                     )}
                   </div>
                   <div className="mt-5 flex flex-wrap gap-3">
-                    {kind === "enrollments" &&
-                      row.status !== "completed" &&
-                      (jobseeker ||
-                        ["withdrawn", "rejected"].includes(row.status)) && (
-                        <button
-                          className={dangerStyle}
-                          onClick={() => setRemoving(row)}
-                        >
-                          Delete enrollment request
-                        </button>
-                      )}
                     {related && (
                       <Link
                         className={`${secondaryStyle} action-view`}

@@ -44,3 +44,10 @@ Role-scoped sidebar replaces the earlier social toolbar and chat/notification do
 ## Skill analysis and Training extension
 
 /matches derives suggestions from the actual profile. Training programs list their own requirements, skills, capacity, fee and schedule. Enrollment requests persist and require authorized confirmation.
+
+
+## Full workspace guide and sidebar skeletons
+
+The sidebar/mobile navigation now shares private page loading through `WorkspaceLoadingProvider`; anonymous shell placeholders cover initial session restoration. The first-visit/replay guide persists while changing real routes, waits for loading to finish, and highlights each authorized page. Jobseekers visit Overview, Profile, Vacancies, Matching, Referrals, Training, Enrollment, Placements, Outcomes, Services, Events, Labor Market and Settings. PESO/admin include registry and their permitted administration pages; partner roles omit restricted modules. Previous/browser Back, Skip/Close and replay remain supported; Finish returns to Overview. Only the existing tour preference is written.
+
+Training Enrollment presents withdrawal as the single cancellation action; the duplicate delete button/dialog is removed from this page.

@@ -1,6 +1,7 @@
 import { LoaderCircle } from "lucide-react"
 
 import { PesoMark } from "./Logo.jsx"
+
 import { CollectionNotice } from "./CollectionNotice.jsx"
 
 export function LogoLoading({ fullScreen = false, label = "Loading…" }) {
@@ -35,6 +36,125 @@ export function LogoLoading({ fullScreen = false, label = "Loading…" }) {
 
 function Bar({ className = "h-4 w-2/3" }) {
   return <div className={`rounded bg-border ${className}`} />
+}
+
+export function SidebarSkeleton({ items = 11, role = "jobseeker" }) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading sidebar menu"
+      aria-busy="true"
+      data-skeleton="sidebar"
+      className="flex min-h-0 flex-1 flex-col"
+    >
+      <span className="sr-only">Loading sidebar menu…</span>
+      <div
+        aria-hidden="true"
+        className="flex min-h-0 flex-1 flex-col motion-safe:animate-pulse"
+      >
+        <div className="hidden items-center gap-3 px-7 py-8 lg:flex">
+          <Bar className="size-10 shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Bar className="h-6 w-24" />
+            <Bar className="h-3 w-32" />
+          </div>
+        </div>
+        <div className="flex-1 space-y-1 overflow-hidden px-3 py-4">
+          {Array.from({ length: items }, (_, i) => (
+            <div
+              key={i}
+              className="flex min-h-12 items-center gap-3 rounded-lg px-3"
+            >
+              <Bar className="size-[18px] shrink-0" />
+              <Bar
+                className={`h-4 ${
+                  i % 3 === 1 ? "w-40" : i % 3 === 2 ? "w-32" : "w-28"
+                }`}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="space-y-5 border-t border-border p-7">
+          {Array.from({ length: role === "jobseeker" ? 3 : 2 }, (_, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <Bar className="size-4" />
+              <Bar className="h-4 w-32" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function MobileNavigationSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading mobile navigation"
+      aria-busy="true"
+      data-skeleton="mobile-navigation"
+      className="col-span-5 grid w-full grid-cols-5 motion-safe:animate-pulse"
+    >
+      <span className="sr-only">Loading mobile navigation…</span>
+      {Array.from({ length: 5 }, (_, i) => (
+        <div
+          key={i}
+          aria-hidden="true"
+          className="flex min-h-16 flex-col items-center justify-center gap-2"
+        >
+          <Bar className="size-5" />
+          <Bar className="h-2 w-10" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function WorkspaceShellSkeleton({ pathname, role = "jobseeker" }) {
+  if (pathname?.startsWith("/jobseeker/onboarding"))
+    return (
+      <main className="mx-auto max-w-[1500px] px-6 py-10">
+        <PageSkeleton pathname={pathname} role={role} />
+      </main>
+    )
+
+  const counts = {
+    admin: 13,
+    peso_staff: 11,
+    jobseeker: 11,
+    employer: 7,
+    training_provider: 6,
+  }
+
+  return (
+    <div
+      className="platform-shell min-h-dvh bg-background"
+      data-skeleton="workspace-shell"
+    >
+      <aside className="workspace-sidebar fixed inset-y-0 left-0 hidden w-[272px] flex-col border-r border-border lg:flex">
+        <SidebarSkeleton items={counts[role] || 11} role={role} />
+      </aside>
+      <div className="lg:pl-[272px]">
+        <div
+          aria-hidden="true"
+          className="flex min-h-20 items-center gap-3 border-b border-border bg-card px-5 sm:px-9"
+        >
+          <Bar className="size-10 rounded-full" />
+          <div className="space-y-3">
+            <Bar className="h-4 w-36" />
+            <Bar className="h-3 w-24" />
+          </div>
+        </div>
+        <main className="mx-auto max-w-[1500px] px-5 py-8 sm:px-9 lg:py-10">
+          <PageSkeleton pathname={pathname} role={role} />
+        </main>
+      </div>
+      <div className="app-bottom-nav lg:hidden">
+        <MobileNavigationSkeleton />
+      </div>
+    </div>
+  )
 }
 
 function Lines({ count = 2 }) {
@@ -105,13 +225,20 @@ function Tags() {
 }
 
 // Route/session/module fallbacks use the destination's structure too. Data
+
 // components retain their more specific, local skeletons once mounted.
+
 export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
   const parts = pathname.split("/").filter(Boolean)
+
   const page = parts[0]
+
   let content
+
   if (page === "dashboard") return <OverviewSkeleton role={role} />
+
   if (page === "settings") return <SettingsSkeleton />
+
   if (page === "jobseeker" && parts[1] === "onboarding")
     return (
       <div className="mx-auto max-w-4xl">
@@ -119,6 +246,7 @@ export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
         <OnboardingSkeleton step={Number(parts[2]) || 1} />
       </div>
     )
+
   if (["jobs", "training"].includes(page))
     content = (
       <>
@@ -190,6 +318,7 @@ export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
         <Lines count={4} />
       </Frame>
     )
+
   return (
     <div data-route-skeleton="true">
       <div aria-hidden="true">
@@ -708,6 +837,7 @@ function FieldBar({ wide = false }) {
     </div>
   )
 }
+
 function ChoiceBars({ count = 2 }) {
   return (
     <div>
@@ -720,6 +850,7 @@ function ChoiceBars({ count = 2 }) {
     </div>
   )
 }
+
 function SelectorBars() {
   return (
     <div>
@@ -734,6 +865,7 @@ function SelectorBars() {
     </div>
   )
 }
+
 export function OnboardingSkeleton({ step = 1 }) {
   return (
     <>

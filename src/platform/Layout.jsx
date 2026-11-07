@@ -9,7 +9,13 @@ import {
   useNavigation,
 } from "react-router"
 
-import { PageSkeleton } from "./LoadingStates.jsx"
+import {
+  PageSkeleton,
+  SidebarSkeleton,
+  MobileNavigationSkeleton,
+} from "./LoadingStates.jsx"
+
+import { useWorkspaceLoading } from "./WorkspaceLoading.jsx"
 
 import { usesLogoLoading } from "./loading.js"
 
@@ -146,6 +152,11 @@ function focusAfterLayout(resolveTarget) {
 
 export function PlatformLayout() {
   const navigation = useNavigation()
+
+  const workspaceLoading = useWorkspaceLoading()
+
+  const sidebarLoading =
+    navigation.state === "loading" || workspaceLoading?.loading
 
   const { user, logout, sessionNotice } = useAuth()
 
@@ -341,66 +352,88 @@ export function PlatformLayout() {
           open ? "drawer-open" : "drawer-closed"
         } workspace-sidebar fixed inset-y-0 left-0 z-30 flex w-[272px] flex-col border-r border-border lg:flex max-lg:top-20`}
       >
-        <div className="hidden px-7 py-8 lg:block">
-          <Brand to="/dashboard" />
-        </div>
-        <div className="flex justify-end px-3 pt-3 lg:hidden">
-          <button
-            aria-label="Close service navigation"
-            onClick={() => setOpen(false)}
-            className={"min-h-11 min-w-11 grid place-items-center"}
-          >
-            <X size={20} />
-          </button>
-        </div>
-        <nav
-          aria-label="Employment services"
-          className="flex-1 overflow-y-auto px-3 py-4"
-        >
-          {nav
-
-            .filter((n) => !n[3] || n[3].includes(user.role))
-
-            .map(([label, to, Icon]) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  `sidebar-link mb-1 flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold ${
-                    isActive ? "sidebar-active" : "sidebar-idle"
-                  }`
-                }
+        {sidebarLoading ? (
+          <>
+            <div className="flex justify-end px-3 pt-3 lg:hidden">
+              <button
+                aria-label="Close service navigation"
+                onClick={() => setOpen(false)}
+                className="grid min-h-11 min-w-11 place-items-center"
               >
-                <Icon size={18} className="shrink-0" />
-                {label}
-              </NavLink>
-            ))}
-        </nav>
-        <div className="border-t border-border p-4">
-          {user.role === "jobseeker" && (
-            <NavLink
-              to="/profile"
-              className="flex min-h-11 items-center gap-3 px-3 text-sm"
+                <X size={20} />
+              </button>
+            </div>
+            <SidebarSkeleton
+              items={
+                nav.filter((n) => !n[3] || n[3].includes(user.role)).length
+              }
+              role={user.role}
+            />
+          </>
+        ) : (
+          <>
+            <div className="hidden px-7 py-8 lg:block">
+              <Brand to="/dashboard" />
+            </div>
+            <div className="flex justify-end px-3 pt-3 lg:hidden">
+              <button
+                aria-label="Close service navigation"
+                onClick={() => setOpen(false)}
+                className={"min-h-11 min-w-11 grid place-items-center"}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <nav
+              aria-label="Employment services"
+              className="flex-1 overflow-y-auto px-3 py-4"
             >
-              <UserRound size={17} />
-              My profile
-            </NavLink>
-          )}
-          <NavLink
-            to="/settings"
-            className="flex min-h-11 items-center gap-3 px-3 text-sm"
-          >
-            <Settings2 size={17} />
-            Account settings
-          </NavLink>
-          <button
-            onClick={signOut}
-            className="flex min-h-11 w-full items-center gap-3 px-3 text-sm"
-          >
-            <LogOut size={17} />
-            Sign out
-          </button>
-        </div>
+              {nav
+
+                .filter((n) => !n[3] || n[3].includes(user.role))
+
+                .map(([label, to, Icon]) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    className={({ isActive }) =>
+                      `sidebar-link mb-1 flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold ${
+                        isActive ? "sidebar-active" : "sidebar-idle"
+                      }`
+                    }
+                  >
+                    <Icon size={18} className="shrink-0" />
+                    {label}
+                  </NavLink>
+                ))}
+            </nav>
+            <div className="border-t border-border p-4">
+              {user.role === "jobseeker" && (
+                <NavLink
+                  to="/profile"
+                  className="flex min-h-11 items-center gap-3 px-3 text-sm"
+                >
+                  <UserRound size={17} />
+                  My profile
+                </NavLink>
+              )}
+              <NavLink
+                to="/settings"
+                className="flex min-h-11 items-center gap-3 px-3 text-sm"
+              >
+                <Settings2 size={17} />
+                Account settings
+              </NavLink>
+              <button
+                onClick={signOut}
+                className="flex min-h-11 w-full items-center gap-3 px-3 text-sm"
+              >
+                <LogOut size={17} />
+                Sign out
+              </button>
+            </div>
+          </>
+        )}
       </aside>
       <div inert={modalOpen} className="lg:pl-[272px]">
         <div className="workspace-topbar flex min-h-20 flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-3 sm:px-9">
@@ -480,48 +513,54 @@ export function PlatformLayout() {
         aria-label="Mobile app navigation"
         className="app-bottom-nav lg:hidden"
       >
-        {[
-          ["Home", "/dashboard", LayoutDashboard],
+        {sidebarLoading ? (
+          <MobileNavigationSkeleton />
+        ) : (
+          <>
+            {[
+              ["Home", "/dashboard", LayoutDashboard],
 
-          [
-            user.role === "training_provider" ? "Programs" : "Jobs",
+              [
+                user.role === "training_provider" ? "Programs" : "Jobs",
 
-            user.role === "training_provider" ? "/training" : "/jobs",
+                user.role === "training_provider" ? "/training" : "/jobs",
 
-            BriefcaseBusiness,
-          ],
+                BriefcaseBusiness,
+              ],
 
-          [
-            user.role === "employer" ? "Referrals" : "Training",
+              [
+                user.role === "employer" ? "Referrals" : "Training",
 
-            user.role === "employer" ? "/referrals" : "/training",
+                user.role === "employer" ? "/referrals" : "/training",
 
-            GraduationCap,
-          ],
+                GraduationCap,
+              ],
 
-          ["Account", "/settings", UserRound],
-        ].map(([label, to, Icon]) => (
-          <NavLink
-            key={label}
-            to={to}
-            className={({ isActive }) =>
-              isActive ? "app-tab app-tab-active" : "app-tab"
-            }
-          >
-            <Icon size={21} />
-            <span>{label}</span>
-          </NavLink>
-        ))}
-        <button
-          className="app-tab"
-          aria-label="Open all services"
-          aria-expanded={open}
-          aria-controls="service-drawer"
-          onClick={toggleNavigation}
-        >
-          <Menu size={21} />
-          <span>Services</span>
-        </button>
+              ["Account", "/settings", UserRound],
+            ].map(([label, to, Icon]) => (
+              <NavLink
+                key={label}
+                to={to}
+                className={({ isActive }) =>
+                  isActive ? "app-tab app-tab-active" : "app-tab"
+                }
+              >
+                <Icon size={21} />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+            <button
+              className="app-tab"
+              aria-label="Open all services"
+              aria-expanded={open}
+              aria-controls="service-drawer"
+              onClick={toggleNavigation}
+            >
+              <Menu size={21} />
+              <span>Services</span>
+            </button>
+          </>
+        )}
       </nav>
     </div>
   )
