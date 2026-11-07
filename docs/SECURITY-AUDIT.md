@@ -1,5 +1,11 @@
 # PesoMatch pre-launch security audit
 
+## November 7 control update
+
+Added stale-tab identity checks against the authenticated session, account synchronization without storing identities/credentials in browser change events, and remounting private views when identity/role changes. Delete intents are encrypted, session/actor/target-bound, time-delayed, expiring and consumed; permissions are rechecked at execution. Account Access erasure requires the administrator's password and revokes target sessions. Soft-deleted source identities remain deleted after imports. Program intake confirmation enforces source linkage, verification and capacity. Event reference links require paired labels and HTTPS without embedded credentials. No payment, agency-login or automatic profile-forwarding integration was added. See [current controls and boundaries](WORKSPACE-UPDATE-2026-11-07.md).
+
+The audit evidence below describes its original recorded revision; its earlier totals are historical.
+
 **Later local follow-up:** The user selected Laragon first. A dedicated password-protected CRUD-only MySQL account is now configured and its actual grants verified; data and APP_KEY were preserved. Local browser companion verification and updated test results are documented in [LOCAL-REFINEMENTS.md](LOCAL-REFINEMENTS.md). The original audit results below remain historical; public HTTPS/infrastructure controls still require the eventual deployment environment.
 
 **Date:** 2026-10-13. **Decision: not approved for public production deployment.** Verified code-level fixes are listed below; TLS, production credentials, infrastructure encryption and operational controls remain open. This is a source/configuration review and local automated verification, not an independent penetration-test certificate or assurance that the system has no vulnerabilities.

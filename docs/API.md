@@ -4,7 +4,7 @@
 
 Laravel 12 / Sanctum stateful cookie sessions. Obtain `/sanctum/csrf-cookie` and send the decoded XSRF token on mutations. All `/api/platform/*` routes require authentication. Registration creates a jobseeker; privileged role provisioning requires the local operator or an existing administrator.
 
-Responses: 401 unauthenticated; 403 unauthorized role/ownership; 404 missing record; 409 duplicate request or already-verified report; 422 validation or invalid workflow state. Validation errors appear in `errors`. List endpoints return Laravel `data`, pagination metadata and links, with up to 100 rows per page. Catalog queries support `id`, `search` and `status`; vacancies also support `saved=1` for the current user.
+Responses: 401 unauthenticated; 403 unauthorized role/ownership; 404 missing record; 409 duplicate request or already-verified report; 422 validation or invalid workflow state. Validation errors appear in `errors`. List endpoints return Laravel `data`, pagination metadata and links, with up to 100 rows per page. Catalog queries support `id`, `search` and `status` (training also supports `source_program_id`); vacancies also support `saved=1` for the current user.
 
 Training additionally accepts `catalog=all|registered_program|online_course|overseas_training|partner_program`. Vacancies accept `availability=all|source_lists_open`. Search includes retained source descriptions so full institution/qualification/address text remains searchable. Query values are validated server-side; LIKE wildcard characters are treated literally.
 
@@ -93,7 +93,7 @@ All paths below require an authenticated jobseeker; ownership comes exclusively 
 
 Detection reports `local-pdf-text-skill-evidence-v1`; this is local text/skill evidence extraction, not a remote LLM or OCR service. Education/work excerpts are advisory text. Existing qualifications and account identity are never overwritten.
 
-Training records can include `source_url`, `source_name`, `source_checked_at` and `external_enrollment`. Source imports are maintained by the local import command, not accepted as arbitrary provenance in catalog forms. External self-paced courses can have null capacity/dates and cannot create a local enrollment; the provider handles enrollment. Every `/matches` vacancy now includes its own `training` list of `{program, addresses}` covering only that vacancy's missing skills.
+Training records can include `source_url`, `source_name`, `source_checked_at` and `external_enrollment`. Source imports are maintained by the local import command, not accepted as arbitrary provenance in catalog forms. External programs can have null capacity/dates and now create a local requested enrollment; PESO must link a verified local intake before confirmation. Every `/matches` vacancy now includes its own `training` list of `{program, addresses}` covering only that vacancy's missing skills.
 
 Training also returns `catalog_type` and `availability_status`. Registered-program rows expose `fee: null`, unknown capacity/dates and `intake_unconfirmed`; registry presence does not confirm an open intake or scholarship. Overseas announcements are labeled `official_announcement` and retain their eligibility restrictions. External training evidence cannot be edited through the normal program mutation endpoint, including by staff; use the reviewed import. Public/current external training requires a source review within 30 days and no passed known end date.
 
@@ -105,4 +105,18 @@ Published external listings appear in public browse, jobseeker browse and recomm
 
 Vacancy `availability_status` separates `source_lists_open`, `confirm_availability`, `review_expired`, `deadline_passed` and `partner_vacancy`. Source-listed-open requires an explicitly supported deadline-bearing source, a check within seven days and an unexpired source deadline. It does not guarantee remaining places. Imports reject unapproved source destinations or ownership conflicts and may unpublish withdrawn external records without deleting workflow history.
 
-Jobseekers can save a source-listed vacancy and request general PESO application guidance. `POST /api/platform/vacancies/{id}/referrals` returns 422 for an external listing; the official website handles its actual application. Connected partner vacancies retain the local reviewed referral/placement flow.
+Jobseekers can save a source-listed vacancy and request general PESO application guidance. `POST /api/platform/vacancies/{id}/referrals` creates a local PESO review request for a current external listing. PESO must record `source_confirmation` before moving it to referred; no external employer submission is automated. Connected partner vacancies retain the local reviewed referral/placement flow.
+
+
+## November 7 additions
+
+Private requests can send `X-Peso-User`. A mismatch with the authenticated session returns `409` with `code: SESSION_CHANGED`; the header never grants access. `/api/auth/user` remains the server identity authority.
+
+- `POST /api/platform/training/{program}/intakes`: PESO/admin only; requires provider, location, mode, capacity, starts_on, ends_on, schedule, fee and intake_verification (20–4000 characters). Creates a separate local program with `source_program_id`. Internal verification text is omitted from program JSON. `GET /training?source_program_id={id}` lists linked local intakes.
+- `PATCH /api/platform/enrollments/{id}`: external confirmation additionally requires `intake_program_id`, an upcoming provider-verified published local intake for that exact source. Capacity and duplicate checks apply transactionally.
+- `PATCH /api/platform/referrals/{id}`: external transition to referred requires staff `source_confirmation` evidence (20–2000 characters); officer/time/evidence are retained in the match snapshot.
+- `POST /api/platform/delete-intents`: `{type: vacancy|training|enrollment|account, id}` returns encrypted `token` and `wait_seconds: 5`. Requires a stateful authenticated session and target permission.
+- `DELETE /api/platform/remove/{type}/{id}`: `{confirmation_token}`; account erasure also requires the acting administrator's `current_password`. Intent is session/actor/target-bound, unlocks in five seconds, expires in five minutes and is consumed. Catalog/request removal uses soft deletion; active own enrollment requests become withdrawn first. Completed enrollment removal is rejected. Account Access cannot delete the current account or last administrator.
+- Event mutations accept optional paired `reference_name` (160 chars) and `reference_url` (HTTPS, 700 chars, no embedded credentials). These are user-entered references, not fabricated official-source verification.
+
+Existing role/ownership, notice, workflow, password, audit and privacy checks remain. See [November 7 update](WORKSPACE-UPDATE-2026-11-07.md).

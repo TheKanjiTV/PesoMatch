@@ -1,5 +1,7 @@
 # PesoMatch — Pre-launch UI, functionality and mobile audit
 
+Historical snapshot: counts and checks below describe the recorded revision. For current in-system source requests, protected removal, synchronized sessions and charcoal dark mode, see the [November 7 workspace update](WORKSPACE-UPDATE-2026-11-07.md).
+
 **Later local follow-up:** See [LOCAL-REFINEMENTS.md](LOCAL-REFINEMENTS.md) for black/white HC2, expanded Appearance, the Overview walkthrough, release-specific update dismissal, current source counts and fresh regression results. The measurements below describe the earlier audit run.
 
 Audit date: 13 October 2026. Scope: the active React 19 / React Router 7 / Vite 8 / Tailwind application, Laravel 12 / Sanctum API and existing Laragon MySQL data. The active router is `src/login.jsx`; retired social-feed prototype files are not the current website. This work preserves the Dashboard layout, plain P identity, Public Sans/Lora typography, HC1/HC2 themes, Settings-only larger-text switch, animations, roles and real Laravel workflows.

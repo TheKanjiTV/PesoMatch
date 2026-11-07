@@ -1,5 +1,7 @@
 # Pre-launch privacy, legal transparency and accessibility audit
 
+Historical snapshot: counts and checks below describe the recorded revision. For current in-system source requests, protected removal, synchronized sessions and charcoal dark mode, see the [November 7 workspace update](WORKSPACE-UPDATE-2026-11-07.md).
+
 **Later local follow-up:** The user selected Laragon first. Monochrome HC2, additional accessible appearance preferences, actual Overview tutorial targets and sourced public catalogs/statistics are documented in [LOCAL-REFINEMENTS.md](LOCAL-REFINEMENTS.md). Operator identity/approval cannot be inferred from a government directory; draft legal notices and the organizational decisions below remain explicit.
 
 **Date:** 2026-10-13. **Release decision: organizational and legal approval still required.** The technical changes and local checks below do not establish legal compliance, government authorization, asset ownership or a complete WCAG conformance claim. Read alongside [SECURITY-AUDIT.md](SECURITY-AUDIT.md) and the researched [official support source register](OFFICIAL-SUPPORT-SOURCES.md).

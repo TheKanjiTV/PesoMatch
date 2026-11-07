@@ -1,5 +1,9 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Résumé and Database Setup
 
+## November 7 additive database update
+
+`2026_11_07_000001_add_facilitation_intakes_and_catalog_removal.php` adds soft-delete timestamps, source-to-local-intake linkage/evidence and event reference fields. It was applied using a temporary local deployment connection after a private consistent backup; runtime `.env`, application key and CRUD-only database credentials stayed unchanged. Protected account and workflow counts matched before/after. Existing historical migration/account counts below are not current totals. See [current database verification](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Résumé workflow
 
 Jobseekers open **My profile**, or step 3 of profiling, and upload a selectable-text PDF. The server extracts up to the first 20 pages of a PDF no larger than 5 MB. Catalog skill names and maintained aliases produce suggestions with source text evidence. Jobseekers review the checkboxes before importing. Existing skills and qualifications remain intact. An optional detected Philippine mobile number can be applied after review.

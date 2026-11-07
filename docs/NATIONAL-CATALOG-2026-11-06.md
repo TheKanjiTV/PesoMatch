@@ -1,5 +1,7 @@
 # Nationwide official-source catalog review — November 6, 2026
 
+Historical snapshot: counts and checks below describe the recorded revision. For current in-system source requests, protected removal, synchronized sessions and charcoal dark mode, see the [November 7 workspace update](WORKSPACE-UPDATE-2026-11-07.md).
+
 The catalog now contains **498 reviewed PESO/government vacancy references** and **22,086 training records**. This is a public-source review, not a live integration, a confirmation from every office, or complete coverage of every Philippine PESO. A reachable official page does not prove a remaining vacancy. No applications, agency inquiries, account registrations or messages were submitted during research.
 
 ## Vacancy coverage

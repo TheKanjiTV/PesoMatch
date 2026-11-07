@@ -19,7 +19,7 @@ php artisan db:seed
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-The active Laragon database is `peso_employment` on MySQL at 127.0.0.1:3306. The existing 134 accounts and all source rows were copied and compared before switching the connection. The original SQLite database and a private consistent backup under `.local/backups/` remain available. For a fresh installation, create the configured MySQL database, copy .env.example to .env, and generate an application key before migrating. Never run migrate:fresh against existing data.
+The active Laragon database is `peso_employment` on MySQL at 127.0.0.1:3306. At the original database migration, 134 then-existing accounts and all source rows were copied and compared before switching the connection; this historical transfer count is not the current account total. The original SQLite database and a private consistent backup under `.local/backups/` remain available. For a fresh installation, create the configured MySQL database, copy .env.example to .env, and generate an application key before migrating. Never run migrate:fresh against existing data.
 
 From the project root:
 
@@ -49,6 +49,8 @@ php artisan peso:import-verified-public-resources
 These commands are idempotent. Recheck sources before editing the dataset/check timestamp. External jobs are excluded from browse/matching after 30 days without a researched refresh; no ongoing source synchronization is claimed.
 
 The [November 6 national catalog review](docs/NATIONAL-CATALOG-2026-11-06.md) records 498 PESO/government vacancy references and 22,086 training records. Only 61 vacancy records have a recently checked source and an unexpired published deadline; remaining places still require office confirmation. Most training entries are registered institution-program records, not confirmed open intakes. The earlier [vacancy-provider replacement](docs/PESO-VACANCY-SOURCES.md) and [November 3 refresh](docs/DATA-REFRESH-2026-11-03.md) remain historical evidence. PSA figures retain their actual reference period.
+
+Current revision: [November 7 session, facilitation, deletion and theme update](docs/WORKSPACE-UPDATE-2026-11-07.md). Browse the [documentation index](docs/README.md).
 
 ## Included flows
 
@@ -87,7 +89,7 @@ Open the printed LAN address followed by `/app` on the phone. Enter that platfor
 
 ## Scope
 
-All new service actions are backed by Laravel. Reviewed PESO/government vacancies, the nationwide TESDA registered-program directory, TESDA Online Program courses and one official overseas training announcement carry source URLs and review dates. Search covers institutions, qualifications and addresses, with catalog and availability filters and priority-location shortcuts. The source coverage panel explains offices with no verified current public listing. Source-listed jobs open the official page; they do not pretend to have connected partner accounts. Unknown deadlines, slots, fees and pay periods stay explicitly unstated. Registered programs require intake confirmation; they are not automatically free or self-paced. Official applications remain on the source website and do not fabricate a local referral or enrollment. Existing sample vacancies and local programs remain visibly fictional. See [source evidence](docs/DATA-SOURCES.md). The matching implementation is an explainable content-based recommender baseline, not a validated predictive hiring model or external LLM. It must be evaluated with pilot data before making effectiveness claims. It does not infer eligibility from sensitive personal attributes.
+All new service actions are backed by Laravel. Reviewed PESO/government vacancies, the nationwide TESDA registered-program directory, TESDA Online Program courses and one official overseas training announcement carry source URLs and review dates. Search covers institutions, qualifications and addresses, with catalog and availability filters and priority-location shortcuts. The source coverage panel explains offices with no verified current public listing. Source-listed jobs open the official page; they do not pretend to have connected partner accounts. Unknown deadlines, slots, fees and pay periods stay explicitly unstated. Registered programs require intake confirmation; they are not automatically free or self-paced. Source details now create local PESO referral/enrollment requests. PESO verifies the employer before referring and creates a separate provider-confirmed local training intake before confirming source enrollment; external submissions and official admission are not automated. Existing sample vacancies and local programs remain visibly fictional. See [source evidence](docs/DATA-SOURCES.md). The matching implementation is an explainable content-based recommender baseline, not a validated predictive hiring model or external LLM. It must be evaluated with pilot data before making effectiveness claims. It does not infer eligibility from sensitive personal attributes.
 
 No TESDA/PEIS/government integration, official certification, scholarship reservation, email delivery or production deployment is configured. PESO facilitates; providers confirm enrollment; employers decide hiring. A provider completion reference is not a TESDA National Certificate.
 

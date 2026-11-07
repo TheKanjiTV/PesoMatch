@@ -1,5 +1,9 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Jobseeker Registration & Profiling
 
+## Current selection and session behavior
+
+Dropdown prompts are disabled/hidden and cannot become a saved selection. Required native selection and server validation remain. Same-origin tabs restore the same server account and profiling progress; stale-tab identity changes are rejected before private actions and refreshed. See [November 7 session update](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Required sections
 
 1. Personal information and contact/location.

@@ -32,7 +32,7 @@ Public registration creates jobseeker accounts only. Admin access is provisioned
 
 ## Brand Commitments
 
-The user explicitly replaces the Facebook/job-board-inspired visual world and delegates design direction to Impeccable. The formal project title above is authoritative. PesoMatch is retained only as the historical repository/product identifier.
+The civic Light Mode layout remains authoritative. The November 7 request explicitly adopts Messenger-inspired charcoal surfaces for Dark Mode and semantic action colors, while preserving the green brand and existing layout. The formal project title above is authoritative. PesoMatch is retained only as the historical repository/product identifier.
 
 ## Evidence on Hand
 
@@ -56,4 +56,4 @@ The PWA installs through supported browsers and provides a safe offline informat
 
 ## Open Decisions
 
-Faculty document template, actual PESO pilot office, partner onboarding rules, program eligibility, consent/retention policy, official data integrations, production deployment and AI evaluation data.
+Faculty document template, formal pilot approval for the user-requested PESO Bansud context, partner onboarding rules, program eligibility, consent/retention policy, official data integrations, production deployment and AI evaluation data.

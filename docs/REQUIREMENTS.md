@@ -1,5 +1,9 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Requirements
 
+## November 7 functional revision
+
+The requested operating context is PESO Bansud, Oriental Mindoro. Source-listed vacancy/program details now accept local referral/enrollment requests. PESO records employer verification before referring an external vacancy and creates a separate provider-confirmed local intake before confirming an external training request. Same-origin tabs restore/synchronize the server session; tutorial replay cannot assign a role. Authorized removal uses named dialogs and a server-enforced five-second intent, preserving catalog/workflow history through soft deletion. Events accept labeled HTTPS reference links. Charcoal dark mode and semantic action colors preserve the Light Mode layout. See [current implementation and limits](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Current authority
 
 The October 10 brief expands PesoMatch from job matching into end-to-end PESO employment facilitation with upskilling and employment monitoring. The formal title above replaces the previous Employment Assistance wording. The whole active interface uses a new civic service design. The original academic manuscript and faculty format were not supplied; this document preserves the existing Markdown structure.

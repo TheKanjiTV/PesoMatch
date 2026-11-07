@@ -1,5 +1,9 @@
 # Loading states
 
+## November 7 compatibility
+
+New source-request, intake, reference-link and removal controls preserve the existing 400 ms minimum resource skeleton behavior. Dashboard routes remain skeleton-only; the PESO logo loader is limited to public/authentication loading and sign-in. Delete countdowns are a separate deliberate five-second confirmation requirement, not a resource-loading delay. See [current workspace update](WORKSPACE-UPDATE-2026-11-07.md).
+
 Only home, login (including staff login), and registration route transitions show the PESO logo loader. Submitting sign-in also shows it until authentication and the handoff finish. Workspace navigation, initial session restoration and lazy modules use destination-specific skeletons; the workspace shell is never covered by a logo loader. Data skeletons retain the 400 ms minimum and remain until the request settles.
 
 Pending page data uses the matching layout in `src/platform/LoadingStates.jsx`. Placeholders remain until the real request settles; an error replaces them with the existing recovery UI. Search inputs stay mounted during result loading, and superseded requests are aborted and ignored. Motion respects device and application preferences.

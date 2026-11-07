@@ -2,7 +2,7 @@
 
 ## Direction
 
-The latest user revision restores the quieter civic workspace: warm ivory background, light sage sidebar, white working cards, Lora page headings and Public Sans body text. Strong text contrast and semantic status colors remain. Dark mode uses solid navy/green surfaces with readable mint and light text. Fonts are local and licensed.
+The latest user revision restores the quieter civic workspace: warm ivory background, light sage sidebar, white working cards, Lora page headings and Public Sans body text. Strong text contrast and semantic status colors remain. Dark mode uses Messenger-inspired layered charcoal surfaces with green brand accents, readable light text and semantic action colors. Fonts are local and licensed.
 
 The public focal scene is an authored Three.js career folio: a linen-green case folder with profile, skills and employment papers. Pages change depth and position to show one continuing record across PESO services. The scene sits directly on the page background with no enclosing box, captions or stage controls. Only pause/play and reset controls remain, with reduced-motion support and a non-WebGL fallback. It suspends offscreen or when the document is hidden. No toy buildings, floating islands or invented impact statistics.
 
@@ -35,4 +35,11 @@ The install page explains Android browser, iPhone/iPad and desktop installation 
 
 ## Résumé and source evidence
 
-Résumé review shows suggested skills beside their extracted evidence and preserves existing profile skills. Official course cards expose a source and checked date, self-paced scheduling and the provider enrollment link. Every recommended vacancy can list training that addresses its own missing skills; the interface never promises hiring after a course. Staff/partner sign-in has its own entry and explanatory copy while using the same role-authorized account backend.
+Résumé review shows suggested skills beside their extracted evidence and preserves existing profile skills. Program cards distinguish registered programs, online courses, overseas announcements and verified local intakes. Source/checked dates remain visible; the primary action submits a local PESO enrollment request and the source link supports review. Every recommended vacancy can list training that addresses its own missing skills; the interface never promises hiring after a course. Staff/partner sign-in has its own entry and explanatory copy while using the same role-authorized account backend.
+
+
+## November 7 charcoal and semantic system
+
+Light Mode retains the current ivory background, sage sidebar, white cards, Lora/Public Sans typography, spacing and layout. Dark `hc2` uses `#18191A` background; `#242526` sidebar/header/cards; `#3A3B3C` hover/active surfaces; `#3E4042` dividers; `#E4E6EB` primary text and `#B0B3B8` secondary text. The prior pure black/white overrides are retired. The existing `peso-appearance` preference persists and restores the theme.
+
+Semantic action bases are green `#31A24C`, amber `#F7B928`, red `#F02849`, blue `#0084FF` and gray `#B0B3B8`. Accessible dark ink is used on bright action fills; status badges use theme-specific surface/ink pairs, explicit labels and readable contrast. Green remains the brand. Add/save, delete/reject, view/information and cancel actions have consistent meaningful treatments. Notes and interview schedules use bold themed emphasis. Named delete dialogs protect focus with Cancel first and a server-enforced five-second wait. Dropdown prompts are disabled/hidden, with valid “All” filter choices retained. See [current interaction contract](WORKSPACE-UPDATE-2026-11-07.md).

@@ -1,5 +1,13 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Training & Skills Development
 
+## Source requests and verified local intakes
+
+The national directory contains registry references, online courses and overseas announcements as well as local programs. **Request enrollment through PESO** creates a local pending request and opens Training Enrollment. A directory listing does not prove current admission, fee or scholarship availability.
+
+PESO uses **Create verified local intake** on a source-program detail, supplying the actual provider, mode, venue, dates, schedule, fee, capacity and verification evidence. This creates a separate local `training_programs` record linked by `source_program_id`, preserving the source registry and its unknown fee. Confirmation of a source request requires selecting an upcoming verified intake for that exact program; the request is linked to the local intake under capacity locks. No external registration, scholarship award or certification is simulated.
+
+Catalog removal uses a five-second server-issued confirmation and soft deletion. Jobseekers can remove an unfinished enrollment request, withdrawing it before removal; staff/provider removal is restricted to withdrawn/rejected requests within scope. Completed training is retained. See [current workflow and boundaries](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Connected routes
 
 /matches → Skills Development Recommendation → /training/:id → Request enrollment → /enrollments. Training can also be explored directly at /training.

@@ -1,5 +1,9 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — PESO Responsibilities
 
+## Source coordination for the requested Bansud workspace
+
+PESO reviews local requests created from official-source listings. An external referral requires recorded employer availability/application verification. A source-training request requires a separately verified local intake before confirmation. PESO coordinates; employers decide hiring and providers supply actual admission, schedule, fees, places and completion evidence. The application does not automatically submit profiles to agencies or issue TESDA credentials. See [current workflow](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Statutory service mapping
 
 The platform supports officer workflows described in [RA 10691, Section 2 amending Section 5 of RA 8759](https://lawphil.net/statutes/repacts/ra2015/ra_10691_2015.html). The following mapping is a concise implementation interpretation, not a claim of complete legal compliance.

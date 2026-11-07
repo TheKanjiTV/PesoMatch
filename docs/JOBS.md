@@ -1,5 +1,9 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Vacancy Management
 
+## Source-listed applications and deletion
+
+Official-source records are distinct from illustrative samples. **Apply through PESO · request referral** creates a local request and opens `/referrals`, including for source-listed vacancies. Before referring an external listing, PESO must record current employer contact, availability and application instructions. The source link remains evidence; it is not the only application action. Employers retain hiring authority. Authorized catalog deletion has a five-second confirmation and soft-deletes the item; existing referral history remains and source imports do not restore deleted identities. See [current workflow](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Routes and navigation
 
 /jobs and /jobs/:id. /matches explains profile alignment and links to vacancy details. /referrals manages the resulting service record.

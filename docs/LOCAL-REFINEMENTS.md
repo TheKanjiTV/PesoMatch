@@ -1,5 +1,7 @@
 # Local Laragon follow-up — 13 October 2026
 
+Historical snapshot: counts and checks below describe the recorded revision. For current in-system source requests, protected removal, synchronized sessions and charcoal dark mode, see the [November 7 workspace update](WORKSPACE-UPDATE-2026-11-07.md).
+
 Historical report: its vacancy provider was retired on November 6, 2026. See [current PESO vacancy sources](PESO-VACANCY-SOURCES.md); these earlier vacancy totals are not current browse totals.
 
 The user selected **Local Laragon first**. This revision addresses the monochrome theme, appearance preferences, Overview tutorial, recurring PWA update prompt and researched data. Earlier audit measurements remain historical; this follow-up does not authorize public deployment or certify unresolved legal decisions.

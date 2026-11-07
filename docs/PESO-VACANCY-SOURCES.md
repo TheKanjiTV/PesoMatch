@@ -1,5 +1,7 @@
 # Official PESO vacancy sources — November 6, 2026
 
+Historical snapshot: counts and checks below describe the recorded revision. For current in-system source requests, protected removal, synchronized sessions and charcoal dark mode, see the [November 7 workspace update](WORKSPACE-UPDATE-2026-11-07.md).
+
 This is the first Pasay-only replacement snapshot. See the later [nationwide catalog review](NATIONAL-CATALOG-2026-11-06.md) for current coverage and totals.
 
 The user requested removal of the inaccessible PhilJobNet provider. Active vacancies now use the [Pasay City PESO job board](https://pasay.gov.ph/job-openings/) and its individual `/peso-jobs/` application pages. The site is hosted on the official city government domain. Its public WordPress catalog API is used only to enumerate published listing identities; each included detail page is fetched and checked separately.

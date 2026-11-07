@@ -1,6 +1,8 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Data Sources
 
-Current review: [November 6 nationwide catalog, coverage and verification](NATIONAL-CATALOG-2026-11-06.md). The October 10 counts and tables below are historical evidence for the original catalog.
+Current service behavior: [November 7 in-system PESO referrals and training intakes](WORKSPACE-UPDATE-2026-11-07.md). Official-source records can create local pending requests; confirmation requires actual PESO/provider/employer evidence.
+
+Current source review: [November 6 nationwide catalog, coverage and verification](NATIONAL-CATALOG-2026-11-06.md). The October 10 counts and tables below are historical evidence for the original catalog.
 
 ## Nationwide official training catalog
 

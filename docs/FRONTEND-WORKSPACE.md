@@ -1,5 +1,11 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Connected Workspace
 
+## Session synchronization and current interactions
+
+Same-origin tabs share the Laravel cookie session. Authenticated `/` and sign-in visits restore the role workspace; Public home remains available at `/?public=1`. BroadcastChannel/storage change notices and focus/visibility rechecks fetch the authoritative account. Identity/role changes reset private page state. A stale tab identity returns `409 SESSION_CHANGED` before acting; tutorial replay only updates the signed-in user's preference.
+
+Source details submit local PESO referral/enrollment requests and open their tracking pages. Destructive controls use a named, keyboard-accessible native modal with a five-second server-enforced wait. Dropdown prompts are hidden/disabled; “All” remains a functional filter. Source review notes, internal intake verification and actual admission are distinct. See [November 7 update](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Routes
 
 | Route | Purpose |

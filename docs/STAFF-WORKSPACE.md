@@ -1,5 +1,9 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Staff & Partner Workspaces
 
+## Current source facilitation and removal
+
+PESO Bansud staff receive source-listed vacancy referrals and training requests in the existing queues. Record current employer contact/application instructions before referring a source vacancy. For registry training, create a verified local intake on the source program detail, then select it when confirming the pending enrollment. Capacity and source/intake linkage are enforced by Laravel. Delete controls are permission-scoped, require a five-second server-issued confirmation and preserve linked history; account erasure additionally requires administrator password confirmation. See [November 7 workflow](WORKSPACE-UPDATE-2026-11-07.md).
+
 ## Operational workflow
 
 PESO/admin: inspect registry, maintain vacancies/training, review requests, coordinate referral/interview/offer, verify placement, schedule follow-up, monitor outcomes and coordinate support cases/events.
