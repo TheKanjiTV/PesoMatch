@@ -292,7 +292,18 @@ export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
       </div>
     )
 
-  if (["jobs", "training"].includes(page))
+  if (page === "jobs" && role === "employer" && !parts[1])
+    content = (
+      <>
+        <div aria-hidden="true" className="mb-6 flex flex-wrap gap-2">
+          <ButtonBar className="w-32" />
+          <ButtonBar className="w-32" />
+          <ButtonBar className="w-28" />
+        </div>
+        <TableSkeleton kind="employer-vacancies" columns={6} />
+      </>
+    )
+  else if (["jobs", "training"].includes(page))
     content = (
       <>
         {!parts[1] && (
@@ -374,10 +385,14 @@ export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
   )
 }
 
-function Stats() {
+function Stats({ employer = false }) {
   return (
-    <div className="overview-stats mb-10 grid grid-cols-2 xl:grid-cols-4">
-      {[0, 1, 2, 3].map((i) => (
+    <div
+      className={`overview-stats mb-10 grid ${
+        employer ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 xl:grid-cols-4"
+      }`}
+    >
+      {Array.from({ length: employer ? 3 : 4 }, (_, i) => (
         <div key={i} className="bg-card p-5">
           <div className="flex items-center justify-between gap-3">
             <Bar className="h-3 w-3/5" />
@@ -416,8 +431,6 @@ function EventCards({ overview = false }) {
 }
 
 export function OverviewSkeleton({ role = "jobseeker" }) {
-  const partner = ["employer", "training_provider"].includes(role)
-
   return (
     <Frame kind="overview">
       <PageHeading />
@@ -447,7 +460,7 @@ export function OverviewSkeleton({ role = "jobseeker" }) {
           </div>
         </div>
       </div>
-      {!partner && <Stats />}
+      {role !== "training_provider" && <Stats employer={role === "employer"} />}
       <div className="grid gap-10 xl:grid-cols-[1.3fr_1fr]">
         <section>
           <Bar className="mb-5 h-7 w-3/5" />
@@ -603,7 +616,17 @@ export function TableSkeleton({ kind = "access", columns = 4 }) {
   return (
     <Frame kind={kind}>
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
-        <div className={columns === 5 ? "min-w-[650px]" : "min-w-[600px]"}>
+        <div
+          className={
+            columns === 6
+              ? "min-w-[820px]"
+              : columns === 3
+                ? "min-w-[420px]"
+                : columns === 5
+                  ? "min-w-[650px]"
+                  : "min-w-[600px]"
+          }
+        >
           <div
             className="grid gap-4 bg-secondary p-4"
             style={{
@@ -648,10 +671,10 @@ export function EventsSkeleton({ overview = false }) {
   )
 }
 
-export function StatsSkeleton() {
+export function StatsSkeleton({ employer = false }) {
   return (
     <Frame kind="overview-stats">
-      <Stats />
+      <Stats employer={employer} />
     </Frame>
   )
 }

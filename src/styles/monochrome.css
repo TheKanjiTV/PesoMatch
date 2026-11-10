@@ -25,6 +25,18 @@
 :root[data-contrast="hc2"] .text-primary { color: #ffffff; }
 .peso-primary,.action-add { background: var(--action-add); color: var(--action-add-ink); border-color: transparent; }
 .peso-primary:hover,.action-add:hover { background: var(--action-add-hover); color: var(--action-add-ink); filter: none; }
+.auth-brand-panel { background: #123d35; color: #fff; }
+.auth-button:disabled { background: var(--neutral-bg); color: var(--neutral-text); border-color: var(--border); }
+:root[data-contrast="hc2"] .auth-shell { background: var(--background); }
+:root[data-contrast="hc2"] .auth-brand-panel { background: var(--card); color: var(--foreground); border-right: 1px solid var(--border); }
+:root[data-contrast="hc2"] .auth-input { border-color: #666b70; }
+:root[data-contrast="hc2"] .auth-input:focus { border-color: var(--primary); }
+:root[data-contrast="hc2"] .auth-input[aria-invalid="true"] { border-color: var(--error-text); }
+:root[data-contrast="hc2"] .auth-input:autofill {
+ box-shadow: 0 0 0 1000px var(--card) inset;
+ -webkit-text-fill-color: var(--foreground);
+ caret-color: var(--foreground);
+}
 .action-delete { background: var(--action-delete); color: var(--action-delete-ink); border-color: transparent; }
 .action-delete:hover { background: var(--action-delete-hover); color: var(--action-delete-ink); filter: none; }
 .action-view,.action-cancel { background: var(--action-view); color: var(--action-view-ink); border: 1px solid var(--border); }

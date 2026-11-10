@@ -53,6 +53,25 @@ class FacilitationWorkflowTest extends TestCase
         return Vacancy::create(['title' => 'Isolated source vacancy', 'organization' => 'Fixture organization', 'location' => 'Mindoro', 'industry' => 'Services', 'employment_type' => 'Full-time', 'description' => 'Public source', 'skills' => [], 'slots' => null, 'deadline' => null, 'status' => 'published', 'external_application' => true, 'source_url' => 'https://pasay.gov.ph/peso-jobs/fixture/', 'source_checked_at' => now()]);
     }
 
+    public function test_employer_delete_confirmation_is_bound_to_own_vacancy_id(): void
+    {
+        $owner = $this->person('employer');
+        $other = $this->person('employer');
+        $own = $this->vacancy();
+        $own->update(['owner_id' => $owner->id, 'external_application' => false, 'source_url' => null]);
+        $foreign = $this->vacancy();
+        $foreign->update(['owner_id' => $other->id, 'external_application' => false, 'source_url' => null]);
+
+        $this->asUser($owner)->postJson('/api/platform/delete-intents', ['type' => 'vacancy', 'id' => $foreign->id])->assertForbidden();
+        $token = $this->postJson('/api/platform/delete-intents', ['type' => 'vacancy', 'id' => $own->id])->assertOk()->json('token');
+        $this->deleteJson('/api/platform/remove/vacancy/'.$own->id, ['confirmation_token' => $token])->assertUnprocessable();
+        $this->travel(6)->seconds();
+        $this->deleteJson('/api/platform/remove/vacancy/'.$foreign->id, ['confirmation_token' => $token])->assertUnprocessable();
+        $this->deleteJson('/api/platform/remove/vacancy/'.$own->id, ['confirmation_token' => $token])->assertOk();
+        $this->assertSoftDeleted('vacancies', ['id' => $own->id]);
+        $this->assertNotSoftDeleted('vacancies', ['id' => $foreign->id]);
+    }
+
     public function test_stale_tab_cannot_act_as_another_account_or_write_preferences(): void
     {
         $seeker = $this->person();

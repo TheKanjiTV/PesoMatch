@@ -20,6 +20,7 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
     Route::delete('/remove/{type}/{id}', [RemovalController::class, 'destroy'])->whereNumber('id');
     Route::get('/summary', [Employment::class, 'summary']);
     Route::get('/vacancies', [Employment::class, 'vacancies']);
+    Route::get('/employers', [Employment::class, 'employers']);
     Route::post('/vacancies', [Employment::class, 'saveVacancy']);
     Route::patch('/vacancies/{vacancy}', [Employment::class, 'saveVacancy']);
     Route::post('/vacancies/{vacancy}/save', [Employment::class, 'bookmark']);

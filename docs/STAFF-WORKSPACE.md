@@ -8,7 +8,11 @@ PESO Bansud staff receive source-listed vacancy referrals and training requests 
 
 PESO/admin: inspect registry, maintain vacancies/training, review requests, coordinate referral/interview/offer, verify placement, schedule follow-up, monitor outcomes and coordinate support cases/events.
 
-Employer: own vacancies and PESO-referred candidates only. Training provider: own programs and enrollment records only. Both partner roles submit catalog records for PESO publication review. Administrators manage existing account roles and audit records. No public role selection.
+Employers use **My vacancies** to create, edit, place on hold, cancel, close, or delete their own postings. Deletion uses the existing timed confirmation and retains linked history. **All vacancies** lists published openings. **Employers** groups published openings by organization. New submissions and edited vacancies sent for publication go through PESO review.
+
+Employers can accept PESO-referred candidates for review, schedule interviews, record offers, decline candidates or withdraw an offer. PESO verifies the employment start and records placement. Employers can browse published training. Training providers manage their own programs and enrollment records and submit program changes for PESO publication review.
+
+Administrators manage existing account roles and audit records. Public registration creates jobseeker accounts.
 
 ## Storage and backend boundary
 

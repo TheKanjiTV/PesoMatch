@@ -32,7 +32,7 @@ export function tutorialSteps(role) {
     "/jobs",
     "Vacancy Management",
     employer
-      ? "Manage your own vacancy submissions. PESO reviews publication before jobseekers can request a referral."
+      ? "Use My vacancies to create and manage your postings. Browse published openings in All vacancies or by organization in Employers. PESO reviews submissions before publication."
       : provider
         ? "Explore published work opportunities. Vacancy management and employer decisions remain restricted to their authorized roles."
         : "Search and filter vacancies, then open a detail page. Jobseekers apply through PESO by requesting a referral; the official source supports staff verification.",
@@ -49,7 +49,9 @@ export function tutorialSteps(role) {
       "Referrals and interviews",
       seeker
         ? "Follow your PESO review, referral, interview schedule and employer updates here. Check the highlighted notes; withdraw an active request if you no longer want to continue."
-        : "Review authorized referral requests, record employer verification where required, and coordinate interviews and offers. PESO verifies employment-start evidence before placement.",
+        : employer
+          ? "Review candidates PESO referred to your vacancies. Accept a referral for review, arrange an interview, record an offer or decline. PESO verifies employment starts."
+          : "Review authorized referral requests, record employer verification where required, and coordinate interviews and offers. PESO verifies employment-start evidence before placement.",
     )
   add(
     "/training",

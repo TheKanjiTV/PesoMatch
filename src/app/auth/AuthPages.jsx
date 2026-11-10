@@ -70,7 +70,7 @@ export function AuthRoutesLayout() {
     <>
       <a
         href="#auth-main"
-        className="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-primary px-5 py-3 text-white focus:translate-y-0"
+        className="peso-primary sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:px-5 focus:py-3"
       >
         Skip to form
       </a>

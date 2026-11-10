@@ -91,6 +91,58 @@ class EmploymentPlatformTest extends TestCase
         $this->assertDatabaseHas('audit_events', ['action' => 'placement.verified']);
     }
 
+    public function test_employer_catalog_and_directory_expose_only_authorized_vacancies(): void
+    {
+        $employer = $this->person('employer');
+        $other = $this->person('employer');
+        $own = $this->vacancy(['owner_id' => $employer->id, 'organization' => 'My organization', 'status' => 'draft']);
+        $private = $this->vacancy(['owner_id' => $other->id, 'organization' => 'Private organization', 'status' => 'pending_review']);
+        $published = $this->vacancy(['owner_id' => $other->id, 'organization' => 'Published organization']);
+
+        $this->actingAs($employer)->getJson('/api/platform/vacancies?scope=mine&owner_id='.$other->id)
+            ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $own->id);
+        $this->getJson('/api/platform/vacancies?scope=all&location=Calap&employment_type=Full-time&sort=title')
+            ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $published->id);
+        $this->getJson('/api/platform/vacancies?scope=all&organization=Private%20organization')
+            ->assertOk()->assertJsonCount(0, 'data');
+        $this->getJson('/api/platform/employers')->assertOk()
+            ->assertJsonCount(1, 'data')->assertJsonPath('data.0', ['organization' => $published->organization, 'vacancy_count' => 1]);
+        $this->getJson('/api/platform/vacancies?scope=all&id='.$own->id)->assertJsonPath('data.0.id', $own->id);
+        $this->getJson('/api/platform/vacancies?scope=all&id='.$private->id)->assertOk()->assertJsonCount(0, 'data');
+        $this->patchJson('/api/platform/vacancies/'.$private->id, [])->assertForbidden();
+        $this->patchJson('/api/platform/vacancies/'.$published->id, $published->toArray())->assertForbidden();
+
+        foreach (['on_hold', 'cancelled', 'closed', 'pending_review'] as $status) {
+            $this->patchJson('/api/platform/vacancies/'.$own->id, [...$own->toArray(), 'owner_id' => $other->id, 'status' => $status])
+                ->assertOk()->assertJsonPath('data.status', $status)->assertJsonPath('data.owner_id', $employer->id);
+        }
+        $this->assertDatabaseHas('vacancies', ['id' => $private->id, 'status' => 'pending_review', 'owner_id' => $other->id]);
+    }
+
+    public function test_employer_referral_actions_require_peso_handoff_and_vacancy_ownership(): void
+    {
+        $owner = $this->person('employer');
+        $other = $this->person('employer');
+        $staff = $this->person('peso_staff');
+        $vacancy = $this->vacancy(['owner_id' => $owner->id]);
+        $pending = Referral::create(['user_id' => $this->person()->id, 'vacancy_id' => $vacancy->id, 'status' => 'requested']);
+        $candidate = Referral::create(['user_id' => $this->person()->id, 'vacancy_id' => $vacancy->id, 'status' => 'requested']);
+        $action = ['status' => 'accepted', 'notes' => 'Candidate accepted for review.'];
+        $decline = ['status' => 'not_selected', 'notes' => 'Candidate was not selected.'];
+
+        $this->actingAs($owner)->patchJson('/api/platform/referrals/'.$pending->id, $decline)->assertForbidden();
+        $this->actingAs($staff)->patchJson('/api/platform/referrals/'.$pending->id, $decline)->assertOk();
+        $this->patchJson('/api/platform/referrals/'.$candidate->id, ['status' => 'referred', 'notes' => 'PESO reviewed the profile.'])->assertOk();
+        $this->actingAs($other)->patchJson('/api/platform/referrals/'.$candidate->id, $action)->assertForbidden();
+        $this->getJson('/api/platform/referrals')->assertJsonCount(0, 'data');
+        $this->actingAs($owner)->getJson('/api/platform/referrals')->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $candidate->id);
+        $this->patchJson('/api/platform/referrals/'.$candidate->id, $action)->assertOk()->assertJsonPath('data.status', 'accepted');
+        $this->patchJson('/api/platform/referrals/'.$candidate->id, ['status' => 'offered', 'notes' => 'Offer recorded.'])->assertOk();
+        $this->patchJson('/api/platform/referrals/'.$candidate->id, $decline)->assertOk()->assertJsonPath('data.status', 'not_selected');
+        $this->getJson('/api/platform/referrals')->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $candidate->id);
+        $this->getJson('/api/platform/summary')->assertJsonPath('vacancies', 1)->assertJsonPath('referrals', 1)->assertJsonPath('placements', 0);
+    }
+
     public function test_enrollment_capacity_status_and_provider_ownership(): void
     {
         $provider = $this->person('training_provider');

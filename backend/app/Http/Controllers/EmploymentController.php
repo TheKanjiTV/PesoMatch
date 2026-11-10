@@ -89,7 +89,14 @@ class EmploymentController extends Controller
             $q->whereKey($r->integer('id'));
         }
         if ($r->user()->role === 'employer') {
-            $q->where('owner_id', $r->user()->id);
+            if ($r->query('scope') !== 'all') {
+                $q->where('owner_id', $r->user()->id);
+            } elseif ($r->filled('id')) {
+                $q->where(fn ($visible) => $visible->where('owner_id', $r->user()->id)
+                    ->orWhere(fn ($published) => $published->available()->where('is_sample', false)));
+            } else {
+                $q->available();
+            }
         } elseif (! $this->staff($r)) {
             $q->available();
         }
@@ -98,14 +105,42 @@ class EmploymentController extends Controller
             $q->where('external_application', true)->where(fn ($source) => $source->where('source_url', 'like', VacancySources::NEGROS_PREFIX.'%')->orWhere('source_url', 'like', VacancySources::ORIENTAL.'%'))
                 ->whereDate('deadline', '>=', today())->where('source_checked_at', '>=', now()->subDays(7));
         }
-        if (in_array($r->query('status'), ['draft', 'pending_review', 'published', 'closed'], true)) {
+        if (in_array($r->query('status'), Vacancy::STATUSES, true)) {
             $q->where('status', $r->query('status'));
+        }
+        foreach (['organization', 'employment_type'] as $column) {
+            if ($r->filled($column)) {
+                $q->where($column, $r->query($column));
+            }
+        }
+        if ($r->filled('location')) {
+            $location = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $r->query('location'));
+            $q->whereRaw("location LIKE ? ESCAPE '!'", ['%'.$location.'%']);
         }
         if ($r->boolean('saved')) {
             $q->whereIn('id', DB::table('saved_vacancies')->where('user_id', $r->user()->id)->select('vacancy_id'));
         }
 
-        return $q->orderBy('is_sample')->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest()->orderByDesc('id')->paginate(100);
+        $q->orderBy('is_sample');
+        match ($r->query('sort')) {
+            'title' => $q->orderBy('title'),
+            '-title' => $q->orderByDesc('title'),
+            'oldest' => $q->orderByRaw('COALESCE(source_posted_on, DATE(created_at))')->oldest(),
+            default => $q->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest(),
+        };
+
+        return $q->orderByDesc('id')->paginate(100);
+    }
+
+    public function employers(Request $r)
+    {
+        $this->roles($r, ['employer', 'peso_staff', 'admin']);
+        $q = Vacancy::available()->where('is_sample', false)->where('organization', '<>', '');
+        $this->searchCatalog($q, $r, ['organization']);
+
+        return $q->select('organization')->selectRaw('COUNT(*) as vacancy_count')
+            ->groupBy('organization')->orderBy('organization', $r->query('sort') === '-title' ? 'desc' : 'asc')
+            ->toBase()->paginate(100);
     }
 
     public function saveVacancy(Request $r, ?Vacancy $vacancy = null)
@@ -115,13 +150,16 @@ class EmploymentController extends Controller
             abort_unless($vacancy->owner_id === $r->user()->id, 403);
         }
         abort_if($vacancy?->external_application, 422, 'Source listings are maintained through the researched source import.');
-        $data = $r->validate(['title' => 'required|string|max:160', 'organization' => 'required|string|max:160', 'location' => 'required|string|max:160', 'industry' => 'required|string|max:120', 'employment_type' => ['required', Rule::in(['Full-time', 'Part-time', 'Contractual', 'Seasonal', 'Internship'])], 'description' => 'required|string|max:8000', 'skills' => 'required|array|min:1|max:30', 'skills.*' => 'required|string|max:100|distinct:ignore_case', 'slots' => 'required|integer|min:1|max:10000', 'salary_min' => 'nullable|integer|min:0', 'salary_max' => 'nullable|integer|gte:salary_min', 'deadline' => ($vacancy?->exists ? 'required|date' : 'required|date|after_or_equal:today'), 'status' => ['required', Rule::in(['draft', 'pending_review', 'published', 'closed'])]]);
-        if (! $this->staff($r)) {
-            $data['status'] = $data['status'] === 'closed' ? 'closed' : 'pending_review';
+        $data = $r->validate(['title' => 'required|string|max:160', 'organization' => 'required|string|max:160', 'location' => 'required|string|max:160', 'industry' => 'required|string|max:120', 'employment_type' => ['required', Rule::in(['Full-time', 'Part-time', 'Contractual', 'Seasonal', 'Internship'])], 'description' => 'required|string|max:8000', 'skills' => 'required|array|min:1|max:30', 'skills.*' => 'required|string|max:100|distinct:ignore_case', 'slots' => 'required|integer|min:1|max:10000', 'salary_min' => 'nullable|integer|min:0', 'salary_max' => 'nullable|integer|gte:salary_min', 'deadline' => ($vacancy?->exists ? 'required|date' : 'required|date|after_or_equal:today'), 'status' => ['required', Rule::in(Vacancy::STATUSES)]]);
+        if (! $this->staff($r) && $data['status'] === 'published') {
+            $data['status'] = 'pending_review';
         }
 
         return DB::transaction(function () use ($r, $vacancy, $data) {
-            $row = $vacancy?->exists ? $vacancy : new Vacancy(['owner_id' => $r->user()->id]);
+            $row = $vacancy?->exists
+                ? Vacancy::whereKey($vacancy->id)->lockForUpdate()->firstOrFail()
+                : new Vacancy(['owner_id' => $r->user()->id]);
+            abort_unless($this->staff($r) || $row->owner_id === $r->user()->id, 403);
             $row->fill($data)->save();
             $this->audit($r, 'vacancy.saved', $row, $data);
 
@@ -235,7 +273,7 @@ class EmploymentController extends Controller
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin', 'employer']);
         $q = Referral::with(['vacancy', 'placement', 'user:id,name']);
         if ($r->user()->role === 'employer') {
-            $q->whereHas('vacancy', fn ($q) => $q->where('owner_id', $r->user()->id))->whereNotIn('status', ['requested', 'withdrawn']);
+            $q->forEmployer($r->user()->id);
         } else {
             $this->participants($q, $r);
         }
@@ -246,15 +284,21 @@ class EmploymentController extends Controller
     public function updateReferral(Request $r, Referral $referral)
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin', 'employer']);
-        $data = $r->validate(['status' => ['required', Rule::in(['referred', 'interviewing', 'offered', 'not_selected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'interview_at' => 'nullable|date|after:now', 'source_confirmation' => 'nullable|string|min:20|max:2000']);
 
-        return DB::transaction(function () use ($r, $referral, $data) {
+        return DB::transaction(function () use ($r, $referral) {
             $row = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
             if ($r->user()->role === 'jobseeker') {
-                abort_unless($row->user_id === $r->user()->id && $data['status'] === 'withdrawn', 403);
+                abort_unless($row->user_id === $r->user()->id, 403);
+            } elseif ($r->user()->role === 'employer') {
+                abort_unless($row->vacancy?->owner_id === $r->user()->id
+                    && in_array($row->status, Referral::EMPLOYER_OPEN_STATES, true), 403);
+            }
+            $data = $r->validate(['status' => ['required', Rule::in(['referred', 'accepted', 'interviewing', 'offered', 'not_selected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'interview_at' => 'nullable|date|after:now', 'source_confirmation' => 'nullable|string|min:20|max:2000']);
+            if ($r->user()->role === 'jobseeker') {
+                abort_unless($data['status'] === 'withdrawn', 403);
                 unset($data['interview_at']);
             } elseif ($r->user()->role === 'employer') {
-                abort_unless($row->vacancy->owner_id === $r->user()->id && in_array($data['status'], ['interviewing', 'offered', 'not_selected']), 403);
+                abort_unless(in_array($data['status'], ['accepted', 'interviewing', 'offered', 'not_selected'], true), 403);
             }
             if ($row->vacancy->external_application && $data['status'] === 'referred') {
                 abort_unless($this->staff($r) && ! empty($data['source_confirmation']), 422, 'PESO must record employer contact, current availability and application instructions before referring this source-listed vacancy.');
@@ -263,7 +307,7 @@ class EmploymentController extends Controller
                 $row->match_snapshot = $snapshot;
             }
             unset($data['source_confirmation']);
-            $this->transition($row->status, $data['status'], ['requested' => ['referred', 'not_selected', 'withdrawn'], 'referred' => ['interviewing', 'offered', 'not_selected', 'withdrawn'], 'interviewing' => ['offered', 'not_selected', 'withdrawn'], 'offered' => ['not_selected', 'withdrawn']]);
+            $this->transition($row->status, $data['status'], ['requested' => ['referred', 'not_selected', 'withdrawn'], 'referred' => ['accepted', 'interviewing', 'offered', 'not_selected', 'withdrawn'], 'accepted' => ['interviewing', 'offered', 'not_selected', 'withdrawn'], 'interviewing' => ['offered', 'not_selected', 'withdrawn'], 'offered' => ['not_selected', 'withdrawn']]);
             if ($data['status'] === 'interviewing' && empty($data['interview_at'])) {
                 throw ValidationException::withMessages(['interview_at' => ['Set an interview schedule.']]);
             }
@@ -321,11 +365,14 @@ class EmploymentController extends Controller
     public function updateEnrollment(Request $r, Enrollment $enrollment)
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin', 'training_provider']);
+        abort_if($r->user()->role === 'jobseeker' && $enrollment->user_id !== $r->user()->id, 403);
+        abort_if($r->user()->role === 'training_provider' && $enrollment->program?->owner_id !== $r->user()->id, 403);
         $data = $r->validate(['status' => ['required', Rule::in(['confirmed', 'in_progress', 'completed', 'rejected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'certificate_reference' => 'nullable|string|max:200', 'intake_program_id' => 'nullable|integer|min:1']);
 
         return DB::transaction(function () use ($r, $enrollment, $data) {
-            $program = TrainingProgram::whereKey($enrollment->training_program_id)->lockForUpdate()->firstOrFail();
+            $program = TrainingProgram::withTrashed()->whereKey($enrollment->training_program_id)->lockForUpdate()->firstOrFail();
             $row = Enrollment::whereKey($enrollment->id)->lockForUpdate()->firstOrFail();
+            abort_unless($row->training_program_id === $program->id, 409, 'The enrollment moved to another intake. Reload and try again.');
             if ($r->user()->role === 'jobseeker') {
                 abort_unless($row->user_id === $r->user()->id && $data['status'] === 'withdrawn', 403);
                 unset($data['certificate_reference']);
@@ -403,7 +450,7 @@ class EmploymentController extends Controller
     public function reportOutcome(Request $r)
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin']);
-        $data = $r->validate(['user_id' => [Rule::excludeIf(! $this->staff($r)), 'sometimes', 'integer', 'exists:users,id'], 'placement_id' => 'nullable|integer|exists:placements,id', 'status' => ['required', Rule::in(['employed', 'self_employed', 'unemployed', 'underemployed', 'in_training', 'not_in_labor_force'])], 'organization' => 'nullable|string|max:160', 'job_title' => 'nullable|string|max:160', 'reported_on' => 'required|date|before_or_equal:today', 'notes' => 'required|string|min:5|max:4000']);
+        $data = $r->validate(['user_id' => [Rule::excludeIf(! $this->staff($r)), 'sometimes', 'integer', 'exists:users,id'], 'placement_id' => 'nullable|integer|min:1', 'status' => ['required', Rule::in(['employed', 'self_employed', 'unemployed', 'underemployed', 'in_training', 'not_in_labor_force'])], 'organization' => 'nullable|string|max:160', 'job_title' => 'nullable|string|max:160', 'reported_on' => 'required|date|before_or_equal:today', 'notes' => 'required|string|min:5|max:4000']);
         $userId = $this->staff($r) ? ($data['user_id'] ?? $r->user()->id) : $r->user()->id;
         abort_unless(User::whereKey($userId)->where('role', 'jobseeker')->exists(), 422, 'Select a jobseeker.');
         if (! empty($data['placement_id'])) {
@@ -456,7 +503,8 @@ class EmploymentController extends Controller
     public function updateService(Request $r, ServiceRequest $service)
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin']);
-        $data = $r->validate(['status' => ['required', Rule::in(['scheduled', 'in_progress', 'completed', 'cancelled'])], 'assigned_to' => 'nullable|integer|exists:users,id', 'appointment_at' => 'nullable|date|after:now', 'staff_notes' => 'required|string|max:4000']);
+        abort_unless($this->staff($r) || $service->user_id === $r->user()->id, 403);
+        $data = $r->validate(['status' => ['required', Rule::in(['scheduled', 'in_progress', 'completed', 'cancelled'])], 'assigned_to' => [Rule::excludeIf(! $this->staff($r)), 'nullable', 'integer', 'exists:users,id'], 'appointment_at' => [Rule::excludeIf(! $this->staff($r)), 'nullable', 'date', 'after:now'], 'staff_notes' => 'required|string|max:4000']);
         if (! $this->staff($r)) {
             abort_unless($service->user_id === $r->user()->id && $data['status'] === 'cancelled', 403);
             $data = ['status' => 'cancelled', 'cancellation_reason' => $data['staff_notes']];
@@ -573,14 +621,24 @@ class EmploymentController extends Controller
         $enrollments = Enrollment::query();
         $placements = Placement::query();
         $services = ServiceRequest::query();
-        if (! $staff) {
+        if ($r->user()->role === 'employer') {
+            $referrals->forEmployer($own);
+            $placements->whereHas('referral.vacancy', fn ($q) => $q->where('owner_id', $own));
+            $enrollments->where('user_id', $own);
+            $services->where('user_id', $own);
+        } elseif (! $staff) {
             $referrals->where('user_id', $own);
             $enrollments->where('user_id', $own);
             $placements->where('user_id', $own);
             $services->where('user_id', $own);
         }
 
-        return response()->json(['referrals' => $referrals->count(), 'enrollments' => $enrollments->count(), 'placements' => $placements->count(), 'services' => $services->whereNotIn('status', ['completed', 'cancelled'])->count(), 'saved' => DB::table('saved_vacancies')->where('user_id', $own)->whereIn('vacancy_id', Vacancy::currentSource()->select('id'))->pluck('vacancy_id'), 'profile' => $r->user()->jobseekerProfile?->onboarding(), 'services_catalog' => self::SERVICES]);
+        $summary = ['referrals' => $referrals->count(), 'enrollments' => $enrollments->count(), 'placements' => $placements->count(), 'services' => $services->whereNotIn('status', ['completed', 'cancelled'])->count(), 'saved' => DB::table('saved_vacancies')->where('user_id', $own)->whereIn('vacancy_id', Vacancy::currentSource()->select('id'))->pluck('vacancy_id'), 'profile' => $r->user()->jobseekerProfile?->onboarding(), 'services_catalog' => self::SERVICES];
+        if ($r->user()->role === 'employer') {
+            $summary['vacancies'] = Vacancy::currentSource()->where('owner_id', $own)->where('is_sample', false)->count();
+        }
+
+        return response()->json($summary);
     }
 
     public function laborMarket(Request $r)

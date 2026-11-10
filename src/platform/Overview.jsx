@@ -47,6 +47,7 @@ export function OverviewPage() {
     events = useResource("/events")
 
   const partner = ["employer", "training_provider"].includes(user.role)
+  const employer = user.role === "employer"
 
   const tasks = staff
     ? [
@@ -87,7 +88,7 @@ export function OverviewPage() {
           [
             "Coordinate referred candidates",
 
-            "Record interview schedules, hiring offers, and selection results.",
+            "Accept candidates for review, arrange interviews, and record offers or declines.",
 
             "/referrals",
           ],
@@ -207,9 +208,11 @@ export function OverviewPage() {
           <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">
             {staff
               ? "Keep each referral, training enrollment and placement traceable. Verify outcomes and help jobseekers who need another pathway."
-              : partner
-                ? "Use your dedicated workspace to manage records. PESO reviews catalog publication and confirms employment placements."
-                : "Your profile connects vacancies, training, and PESO services. Review your options, build skills, and keep your service records in one place."}
+              : employer
+                ? "Create, edit and delete your own vacancies. PESO reviews submissions for publication and verifies employment starts."
+                : partner
+                  ? "Manage your training programs and learner progress. PESO reviews catalog publication."
+                  : "Your profile connects vacancies, training, and PESO services. Review your options, build skills, and keep your service records in one place."}
           </p>
           <div className="mt-6" data-tour="overview-primary-action">
             <ActionLink
@@ -225,9 +228,11 @@ export function OverviewPage() {
             >
               {staff
                 ? "Open referral queue"
-                : partner
-                  ? "Open my workspace"
-                  : "Explore my matches"}
+                : employer
+                  ? "Open my vacancies"
+                  : partner
+                    ? "Open my workspace"
+                    : "Explore my matches"}
             </ActionLink>
           </div>
         </div>
@@ -272,42 +277,73 @@ export function OverviewPage() {
           </ol>
         </div>
       </div>
-      {!partner && (
-        <ResourceState resource={r} skeleton={<StatsSkeleton />}>
-          <div className="overview-stats mb-10 grid grid-cols-2 xl:grid-cols-4">
-            {[
-              ["Referrals", r.data?.referrals, "/referrals", FileCheck2],
+      {user.role !== "training_provider" && (
+        <ResourceState
+          resource={r}
+          skeleton={<StatsSkeleton employer={employer} />}
+        >
+          <div
+            className={`overview-stats mb-10 grid ${
+              employer
+                ? "grid-cols-1 sm:grid-cols-3"
+                : "grid-cols-2 xl:grid-cols-4"
+            }`}
+          >
+            {(employer
+              ? [
+                  [
+                    "My vacancies",
+                    r.data?.vacancies,
+                    "/jobs",
+                    BriefcaseBusiness,
+                  ],
+                  [
+                    "Referred candidates",
+                    r.data?.referrals,
+                    "/referrals",
+                    FileCheck2,
+                  ],
+                  [
+                    "Verified placements",
+                    r.data?.placements,
+                    "/placements",
+                    BookOpen,
+                  ],
+                ]
+              : [
+                  ["Referrals", r.data?.referrals, "/referrals", FileCheck2],
 
-              [
-                "Training enrollments",
+                  [
+                    "Training enrollments",
 
-                r.data?.enrollments,
+                    r.data?.enrollments,
 
-                "/enrollments",
+                    "/enrollments",
 
-                BookOpen,
-              ],
+                    BookOpen,
+                  ],
 
-              [
-                "Verified placements",
+                  [
+                    "Verified placements",
 
-                r.data?.placements,
+                    r.data?.placements,
 
-                "/placements",
+                    "/placements",
 
-                BriefcaseBusiness,
-              ],
+                    BriefcaseBusiness,
+                  ],
 
-              [
-                "Open service requests",
+                  [
+                    "Open service requests",
 
-                r.data?.services,
+                    r.data?.services,
 
-                "/services",
+                    "/services",
 
-                LifeBuoy,
-              ],
-            ].map(([label, value, to, Icon]) => (
+                    LifeBuoy,
+                  ],
+                ]
+            ).map(([label, value, to, Icon]) => (
               <Link key={to} to={to} className="bg-card p-5 hover:bg-secondary">
                 <div className="flex items-center justify-between gap-3 text-muted-foreground">
                   <span className="text-xs">{label}</span>

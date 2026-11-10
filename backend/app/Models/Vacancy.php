@@ -10,17 +10,19 @@ class Vacancy extends Model
 {
     use SoftDeletes;
 
+    public const STATUSES = ['draft', 'pending_review', 'published', 'on_hold', 'cancelled', 'closed'];
+
     protected $guarded = ['id'];
 
     protected $appends = ['availability_status'];
 
     public function getAvailabilityStatusAttribute(): string
     {
-        if (! $this->external_application) {
-            return 'partner_vacancy';
-        }
         if ($this->deadline && $this->deadline < today()->toDateString()) {
             return 'deadline_passed';
+        }
+        if (! $this->external_application) {
+            return 'partner_vacancy';
         }
         if (! $this->source_checked_at || $this->source_checked_at->lt(now()->subDays(30))) {
             return 'review_expired';

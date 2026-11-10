@@ -44,10 +44,10 @@ export function AuthButton({
     <button
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={`inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-lg border px-5 py-3 text-sm font-semibold transition duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:border-border disabled:bg-[#e8ecf4] disabled:text-[#697386] ${
+      className={`auth-button inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-lg border px-5 py-3 text-sm font-semibold transition duration-150 active:translate-y-px disabled:cursor-not-allowed ${
         variant === "primary"
           ? "peso-primary border-primary bg-primary text-primary-foreground"
-          : "border-[#ced9ed] bg-card text-primary hover:border-primary hover:bg-secondary"
+          : "border-border bg-card text-primary hover:border-primary hover:bg-secondary"
       } ${className}`}
       {...props}
     >
@@ -131,7 +131,7 @@ export function Field({
           aria-describedby={
             error || success || helper ? `${id}-message` : undefined
           }
-          className={`h-12 w-full rounded-lg border bg-card text-base text-foreground outline-none transition placeholder:text-[#8a94a6] hover:border-[#98a6bb] focus:border-primary focus:ring-[3px] focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground ${
+          className={`auth-input h-12 w-full rounded-lg border bg-card text-base text-foreground outline-none transition placeholder:text-muted-foreground hover:border-primary/60 focus:border-primary focus:ring-[3px] focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground ${
             Icon ? "pl-11" : prefix ? "pl-[66px]" : "pl-3.5"
           } ${password ? "pr-12" : "pr-3.5"} ${
             error
@@ -242,12 +242,12 @@ export function PasswordStrength({ password }) {
 
   const color =
     score === 4
-      ? "bg-[#278447]"
+      ? "bg-success-ink"
       : score === 3
         ? "bg-primary"
         : score === 2
-          ? "bg-[#c79c23]"
-          : "bg-[#C92A2A]"
+          ? "bg-pending-ink"
+          : "bg-error-ink"
 
   return (
     <div className="space-y-2.5">
@@ -274,7 +274,7 @@ export function PasswordStrength({ password }) {
           <div
             key={value}
             className={`h-1 flex-1 rounded-full ${
-              password && value <= score ? color : "bg-[#E4E7EC]"
+              password && value <= score ? color : "bg-muted"
             }`}
           />
         ))}
@@ -302,7 +302,7 @@ export function PasswordStrength({ password }) {
 
 function BrandPanel() {
   return (
-    <aside className="auth-brand-panel hidden bg-[#123d35] text-white lg:sticky lg:top-0 lg:flex lg:h-dvh lg:min-h-[680px] lg:flex-col lg:px-12 lg:py-10">
+    <aside className="auth-brand-panel hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:min-h-[680px] lg:flex-col lg:px-12 lg:py-10">
       <Brand light />
       <div className="my-auto py-20">
         <h2 className="max-w-md font-display text-5xl leading-[1.15]">
@@ -353,7 +353,7 @@ export function AuthLayout({
       className={
         centered
           ? "min-h-dvh bg-background"
-          : "min-h-dvh bg-card lg:grid lg:grid-cols-[43%_57%]"
+          : "auth-shell min-h-dvh bg-card lg:grid lg:grid-cols-[43%_57%]"
       }
     >
       {!centered && <BrandPanel />}

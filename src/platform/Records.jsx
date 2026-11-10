@@ -104,7 +104,9 @@ const outcomeFields = [
 const referralNext = {
   requested: ["referred", "not_selected"],
 
-  referred: ["interviewing", "offered", "not_selected"],
+  referred: ["accepted", "interviewing", "offered", "not_selected"],
+
+  accepted: ["interviewing", "offered", "not_selected"],
 
   interviewing: ["offered", "not_selected"],
 
@@ -145,6 +147,7 @@ export function RecordsPage({ kind }) {
   const { user } = useAuth(),
     staff = staffRole(user.role),
     jobseeker = user.role === "jobseeker"
+  const employer = user.role === "employer"
 
   const r = useResource(`/${kind}`)
 
@@ -224,15 +227,32 @@ export function RecordsPage({ kind }) {
         help =
           "Confirm employment with the employer or jobseeker before recording placement. Record the evidence source."
       } else {
-        let options = jobseeker ? ["withdrawn"] : referralNext[row.status] || []
+        const options = jobseeker
+          ? ["withdrawn"]
+          : referralNext[row.status] || []
 
-        if (user.role === "employer")
-          options = options.filter((s) => s !== "referred")
+        const employerLabels = {
+          accepted: "Accept for review",
+          interviewing: "Schedule interview",
+          offered: "Record job offer",
+          not_selected:
+            row.status === "offered" ? "Withdraw offer" : "Decline candidate",
+        }
+        if (employer)
+          help =
+            "Accepting a referral starts your review. Record a separate offer when you decide to hire."
 
         heading = "Update referral"
 
         fields = [
-          field("status", "Next referral status", "text", { options }),
+          field("status", "Next referral status", "text", {
+            options: employer
+              ? options.map((value) => ({
+                  value,
+                  label: employerLabels[value],
+                }))
+              : options,
+          }),
 
           field(
             "interview_at",
@@ -468,6 +488,11 @@ export function RecordsPage({ kind }) {
     <>
       <Heading
         {...config}
+        description={
+          employer && kind === "referrals"
+            ? "Review candidates PESO referred to your vacancies. Accept for review, schedule interviews, record offers, or decline."
+            : config.description
+        }
         action={
           kind === "outcomes" ? (
             <button
@@ -578,7 +603,9 @@ export function RecordsPage({ kind }) {
               ) : undefined
             }
           >
-            {kind === "referrals" ? (
+            {kind === "referrals" && employer ? (
+              "Candidates appear here after PESO refers them to one of your vacancies."
+            ) : kind === "referrals" ? (
               <>
                 Explore{" "}
                 <Link
@@ -777,7 +804,9 @@ export function RecordsPage({ kind }) {
                             ? kind === "services"
                               ? "Cancel request"
                               : "Withdraw request"
-                            : "Update status"}
+                            : employer && kind === "referrals"
+                              ? "Review referral"
+                              : "Update status"}
                         </button>
                       )}
                     {kind === "referrals" &&

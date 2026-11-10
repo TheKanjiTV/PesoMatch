@@ -6,7 +6,7 @@ import {
   trainingConsentStatement,
 } from "./CollectionNotice.jsx"
 
-import { Link, useParams, useNavigate } from "react-router"
+import { Link, useParams, useNavigate, useSearchParams } from "react-router"
 
 import { ArrowRight, Bookmark, CalendarDays, MapPin } from "lucide-react"
 
@@ -35,7 +35,16 @@ import {
 
 import { ResourceState } from "./ResourceState.jsx"
 
-import { CatalogSkeleton, MatchesSkeleton } from "./LoadingStates.jsx"
+import {
+  CatalogSkeleton,
+  MatchesSkeleton,
+  TableSkeleton,
+} from "./LoadingStates.jsx"
+import {
+  EmployerVacancyTable,
+  VacancyStatus,
+  vacancyStatuses,
+} from "./EmployerVacancies.jsx"
 
 import { SearchInput } from "./SearchInput.jsx"
 
@@ -76,6 +85,9 @@ const F = (name, label, type = "text", extra = {}) => ({
 const statusField = F("status", "Publication status", "text", {
   options: ["draft", "pending_review", "published", "closed"],
 })
+const vacancyStatusOptions = Object.entries(vacancyStatuses).map(
+  ([value, [label]]) => ({ value, label }),
+)
 
 function Verification({ record }) {
   if (!record.external_application && !record.external_enrollment) return null
@@ -142,7 +154,7 @@ const vacancyFields = [
 
   F("deadline", "Application deadline", "date"),
 
-  statusField,
+  { ...statusField, options: vacancyStatusOptions },
 
   F("skills_text", "Required skills (comma separated)"),
 
@@ -184,15 +196,28 @@ export function CatalogPage({ kind = "vacancies" }) {
     { id } = useParams()
 
   const navigate = useNavigate()
+  const [params] = useSearchParams()
 
   const [removing, setRemoving] = useState(null)
 
   const [intake, setIntake] = useState(null)
 
   const training = kind === "training"
+  const employer = !training && user.role === "employer"
+  const view = ["all", "employers"].includes(params.get("view"))
+    ? params.get("view")
+    : "mine"
+  const directory = employer && !id && view === "employers"
+  const organization =
+    employer && view === "all" ? params.get("organization") || "" : ""
+  const returnQuery = employer
+    ? `?${new URLSearchParams({ view, ...(organization && { organization }) })}`
+    : ""
+  const catalogReturn = training ? "/training" : `/jobs${returnQuery}`
 
-  const showSourceStatus =
-    user.role !== (training ? "training_provider" : "employer")
+  const showSourceStatus = training
+    ? user.role !== "training_provider"
+    : !employer || view === "all" || Boolean(id)
 
   const [search, setSearch] = useState(""),
     [filter, setFilter] = useState("all"),
@@ -202,35 +227,67 @@ export function CatalogPage({ kind = "vacancies" }) {
     [busy, setBusy] = useState(false),
     [savedOnly, setSavedOnly] = useState(false),
     [catalogFilter, setCatalogFilter] = useState("all"),
-    [availabilityFilter, setAvailabilityFilter] = useState("all")
+    [availabilityFilter, setAvailabilityFilter] = useState("all"),
+    [location, setLocation] = useState(""),
+    [employment, setEmployment] = useState(""),
+    [sort, setSort] = useState("newest")
 
   const query = useSearchQuery(search)
+  const locationQuery = useSearchQuery(location)
 
-  const r = useResource(
-    (training ? "/training" : "/vacancies") +
-      (id
-        ? `?id=${id}`
-        : `?search=${encodeURIComponent(query)}&status=${filter}${
-            savedOnly && !training ? "&saved=1" : ""
-          }&${
-            training
-              ? `catalog=${catalogFilter}`
-              : `availability=${availabilityFilter}`
-          }`),
+  const resourcePath = training ? "/training" : "/vacancies"
+  const request = new URLSearchParams(
+    id
+      ? { id }
+      : {
+          search: query,
+          status: employer && view !== "mine" ? "all" : filter,
+          ...(training
+            ? { catalog: catalogFilter }
+            : {
+                availability:
+                  employer && view === "mine" ? "all" : availabilityFilter,
+              }),
+          ...(savedOnly && !training && { saved: "1" }),
+        },
   )
-
+  if (employer) {
+    request.set("scope", id || view === "all" ? "all" : "mine")
+    if (!id && !directory) {
+      if (organization) request.set("organization", organization)
+      if (locationQuery) request.set("location", locationQuery)
+      if (employment) request.set("employment_type", employment)
+      request.set("sort", sort)
+    }
+  }
+  const r = useResource(
+    directory
+      ? `/employers?${new URLSearchParams({ search: query, sort: sort === "-title" ? "-title" : "title" })}`
+      : `${resourcePath}?${request}`,
+  )
   const summary = useResource("/summary")
-
+  const staff = staffRole(user.role)
   const canManage =
-      staffRole(user.role) ||
-      user.role === (training ? "training_provider" : "employer"),
-    resourcePath = training ? "/training" : "/vacancies"
+    staff || user.role === (training ? "training_provider" : "employer")
+  const canManageRecord = (record) =>
+    staff || (canManage && record.owner_id === user.id)
 
   const records = r.data?.data || []
 
   const filtered = records
 
   const detail = id ? records.find((v) => String(v.id) === id) : null
+
+  useEffect(() => {
+    setEditor(null)
+    setRemoving(null)
+    setSearch("")
+    setFilter("all")
+    setLocation("")
+    setEmployment("")
+    setAvailabilityFilter("all")
+    setSort("newest")
+  }, [view, organization])
 
   useEffect(() => {
     if (id && r.data)
@@ -245,7 +302,10 @@ export function CatalogPage({ kind = "vacancies" }) {
 
       fee: row.fee ?? 0,
 
-      status: row.status || (staffRole(user.role) ? "draft" : "pending_review"),
+      status:
+        (employer && row.status === "published"
+          ? "pending_review"
+          : row.status) || (staff ? "draft" : "pending_review"),
 
       slots: row.slots || 1,
 
@@ -284,7 +344,8 @@ export function CatalogPage({ kind = "vacancies" }) {
 
     setMessage("Catalog record saved.")
 
-    await r.reload()
+    if (employer && !id && view !== "mine") navigate("/jobs?view=mine")
+    else await r.reload()
   }
 
   async function action(row, save = false) {
@@ -347,22 +408,50 @@ export function CatalogPage({ kind = "vacancies" }) {
   return (
     <>
       <Heading
-        title={detail?.title || noun}
+        title={detail?.title || (directory ? "Employer directory" : noun)}
         description={
           training
-            ? "Explore upskilling pathways, review requirements, and follow provider-confirmed enrollment."
+            ? user.role === "employer"
+              ? "Browse published training and skills development programs. Training providers manage learner enrollment."
+              : "Explore upskilling pathways, review requirements, and follow provider-confirmed enrollment."
             : detail?.external_application
               ? "Review the official source and plan your application with PESO guidance."
-              : "Discover work opportunities or manage reviewed vacancies for PESO referrals."
+              : directory
+                ? "Browse organizations with published vacancies."
+                : employer
+                  ? "Manage your own postings and browse published vacancies. PESO reviews submissions before publication."
+                  : "Discover work opportunities or manage reviewed vacancies for PESO referrals."
         }
         action={
-          canManage && (
+          canManage &&
+          (!employer || (!id && !directory)) && (
             <button className={addStyle} onClick={() => edit()}>
               Add {training ? "training program" : "vacancy"}
             </button>
           )
         }
       />
+      {employer && !id && (
+        <nav
+          aria-label="Employer vacancy views"
+          className="mb-5 flex flex-wrap gap-2 border-b border-border pb-3"
+        >
+          {[
+            ["mine", "My vacancies"],
+            ["all", "All vacancies"],
+            ["employers", "Employers"],
+          ].map(([value, label]) => (
+            <Link
+              key={value}
+              to={`/jobs?view=${value}`}
+              aria-current={view === value ? "page" : undefined}
+              className={view === value ? primaryStyle : secondaryStyle}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+      )}
       {removing && (
         <DeleteDialog
           type={training ? "training" : "vacancy"}
@@ -371,23 +460,25 @@ export function CatalogPage({ kind = "vacancies" }) {
           onDeleted={async () => {
             setMessage("Catalog item deleted. Linked history is preserved.")
 
-            if (id) navigate(training ? "/training" : "/jobs")
+            if (id) navigate(catalogReturn)
             else await r.reload()
           }}
         />
       )}
-      {canManage && detail && (
-        <div className="mb-5 flex flex-wrap gap-3">
-          {training && detail.external_enrollment && staffRole(user.role) && (
-            <button className={addStyle} onClick={() => setIntake(detail)}>
-              Create verified local intake
+      {detail &&
+        canManageRecord(detail) &&
+        (!employer || !detail.external_application) && (
+          <div className="mb-5 flex flex-wrap gap-3">
+            {training && detail.external_enrollment && staffRole(user.role) && (
+              <button className={addStyle} onClick={() => setIntake(detail)}>
+                Create verified local intake
+              </button>
+            )}
+            <button className={dangerStyle} onClick={() => setRemoving(detail)}>
+              Delete {training ? "training" : "vacancy"}
             </button>
-          )}
-          <button className={dangerStyle} onClick={() => setRemoving(detail)}>
-            Delete {training ? "training" : "vacancy"}
-          </button>
-        </div>
-      )}
+          </div>
+        )}
       {intake && (
         <Editor
           title={`Verify local intake: ${intake.title}`}
@@ -462,11 +553,17 @@ export function CatalogPage({ kind = "vacancies" }) {
             training ? "training program" : "vacancy"
           }`}
           initial={editor}
-          fields={(training ? trainingFields : vacancyFields).map((f) =>
-            f.name === "status" && !staffRole(user.role)
-              ? { ...f, options: ["pending_review", "closed"] }
-              : f,
-          )}
+          fields={(training ? trainingFields : vacancyFields).map((f) => {
+            if (f.name !== "status" || staff) return f
+            return {
+              ...f,
+              options: training
+                ? ["pending_review", "closed"]
+                : vacancyStatusOptions.filter(
+                    ({ value }) => value !== "published",
+                  ),
+            }
+          })}
           help={
             !staffRole(user.role)
               ? "PESO reviews partner submissions before they appear in the public catalog."
@@ -477,7 +574,24 @@ export function CatalogPage({ kind = "vacancies" }) {
         />
       )}
       {!id && (
-        <div className="mb-6 flex flex-wrap items-start gap-3">
+        <div
+          className={
+            employer
+              ? "mb-6 grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(240px,2fr)_repeat(4,minmax(0,1fr))]"
+              : "mb-6 flex flex-wrap items-start gap-3"
+          }
+        >
+          {organization && (
+            <div className="col-span-full flex w-full flex-wrap items-center gap-3">
+              <span className="font-semibold">{organization}</span>
+              <Link
+                to="/jobs?view=all"
+                className="text-sm text-primary underline"
+              >
+                Clear employer filter
+              </Link>
+            </div>
+          )}
           {!training && user.role === "jobseeker" && (
             <button
               className={savedOnly ? primaryStyle : secondaryStyle}
@@ -488,14 +602,18 @@ export function CatalogPage({ kind = "vacancies" }) {
             </button>
           )}
           <SearchInput
-            label={`Search ${training ? "training" : "vacancies"}`}
+            label={`Search ${
+              directory ? "employers" : training ? "training" : "vacancies"
+            }`}
             value={search}
             onChange={setSearch}
             loading={r.loading}
             placeholder={
-              training
-                ? "Search programs, providers or skills"
-                : "Search job title, employer, location or skill"
+              directory
+                ? "Search organization name"
+                : training
+                  ? "Search programs, providers or skills"
+                  : "Search job title, employer, location or skill"
             }
             suggestions={searchSuggestions(records, search, [
               "title",
@@ -529,51 +647,110 @@ export function CatalogPage({ kind = "vacancies" }) {
               </option>
             </select>
           ) : (
-            <select
-              aria-label="Filter vacancy availability"
-              className={`${inputStyle} max-w-64`}
-              value={availabilityFilter}
-              onChange={(event) => setAvailabilityFilter(event.target.value)}
-            >
-              <option value="all">All reviewed listings</option>
-              <option value="source_lists_open">
-                Source-listed open postings
-              </option>
-            </select>
+            !directory &&
+            (!employer || view === "all") && (
+              <select
+                aria-label="Filter vacancy availability"
+                className={`${inputStyle} max-w-64`}
+                value={availabilityFilter}
+                onChange={(event) => setAvailabilityFilter(event.target.value)}
+              >
+                <option value="all">All reviewed listings</option>
+                <option value="source_lists_open">
+                  Source-listed open postings
+                </option>
+              </select>
+            )
           )}
-          {canManage && (
+          {canManage && (!employer || view === "mine") && (
             <select
               aria-label="Filter by publication status"
               className={`${inputStyle} max-w-48`}
               value={filter}
               onChange={(event) => setFilter(event.target.value)}
             >
-              {["all", "draft", "pending_review", "published", "closed"].map(
-                (status) => (
-                  <option key={status} value={status}>
-                    {status.replaceAll("_", " ")}
-                  </option>
-                ),
+              <option value="all">All statuses</option>
+              {(training
+                ? statusField.options.map((value) => ({
+                    value,
+                    label: value.replaceAll("_", " "),
+                  }))
+                : vacancyStatusOptions
+              ).map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          )}
+          {employer && !directory && (
+            <>
+              <input
+                aria-label="Filter by location"
+                placeholder="Any location"
+                maxLength={160}
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
+                className={`${inputStyle} max-w-48`}
+              />
+              <select
+                aria-label="Filter by employment type"
+                value={employment}
+                onChange={(event) => setEmployment(event.target.value)}
+                className={`${inputStyle} max-w-48`}
+              >
+                <option value="">All types</option>
+                {vacancyFields
+                  .find(({ name }) => name === "employment_type")
+                  .options.map((type) => (
+                    <option key={type}>{type}</option>
+                  ))}
+              </select>
+            </>
+          )}
+          {employer && (
+            <select
+              aria-label="Sort results"
+              value={directory && sort === "newest" ? "title" : sort}
+              onChange={(event) => setSort(event.target.value)}
+              className={`${inputStyle} max-w-44`}
+            >
+              {!directory && (
+                <>
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                </>
               )}
+              <option value="title">Name A–Z</option>
+              <option value="-title">Name Z–A</option>
             </select>
           )}
         </div>
       )}
       <ResourceState
         resource={r}
-        skeleton={<CatalogSkeleton detail={Boolean(id)} training={training} />}
+        skeleton={
+          employer && !id ? (
+            <TableSkeleton
+              kind="employer-vacancies"
+              columns={directory ? 3 : 6}
+            />
+          ) : (
+            <CatalogSkeleton detail={Boolean(id)} training={training} />
+          )
+        }
       >
         {id && !detail ? (
           <Empty title="Record unavailable">
             This record may be closed or outside your permitted catalog.{" "}
-            <Link to={training ? "/training" : "/jobs"} className="underline">
+            <Link to={catalogReturn} className="underline">
               Return to the catalog.
             </Link>
           </Empty>
         ) : detail ? (
           <>
             <Link
-              to={training ? "/training" : "/jobs"}
+              to={catalogReturn}
               className="mb-6 inline-flex min-h-11 items-center text-sm font-semibold text-primary"
             >
               ← Back to catalog
@@ -581,7 +758,7 @@ export function CatalogPage({ kind = "vacancies" }) {
             <Detail
               record={detail}
               training={training}
-              canManage={canManage}
+              canManage={canManageRecord(detail)}
               role={user.role}
               busy={busy}
               saved={summary.data?.saved?.includes(detail.id)}
@@ -589,6 +766,37 @@ export function CatalogPage({ kind = "vacancies" }) {
               action={action}
             />
           </>
+        ) : employer ? (
+          filtered.length ? (
+            <EmployerVacancyTable
+              rows={filtered}
+              view={view}
+              searchParams={returnQuery}
+              canManage={canManageRecord}
+              edit={edit}
+              remove={setRemoving}
+            />
+          ) : (
+            <Empty
+              title={
+                view === "mine" &&
+                !query &&
+                filter === "all" &&
+                !locationQuery &&
+                !employment
+                  ? "No vacancies yet"
+                  : "No matching results"
+              }
+            >
+              {view === "mine" &&
+              !query &&
+              filter === "all" &&
+              !locationQuery &&
+              !employment
+                ? "Use Add vacancy to create your first posting and submit it for PESO review."
+                : "Try a different search or adjust the filters."}
+            </Empty>
+          )
         ) : (
           <>
             {!filtered.length ? (
@@ -611,7 +819,8 @@ export function CatalogPage({ kind = "vacancies" }) {
                   >
                     <div className="flex flex-wrap gap-2">
                       <Badge>{training ? v.mode : v.employment_type}</Badge>
-                      {canManage && (
+                      {!training && <VacancyStatus record={v} />}
+                      {training && canManage && (
                         <Badge>{v.status.replaceAll("_", " ")}</Badge>
                       )}
                       <Sample record={v} />
@@ -667,7 +876,7 @@ export function CatalogPage({ kind = "vacancies" }) {
                         View {training ? "program" : "vacancy"}
                         <ArrowRight size={16} />
                       </Link>
-                      {canManage && (
+                      {canManageRecord(v) && (
                         <button
                           className={dangerStyle}
                           onClick={() => setRemoving(v)}
@@ -711,6 +920,7 @@ function Detail({
       <article className="rounded-lg border border-border bg-card p-6 sm:p-8">
         <div className="flex flex-wrap gap-2">
           <Badge>{training ? v.mode : v.employment_type}</Badge>
+          {!training && <VacancyStatus record={v} />}
           <Sample record={v} />
           <Source record={v} />
           <Verification record={v} />

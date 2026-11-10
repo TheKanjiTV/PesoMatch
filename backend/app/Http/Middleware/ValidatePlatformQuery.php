@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Vacancy;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +16,12 @@ class ValidatePlatformQuery
             Validator::make($request->query(), [
                 'id' => 'sometimes|integer|min:1', 'page' => 'sometimes|integer|min:1|max:10000',
                 'search' => ['bail', 'sometimes', 'nullable', 'string', 'max:200', 'not_regex:/[\x00-\x1f\x7f]/u'],
-                'status' => ['sometimes', 'nullable', 'string', Rule::in(['all', 'draft', 'pending_review', 'published', 'closed'])],
+                'status' => ['sometimes', 'nullable', 'string', Rule::in(['all', ...Vacancy::STATUSES])],
+                'scope' => ['sometimes', Rule::in(['mine', 'all'])],
+                'organization' => 'sometimes|nullable|string|max:160',
+                'location' => 'sometimes|nullable|string|max:160',
+                'employment_type' => ['sometimes', 'nullable', Rule::in(['Full-time', 'Part-time', 'Contractual', 'Seasonal', 'Internship'])],
+                'sort' => ['sometimes', Rule::in(['newest', 'oldest', 'title', '-title'])],
                 'saved' => 'sometimes|boolean',
                 'source_program_id' => 'sometimes|integer|min:1',
                 'include_samples' => 'sometimes|boolean',

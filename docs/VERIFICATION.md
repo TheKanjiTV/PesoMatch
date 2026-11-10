@@ -1,5 +1,11 @@
 # AI-Powered Employment Facilitation Platform for Public Employment Service Office (PESO) — Verification
 
+## Employer workspace and auth theme — November 10, 2026
+
+- Laravel passed 97 tests and 5,918 assertions on isolated SQLite. Employer cases exercise private vacancy reads, foreign edits, forged owner IDs, referral access before and after PESO handoff, and delete tokens submitted with a different vacancy ID.
+- The production build and 10 account-client checks passed. Five focused Edge cases covered employer vacancies and referrals, auth theme, the employer tutorial, and the shared loading shell. After the visual adjustments, the employer workflow passed again and the isolated auth theme check passed with tracing. Browser records were fixtures. Desktop login, mobile registration, and the vacancy table were reviewed visually, including Axe on mobile registration.
+- The local preview returned HTTP 200. A read-only database check found two employer accounts, zero non-sample vacancies owned by them, and 491 current published non-sample listings. The published count includes reviewed source listings. No employer postings or hiring records were seeded.
+
 ## Current verification — November 7, 2026
 
 - Latest shell-loading correction: production build, all 10 account-client tests, formatting and diff checks passed. Initial sidebar/mobile/header placeholders now settle once per authenticated shell; subsequent module changes, searches and retries keep navigation usable. The header includes name/role, theme, Install and Public home placeholders with existing mobile visibility.

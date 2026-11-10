@@ -136,26 +136,30 @@ export function Heading({ title, description, action }) {
   )
 }
 
-export function Badge({ children, sample = false }) {
+export function Badge({ children, sample = false, tone: specifiedTone }) {
   const value = String(children || "").toLowerCase()
 
-  const tone = sample
-    ? "sample"
-    : /unverified|not verified|unconfirmed|confirm intake|confirm availability|draft/.test(
-          value,
-        )
-      ? "pending"
-      : /completed|verified|placed|confirmed|published|employed|active|profile complete/.test(
+  const tone =
+    specifiedTone ??
+    (sample
+      ? "sample"
+      : /unverified|not verified|unconfirmed|confirm intake|confirm availability|draft/.test(
             value,
           )
-        ? "success"
-        : /declined|rejected|error|failed/.test(value)
-          ? "error"
-          : /cancelled|withdrawn|closed|removed/.test(value)
-            ? "neutral"
-            : /pending|requested|review|offered|scheduled|progress/.test(value)
-              ? "pending"
-              : "info"
+        ? "pending"
+        : /\b(?:completed|verified|placed|confirmed|published|employed|active|accepted)\b|profile complete/.test(
+              value,
+            )
+          ? "success"
+          : /declined|rejected|error|failed|cancelled|not selected/.test(value)
+            ? "error"
+            : /withdrawn|closed|removed/.test(value)
+              ? "neutral"
+              : /pending|requested|review|offered|scheduled|progress|on hold/.test(
+                    value,
+                  )
+                ? "pending"
+                : "info")
 
   return <span className={`status-badge status-${tone}`}>{children}</span>
 }

@@ -18,11 +18,16 @@ Training additionally accepts `catalog=all|registered_program|online_course|over
 
 Paths below have the `/api/platform` prefix.
 
+Vacancy lists accept `location`, `employment_type`, `organization` and `sort=newest|oldest|title|-title`. Employers use `scope=mine` for their records across statuses. With `scope=all&id={id}`, an employer can open their own vacancy or a current published listing. Other private IDs return an empty list. The directory exposes organization names and counts from published vacancies.
+
+Vacancy statuses include `draft`, `pending_review`, `published`, `on_hold`, `cancelled` and `closed`. Employer submissions for publication enter `pending_review`. Employer edits and timed removal requests use the signed-in account's ownership. Candidate decisions require a PESO handoff for a vacancy the employer owns.
+
 | Method and path | Authorized behavior |
 | --- | --- |
-| GET /summary | Own service counts; PESO/admin operational counts |
-| GET /vacancies | Published current catalog; employers see own; PESO sees all |
-| POST /vacancies; PATCH /vacancies/{id} | PESO or own employer submission; partner publication requires review |
+| GET /summary | Own service counts, employer vacancy and candidate counts, or PESO operational counts |
+| GET /vacancies | Current published catalog for jobseekers. Employers default to their own records and can use `scope=all` to browse published openings. PESO sees all. |
+| GET /employers | Employer and PESO roles can browse published vacancy counts by organization |
+| POST /vacancies / PATCH /vacancies/{id} | PESO or owner employer submission. PESO controls publication. |
 | POST /vacancies/{id}/save; DELETE same | Own persisted saved vacancy |
 | POST /vacancies/{id}/referrals | Jobseeker requests own referral; optional notes |
 | GET /matches | Jobseeker profile-based vacancy and training suggestions |
@@ -30,7 +35,7 @@ Paths below have the `/api/platform` prefix.
 | POST /training; PATCH /training/{id} | PESO or own provider submission |
 | POST /training/{id}/enroll | Jobseeker; required accepted consent; optional notes |
 | GET /referrals | Own jobseeker, PESO/admin all, employer's referred candidates |
-| PATCH /referrals/{id} | Authorized next status, notes, interview_at when applicable |
+| PATCH /referrals/{id} | Authorized next status and notes. Employers may accept a PESO-referred candidate, schedule an interview, offer or decline within their own vacancies. |
 | POST /referrals/{id}/placement | PESO/admin only; offered referral and verification evidence required |
 | GET /enrollments | Own jobseeker, PESO/admin all, own provider learners |
 | PATCH /enrollments/{id} | Authorized next status; notes; completion reference when completing |
