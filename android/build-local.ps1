@@ -21,7 +21,9 @@ try { $taskHash = [BitConverter]::ToString([Security.Cryptography.SHA256]::Creat
 $taskGradle = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'app\build.gradle') -Raw
 $taskVersion = [regex]::Match($taskGradle, "versionName\s+'([^']+)'").Groups[1].Value
 if (-not $taskVersion) { throw 'Android versionName is missing.' }
-$taskRelease = @{ available=$true; version=$taskVersion; url='/downloads/peso-android-local.apk'; sha256=$taskHash } | ConvertTo-Json
+$taskVersionCode = [regex]::Match($taskGradle, 'versionCode\s+(\d+)').Groups[1].Value
+if (-not $taskVersionCode) { throw 'Android versionCode is missing.' }
+$taskRelease = @{ available=$true; version=$taskVersion; versionCode=[int]$taskVersionCode; url='/downloads/peso-android-local.apk'; sha256=$taskHash } | ConvertTo-Json
 [IO.File]::WriteAllText((Join-Path $taskProject 'public\app-release.json'),$taskRelease)
 if (Test-Path (Join-Path $taskProject 'dist')) {
     New-Item -ItemType Directory -Force (Join-Path $taskProject 'dist\downloads') | Out-Null

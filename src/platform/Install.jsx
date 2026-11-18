@@ -23,7 +23,7 @@ export function InstallPage() {
   useEffect(() => {
     document.title = "Install PESO | Employment Services"
 
-    fetch("/app-release.json")
+    fetch("/app-release.json", { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : null))
 
       .then(setAndroid)
@@ -123,18 +123,21 @@ export function InstallPage() {
           </h2>
           <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
             The Android companion opens the same platform in a dedicated app,
-            with mobile navigation and Android Back support. Enter your PESO
-            platform’s address on first launch.
+            with mobile navigation and Android Back support. It connects to
+            pesomatch.site automatically.
           </p>
           {android?.available ? (
             <>
-              <a className={`${primaryStyle} mt-5`} href={android.url} download>
+              <a
+                className={`${primaryStyle} mt-5`}
+                href={android.versionCode ? `${android.url}?v=${android.versionCode}` : android.url}
+                download
+              >
                 <Download size={18} />
                 Download Android APK
               </a>
               <p className="mt-3 text-sm text-muted-foreground">
-                Local development build · {android.version}. A public store
-                release needs a deployed HTTPS platform and release signing.
+                Version {android.version} · Direct download
               </p>
             </>
           ) : (

@@ -869,21 +869,23 @@ export function CatalogPage({ kind = "vacancies" }) {
                             ? "Confirm availability on source"
                             : `Apply by ${date(v.deadline)}`}
                       </span>
-                      <Link
-                        to={`${training ? "/training" : "/jobs"}/${v.id}`}
-                        className="action-view inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold"
-                      >
-                        View {training ? "program" : "vacancy"}
-                        <ArrowRight size={16} />
-                      </Link>
-                      {canManageRecord(v) && (
-                        <button
-                          className={dangerStyle}
-                          onClick={() => setRemoving(v)}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          to={`${training ? "/training" : "/jobs"}/${v.id}`}
+                          className="action-view inline-flex min-h-11 items-center gap-2 rounded-lg px-4 text-sm font-semibold"
                         >
-                          Delete {training ? "training" : "vacancy"}
-                        </button>
-                      )}
+                          View {training ? "program" : "vacancy"}
+                          <ArrowRight size={16} />
+                        </Link>
+                        {canManageRecord(v) && (
+                          <button
+                            className={dangerStyle}
+                            onClick={() => setRemoving(v)}
+                          >
+                            Delete {training ? "training" : "vacancy"}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </article>
                 ))}

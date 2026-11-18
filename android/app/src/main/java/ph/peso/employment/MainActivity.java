@@ -30,6 +30,7 @@ import java.util.Locale;
 
 /** Same-origin web companion: Laravel keeps its real session and CSRF protection. */
 public class MainActivity extends Activity {
+    private static final String LIVE_ORIGIN = "https://pesomatch.site";
     private WebView web;
     private LinearLayout root;
     private ProgressBar progress;
@@ -47,8 +48,95 @@ public class MainActivity extends Activity {
         debugBuild = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         prefs = getSharedPreferences("peso-platform", MODE_PRIVATE);
         origin = prefs.getString("origin", "");
-        if (origin.isEmpty()) setup(); else openPlatform();
+        if (origin.isEmpty() || origin.equals("https://pesomatch.bongabonghealthup.online")
+                || origin.equals("https://snow-stingray-241500.hostingersite.com")
+                || origin.equals("https://navajowhite-curlew-967305.hostingersite.com")) {
+            origin = LIVE_ORIGIN;
+            prefs.edit().putString("origin", origin).apply();
+        }
+        startPlatform();
     }
+    private void startPlatform() {
+        LinearLayout loading = screen();
+        loading.setGravity(Gravity.CENTER);
+        android.widget.ImageView logo = new android.widget.ImageView(this);
+        logo.setImageResource(R.drawable.peso_icon);
+        loading.addView(logo, new LinearLayout.LayoutParams(dp(84), dp(84)));
+        loading.addView(text("Opening PESO…", 20, true));
+        ProgressBar spinner = new ProgressBar(this);
+        spinner.setContentDescription("Loading PESO");
+        loading.addView(spinner, new LinearLayout.LayoutParams(dp(32), dp(32)));
+
+        if (!LIVE_ORIGIN.equals(origin)) {
+            openPlatform();
+            return;
+        }
+        new Thread(() -> {
+            int latestVersion = fetchPublishedVersion();
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                openPlatform();
+                if (latestVersion > installedVersion()) showUpdate(latestVersion);
+            });
+        }, "peso-release-check").start();
+    }
+
+    private int installedVersion() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (android.content.pm.PackageManager.NameNotFoundException ex) {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    private int fetchPublishedVersion() {
+        java.net.HttpURLConnection connection = null;
+        try {
+            connection = (java.net.HttpURLConnection) new java.net.URL(
+                    LIVE_ORIGIN + "/app-release.json").openConnection();
+            connection.setInstanceFollowRedirects(false);
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Cache-Control", "no-cache");
+            if (connection.getResponseCode() != 200) return 0;
+            try (java.io.InputStream input = connection.getInputStream()) {
+                java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+                byte[] chunk = new byte[1024];
+                int count;
+                while ((count = input.read(chunk)) != -1) {
+                    if (buffer.size() + count > 8192) return 0;
+                    buffer.write(chunk, 0, count);
+                }
+                byte[] bytes = buffer.toByteArray();
+                org.json.JSONObject release = new org.json.JSONObject(
+                        new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+                return release.optBoolean("available") ? release.optInt("versionCode") : 0;
+            }
+        } catch (java.io.IOException | org.json.JSONException ex) {
+            return 0;
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+    }
+
+    private void showUpdate(int version) {
+        new AlertDialog.Builder(this)
+                .setTitle("Please Update")
+                .setMessage("A newer version of PESO is available. Download it to update this app.")
+                .setPositiveButton("Download update", (dialog, which) -> {
+                    Uri download = Uri.parse(LIVE_ORIGIN + "/downloads/peso-android-local.apk?v=" + version);
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, download));
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        new AlertDialog.Builder(this).setMessage("Open pesomatch.site/app in your browser to download the update.")
+                                .setPositiveButton("OK", null).show();
+                    }
+                })
+                .setNegativeButton("Later", null)
+                .show();
+    }
+
     private LinearLayout screen() {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -86,7 +174,7 @@ public class MainActivity extends Activity {
         layout.addView(text("Platform address",15,true));
         EditText address=new EditText(this); address.setSingleLine(true);
         address.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-        address.setHint("https://your-peso-platform.example"); address.setText(origin);
+        address.setHint(LIVE_ORIGIN); address.setText(origin);
         address.setContentDescription("PESO platform address");
         layout.addView(address,new LinearLayout.LayoutParams(-1,dp(56)));
         TextView error=text("",15,true);error.setTextColor(Color.rgb(139,46,36));layout.addView(error);
@@ -126,11 +214,7 @@ public class MainActivity extends Activity {
             if(android.os.Build.VERSION.SDK_INT>=30){android.graphics.Insets bars=insets.getInsets(WindowInsets.Type.systemBars());v.setPadding(bars.left,bars.top,bars.right,bars.bottom);}
             return insets;
         });
-        LinearLayout toolbar=new LinearLayout(this);toolbar.setGravity(Gravity.CENTER_VERTICAL);toolbar.setPadding(dp(12),0,dp(8),0);
-        TextView name=text("PESO",16,true);name.setTextColor(Color.WHITE);toolbar.addView(name,new LinearLayout.LayoutParams(0,dp(44),1));
-        Button settings=button("Platform");settings.setContentDescription("Change PESO platform address");toolbar.addView(settings,new LinearLayout.LayoutParams(dp(100),dp(44)));
-        settings.setOnClickListener(v->new AlertDialog.Builder(this).setTitle("Platform settings").setMessage("Changing the platform signs you out of this device. Save your work first.").setPositiveButton("Change address",(d,w)->{if(web!=null){web.destroy();web=null;}setup();}).setNegativeButton("Cancel",null).show());
-        root.addView(toolbar);progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);root.addView(progress,new LinearLayout.LayoutParams(-1,dp(3)));
+        progress=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);progress.setIndeterminate(true);root.addView(progress,new LinearLayout.LayoutParams(-1,dp(3)));
         web=new WebView(this);root.addView(web,new LinearLayout.LayoutParams(-1,0,1));
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(false);s.setAllowContentAccess(true);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setUserAgentString(s.getUserAgentString()+" PESOAndroid/1.2.0");
         CookieManager.getInstance().setAcceptCookie(true);CookieManager.getInstance().setAcceptThirdPartyCookies(web,false);
