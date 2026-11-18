@@ -554,6 +554,10 @@ function WorkspaceFrame() {
                 BriefcaseBusiness,
               ],
 
+              ...(user.role === "jobseeker"
+                ? [["Job Matching", "/matches", Route]]
+                : []),
+
               [
                 user.role === "employer" ? "Referrals" : "Training",
 
@@ -562,16 +566,26 @@ function WorkspaceFrame() {
                 GraduationCap,
               ],
 
-              ["Account", "/settings", UserRound],
+              ...(user.role === "jobseeker"
+                ? []
+                : [["Account", "/settings", UserRound]]),
             ].map(([label, to, Icon]) => (
               <NavLink
                 key={label}
                 to={to}
                 className={({ isActive }) =>
-                  isActive ? "app-tab app-tab-active" : "app-tab"
+                  ["app-tab", isActive && "app-tab-active", to === "/matches" && "app-tab-matching"]
+                    .filter(Boolean)
+                    .join(" ")
                 }
               >
-                <Icon size={21} />
+                {to === "/matches" ? (
+                  <span className="app-tab-matching-icon">
+                    <Icon size={25} aria-hidden="true" />
+                  </span>
+                ) : (
+                  <Icon size={21} aria-hidden="true" />
+                )}
                 <span>{label}</span>
               </NavLink>
             ))}

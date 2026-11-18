@@ -101,6 +101,9 @@ html[data-page-transition="back"]::view-transition-new(root) { animation: accoun
  .workspace-actions > a { display: none; }
  .app-bottom-nav { position: fixed; z-index: 35; bottom: 0; left: 0; right: 0; display: flex; background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -5px 20px #123d3512; padding: .4rem .5rem calc(.4rem + env(safe-area-inset-bottom)); }
  .app-tab { min-height: 3.4rem; flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; font-size: .7rem; font-weight: 750; color: var(--muted-foreground); border-radius: .65rem; }
+ .app-tab-matching { position: relative; justify-content: flex-end; padding-bottom: .2rem; color: var(--primary); text-align: center; line-height: 1.15; }
+ .app-tab-matching-icon { position: absolute; bottom: calc(100% - 1.8rem); display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border: 3px solid var(--card); border-radius: 50%; background: var(--primary); color: var(--primary-foreground); box-shadow: 0 4px 10px #0003; }
+ .app-tab-matching:focus-visible .app-tab-matching-icon { outline: 2px solid var(--ring); outline-offset: 2px; }
  .app-tab-active { background: var(--secondary); color: var(--primary); }
  .app-update { bottom: 6rem; }
  .journey-strip { grid-template-columns: repeat(3,minmax(0,1fr)); }
