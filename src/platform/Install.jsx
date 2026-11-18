@@ -33,9 +33,9 @@ export function InstallPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5">
-        <Brand />
-        <AppearanceControls />
+      <header className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-4 py-5 sm:flex sm:justify-between sm:gap-4 sm:px-5">
+        <div className="col-start-2"><Brand /></div>
+        <div className="justify-self-end"><AppearanceControls /></div>
       </header>
       <main className="mx-auto max-w-6xl px-5 py-10 sm:py-16">
         <Link

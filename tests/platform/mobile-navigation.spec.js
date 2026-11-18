@@ -20,6 +20,10 @@ for (const role of ["jobseeker", "admin"]) {
     await page.goto("/dashboard")
     const nav = page.getByRole("navigation", { name: "Mobile app navigation" })
     const matching = nav.getByRole("link", { name: "Job Matching" })
+    const brand = page.locator(".mobile-app-header a")
+    await expect(brand).toBeVisible()
+    const brandBounds = await brand.boundingBox()
+    expect(Math.abs(brandBounds.x + brandBounds.width / 2 - 180)).toBeLessThan(1)
     if (role === "jobseeker") {
       await expect(nav.getByRole("link")).toHaveText(["Home", "Jobs", "Job Matching", "Training"])
       const circle = matching.locator(".app-tab-matching-icon")
@@ -40,3 +44,13 @@ for (const role of ["jobseeker", "admin"]) {
     await expect(page.locator("#service-drawer")).toBeVisible()
   })
 }
+
+
+test("Install PESO centers the brand on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 })
+  await page.goto("/app")
+  const brand = page.locator("header").getByRole("link", { name: "PESO employment services home" })
+  await expect(brand).toBeVisible()
+  const bounds = await brand.boundingBox()
+  expect(Math.abs(bounds.x + bounds.width / 2 - 180)).toBeLessThan(1)
+})

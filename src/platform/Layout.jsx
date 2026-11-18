@@ -339,8 +339,8 @@ function WorkspaceFrame() {
       >
         Skip to workspace
       </a>
-      <header className="mobile-app-header flex min-h-20 items-center justify-between gap-2 border-b border-border bg-card px-4 lg:hidden">
-        <span inert={modalOpen}>
+      <header className="mobile-app-header grid min-h-20 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b border-border bg-card px-4 lg:hidden">
+        <span inert={modalOpen} className="col-start-2">
           {shellLoading ? (
             <WorkspaceBrandSkeleton />
           ) : (
@@ -352,7 +352,7 @@ function WorkspaceFrame() {
           aria-expanded={open}
           aria-controls="service-drawer"
           aria-label="Toggle service navigation"
-          className="min-h-11 px-3"
+          className="min-h-11 justify-self-end px-2 sm:px-3"
         >
           {open ? <X /> : <Menu />}
         </button>
