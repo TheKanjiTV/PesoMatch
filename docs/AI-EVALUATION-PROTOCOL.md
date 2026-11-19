@@ -68,3 +68,7 @@ python -m unittest discover -s tests/evaluation
 ```
 
 The calculator checks the original fixture hash, refuses blank/incomplete/duplicate/unknown ratings and requires actual reviewer role/date/reasons and an independence confirmation. It produces per-case/per-reviewer nDCG@3, Recall@3 and MRR, separating zero-relevant cases as null. It does not manufacture accuracy or a population-level improvement claim. Retain original review records; tool acceptance does not independently verify a reviewer's identity or qualifications. Current human results remain pending because no actual independent labels have been provided.
+
+### November 20 interview protocol change
+
+Production testing found that a model could return rubric feedback in an opening response before the applicant had answered. The final opening contract now requests only one model-generated question; empty feedback/summary are server-owned initial state. The model still generates all answer-based rubric feedback and final summaries. The original November 19 interview holdout outputs predate this protocol change and do not validate that final opening contract. Matching/adviser/resume implementation and the matching reviewer packet are unchanged. Reserve new unused interview cases for a formal final-protocol study; do not relabel repeated old cases as a new holdout. Bilingual full-dialogue integration checks passed again after this change; these remain separate from human evaluation.

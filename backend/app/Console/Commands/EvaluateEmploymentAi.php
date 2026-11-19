@@ -66,7 +66,10 @@ class EvaluateEmploymentAi extends Command
                 try {
                     $data = ['profile_evidence' => $c['profile_evidence'], 'vacancy' => $c['vacancy'], 'training_records' => $c['training_records'], 'resume' => $c['resume'], 'additional_facts' => $c['additional_facts']];
                     $task = $kind === 'interview' ? AiPrompts::interview(0) : AiPrompts::$kind();
-                    $out = $ai->generate($task, $data, ($kind === 'adviser' ? AiOutputs::adviser(array_column($c['profile_evidence'], 'id')) : AiOutputs::$kind()), AiOutputs::rules($kind), $c['language']);
+                    $out = $ai->generate($task, $data, ($kind === 'adviser' ? AiOutputs::adviser(array_column($c['profile_evidence'], 'id')) : ($kind === 'interview' ? AiOutputs::opening() : AiOutputs::$kind())), AiOutputs::rules($kind === 'interview' ? 'opening' : $kind), $c['language']);
+                    if ($kind === 'interview') {
+                        $out += ['feedback' => [], 'improvement' => '', 'summary' => ''];
+                    }
                     if ($kind === 'adviser') {
                         AiOutputs::groundEvidence($out, $c['profile_evidence'], $c['training_records']);
                     }

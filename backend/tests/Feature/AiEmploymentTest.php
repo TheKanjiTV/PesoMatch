@@ -173,9 +173,9 @@ class AiEmploymentTest extends TestCase
     {
         $u = $this->person();
         $v = $this->vacancy();
-        $opening = ['question' => 'How do you respond to a customer question?', 'feedback' => [], 'improvement' => '', 'summary' => ''];
+        $opening = ['question' => 'How do you respond to a customer question?'];
         $this->fakeOutput($opening);
-        $id = $this->actingAs($u)->postJson('/api/platform/ai/interviews', $this->payload($v))->assertCreated()->assertJsonPath('data.version', 1)->assertJsonPath('data.completed_at', null)->json('data.id');
+        $id = $this->actingAs($u)->postJson('/api/platform/ai/interviews', $this->payload($v))->assertCreated()->assertJsonPath('data.version', 1)->assertJsonPath('data.completed_at', null)->assertJsonPath('data.transcript.turns.0.output.feedback', [])->json('data.id');
         $this->assertStringNotContainsString('customer question', DB::table('ai_practices')->value('transcript'));
         $this->actingAs($this->person())->getJson('/api/platform/ai/interviews/'.$id)->assertForbidden();
         $this->actingAs($u);

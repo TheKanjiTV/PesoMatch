@@ -41,6 +41,11 @@ class AiOutputs
         return self::object(['relevance' => self::string(), 'clarity' => self::string(), 'completeness' => self::string(), 'questions' => self::strings(), 'suggestions' => self::items(['original' => self::string(), 'revision' => self::string(), 'reason' => self::string()])]);
     }
 
+    public static function opening(): array
+    {
+        return self::object(['question' => self::string()]);
+    }
+
     public static function interview(bool $final = false): array
     {
         return self::object(['question' => $final ? ['type' => 'string', 'enum' => ['']] : self::string(), 'feedback' => self::items(['criterion' => ['type' => 'string', 'enum' => ['relevance', 'clarity', 'specific_examples', 'organization']], 'score' => ['type' => 'integer', 'enum' => [1, 2, 3, 4]], 'evidence_quote' => self::string(), 'comment' => self::string()]), 'improvement' => self::string(), 'summary' => self::string()]);
@@ -48,6 +53,9 @@ class AiOutputs
 
     public static function rules(string $kind): array
     {
+        if ($kind === 'opening') {
+            return ['question' => 'required|string|max:1500'];
+        }
         if ($kind === 'adviser') {
             return [
                 'relevant_evidence' => 'present|array|max:15', 'relevant_evidence.*' => 'array:evidence_id,relevance',

@@ -82,7 +82,9 @@ class AiController extends Controller
         $options = $this->consent($r);
         $v = $this->vacancy($r);
         $input = ['profile_evidence' => $context->profile($r->user()), 'vacancy' => $context->vacancy($v), 'conversation' => []];
-        $out = $ai->generate(AiPrompts::interview(0), $input, AiOutputs::interview(), AiOutputs::rules('interview'), $options['language']);
+        $out = $ai->generate(AiPrompts::interview(0), $input, AiOutputs::opening(), AiOutputs::rules('opening'), $options['language']);
+        // No answer exists yet. Empty feedback is server-owned protocol state.
+        $out += ['feedback' => [], 'improvement' => '', 'summary' => ''];
         abort_unless(filled($out['question']) && substr_count($out['question'], '?') <= 1 && count($out['feedback']) === 0 && empty($out['summary']), 502, 'Invalid opening interview response.');
         $practice = AiPractice::create(['user_id' => $r->user()->id, 'vacancy_id' => $v->id, 'language' => $options['language'], 'model' => config('ai.language_model'), 'transcript' => ['context' => $input, 'turns' => [['output' => $out]]], 'expires_at' => now()->addDays(7)]);
 
