@@ -25,7 +25,7 @@ node --version
 pnpm --version
 ```
 
-The loader selects `/opt/alt/php84/usr/bin` and `/opt/alt/alt-nodejs24/root/usr/bin`, with pinned Corepack pnpm 10.29.3. PHP 8.4.28, Node 24.22.3 and pnpm 10.29.3 were observed November 20. Its source is `deploy/hostinger-runtime.sh`. The private checkout is `/home/u636932635/apps/pesomatch/PesoMatch`. Only the user-approved public key is registered as **PesoMatch laptop**; the private key remains `~/.ssh/id_ed25519_pesomatch_hostinger` on the laptop. The alias enforces its stored host key; investigate future mismatches instead of disabling verification.
+The loader selects `/opt/alt/php84/usr/bin` and `/opt/alt/alt-nodejs24/root/usr/bin`, with pinned Corepack pnpm 10.29.3. Remote builds limit Rayon/libuv workers to one to fit shared-hosting thread limits; a direct remote build succeeded with these settings. PHP 8.4.28, Node 24.22.3 and pnpm 10.29.3 were observed November 20. Its source is `deploy/hostinger-runtime.sh`. The private checkout is `/home/u636932635/apps/pesomatch/PesoMatch`. Only the user-approved public key is registered as **PesoMatch laptop**; the private key remains `~/.ssh/id_ed25519_pesomatch_hostinger` on the laptop. The alias enforces its stored host key; investigate future mismatches instead of disabling verification.
 
 ## One-time private preparation
 

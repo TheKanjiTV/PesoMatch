@@ -36,7 +36,8 @@ rsync -a "$RELEASE/backend/storage/" "$SHARED/storage/"
 mv "$RELEASE/backend/storage" "$RELEASE/backend/storage-placeholders"
 ln -s "$SHARED/storage" "$RELEASE/backend/storage"
 (cd "$RELEASE/backend"; composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader; composer check-platform-reqs --no-dev)
-(cd "$RELEASE"; pnpm install --frozen-lockfile; pnpm build)
+# Shared hosting limits native worker threads; avoid Rolldown/Rayon exhausting them.
+(cd "$RELEASE"; pnpm install --frozen-lockfile; RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-1} UV_THREADPOOL_SIZE=${UV_THREADPOOL_SIZE:-1} pnpm build)
 BACKUP="$SITE_ROOT/backups/pre-$REVISION-$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$BACKUP/public_html"
 cp -a "$SHARED/backend.env" "$BACKUP/backend.env"
