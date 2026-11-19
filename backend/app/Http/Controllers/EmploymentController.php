@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EmploymentOutcome;
 use App\Models\Enrollment;
+use App\Models\LoginPolicy;
 use App\Models\Placement;
 use App\Models\PublicResource;
 use App\Models\Referral;
@@ -169,7 +170,7 @@ class EmploymentController extends Controller
 
     public function programs(Request $r)
     {
-        $q = TrainingProgram::query();
+        $q = TrainingProgram::query()->withCount(['enrollments as occupied_places' => fn ($q) => $q->whereIn('status', ['confirmed', 'in_progress', 'completed']), 'enrollments as pending_requests' => fn ($q) => $q->where('status', 'requested')]);
         if (! $r->filled('id') && ! ($r->boolean('include_samples') && app()->environment(['local', 'testing']))) {
             $q->where('is_sample', false);
         }
@@ -341,6 +342,9 @@ class EmploymentController extends Controller
         return DB::transaction(function () use ($r, $program, $data) {
             $program = TrainingProgram::whereKey($program->id)->lockForUpdate()->firstOrFail();
             abort_unless(TrainingProgram::available()->whereKey($program->id)->exists(), 422, 'Enrollment requests are closed for this program.');
+            abort_if($program->external_enrollment, 422, 'This is a catalog listing, not a scheduled intake. Record training interest for PESO planning instead.');
+            $used = Enrollment::where('training_program_id', $program->id)->whereIn('status', ['confirmed', 'in_progress', 'completed'])->count();
+            abort_if($used >= $program->capacity, 422, 'This training is full.');
             abort_if(Enrollment::withTrashed()->where('user_id', $r->user()->id)->where('training_program_id', $program->id)->exists(), 409, 'An enrollment already exists for this program. Ask PESO to review a withdrawn request or select a new intake.');
             $row = Enrollment::create(['status' => 'requested', 'user_id' => $r->user()->id, 'training_program_id' => $program->id, 'notes' => $data['notes'] ?? null, 'consent_accepted_at' => now(), 'consent_notice_version' => $data['consent_notice_version'] ?? null, 'consent_recipient' => $program->provider]);
             $this->audit($r, 'enrollment.requested', $row, ['consent' => true]);
@@ -582,6 +586,18 @@ class EmploymentController extends Controller
         ])->select('id', 'name', 'email', 'created_at')->latest()->paginate(100);
     }
 
+    public function createAccount(Request $r)
+    {
+        $this->roles($r, ['admin']);
+        $data = $r->validate(['current_password' => 'required|current_password:web', 'first_name' => 'required|string|max:80', 'last_name' => 'required|string|max:80', 'email' => 'required|email|max:255|unique:users,email', 'password' => ['required', 'string', 'confirmed', new \App\Rules\PasswordBytes, \Illuminate\Validation\Rules\Password::min(12)->letters()->mixedCase()->numbers()->symbols()], 'role' => ['required', Rule::in(['jobseeker', 'peso_staff', 'employer', 'training_provider', 'admin'])]]);
+        return DB::transaction(function () use ($r, $data) {
+            $row = User::create(['name' => $data['first_name'].' '.$data['last_name'], 'first_name' => $data['first_name'], 'last_name' => $data['last_name'], 'email' => strtolower($data['email']), 'password' => $data['password']]);
+            $row->forceFill(['role' => $data['role']])->save();
+            $this->audit($r, 'user.created', $row, ['role' => $row->role]);
+            return response()->json(['data' => $row], 201);
+        });
+    }
+
     public function users(Request $r)
     {
         $this->roles($r, ['admin']);
@@ -603,6 +619,35 @@ class EmploymentController extends Controller
             $this->audit($r, 'user.role_changed', $user, $data);
 
             return response()->json(['message' => 'Access updated.']);
+        });
+    }
+
+    public function loginPolicy(Request $r)
+    {
+        $this->roles($r, ['admin']);
+
+        return response()->json(['stages' => LoginPolicy::stages()]);
+    }
+
+    public function updateLoginPolicy(Request $r)
+    {
+        $this->roles($r, ['admin']);
+        $data = $r->validate([
+            'stages' => ['required', 'array', 'list', 'size:3'],
+            'stages.*' => ['required', 'array:attempts,lockout_minutes'],
+            'stages.*.attempts' => ['required', 'integer', 'between:1,20'],
+            'stages.*.lockout_minutes' => ['required', 'integer', 'between:1,1440'],
+        ]);
+        $stages = array_map(fn (array $stage) => [
+            'attempts' => (int) $stage['attempts'],
+            'lockout_minutes' => (int) $stage['lockout_minutes'],
+        ], $data['stages']);
+
+        return DB::transaction(function () use ($r, $stages) {
+            $policy = LoginPolicy::updateOrCreate(['id' => LoginPolicy::ID], ['stages' => $stages]);
+            $this->audit($r, 'login_policy.updated', $policy, ['stages' => $stages]);
+
+            return response()->json(['stages' => $policy->stages]);
         });
     }
 

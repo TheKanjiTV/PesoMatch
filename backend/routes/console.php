@@ -117,3 +117,18 @@ Artisan::command('peso:import-verified-public-resources', function () {
     });
     $this->info(count($events).' source events and '.count($reports).' official statistical report imported. No people, enrollments or outcomes were fabricated.');
 })->purpose('Import reviewed official calendars and PSA statistics with source provenance');
+
+Artisan::command('peso:ai-index', function () {
+    $this->info('Embedding public, published vacancies with '.config('ai.embedding_model').'.');
+    try { $this->info('Updated '.app(\App\Services\SemanticMatcher::class)->index(fn ($count) => $this->info('Indexed '.$count.' changed vacancies.')).' vacancy vectors.'); }
+    catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) { $this->error($e->getMessage()); return 1; }
+})->purpose('Refresh content-hashed semantic vacancy embeddings (external Cohere inference)');
+
+Artisan::command('peso:ai-prune', function () {
+    $this->info('Expired practices deleted: '.\App\Models\AiPractice::where('expires_at', '<=', now())->delete());
+    DB::table('ai_embeddings')->where('source_type', 'profile')->whereNotIn('source_id', User::select('id'))->delete();
+})->purpose('Erase expired encrypted practice transcripts and orphan profile vectors');
+
+\Illuminate\Support\Facades\Schedule::command('peso:ai-prune')->hourly();
+
+\Illuminate\Support\Facades\Schedule::command('peso:ai-index')->hourly()->withoutOverlapping()->when(fn () => app(\App\Services\AiProvider::class)->configured());

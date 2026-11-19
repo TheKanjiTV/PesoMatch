@@ -124,8 +124,10 @@ class ResumeTest extends TestCase
         foreach ($matches[0]['training'] as $suggestion) {
             $this->assertSame(['Communication'], $suggestion['addresses']);
         }
-        $this->postJson("/api/platform/training/{$p->id}/enroll", ['consent' => true])->assertCreated()->assertJsonPath('data.status', 'requested');
-        $this->assertDatabaseCount('enrollments', 1);
+        $this->postJson("/api/platform/training/{$p->id}/enroll", ['consent' => true])->assertUnprocessable();
+        $this->postJson('/api/platform/training-demands', ['topic' => $p->title, 'source_program_id' => $p->id])->assertCreated();
+        $this->assertDatabaseCount('enrollments', 0);
+        $this->assertDatabaseCount('training_demands', 1);
         $u->jobseekerProfile->skills()->attach(Skill::where('name', 'Communication')->firstOrFail());
         $this->actingAs($u->fresh())->getJson('/api/platform/matches')->assertJsonCount(0, 'matches.0.training');
     }

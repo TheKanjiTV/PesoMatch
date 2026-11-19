@@ -126,6 +126,7 @@ async function mock(context, initial = seeker) {
     referrals: [],
 
     enrollments: [],
+    demands: [],
 
     events: [],
 
@@ -201,7 +202,9 @@ async function mock(context, initial = seeker) {
       })
 
     if (path === "/api/public/source-coverage")
-      return route.fulfill({ json: { review_date: "2026-11-07", sources: [] } })
+      return route.fulfill({
+        json: { review_date: "2026-11-07", sources: [] },
+      })
 
     if (path.endsWith("/delete-intents"))
       return route.fulfill({
@@ -232,6 +235,15 @@ async function mock(context, initial = seeker) {
       })
 
       return route.fulfill({ status: 201, json: { data: state.referrals[0] } })
+    }
+
+    if (path === "/api/platform/training-demands") {
+      if (req.method() === "POST")
+        state.demands.push({
+          ...req.postDataJSON(),
+          topic_key: program.title.toLowerCase(),
+        })
+      return route.fulfill({ json: list(state.demands) })
     }
 
     if (path === `/api/platform/training/${program.id}/enroll`) {
@@ -378,7 +390,7 @@ test("two tabs restore the same server account, replay keeps its role, and sign-
   await expect(page.getByText(admin.name, { exact: true })).toBeVisible()
 })
 
-test("external vacancy and registry training create local requests and open their tracking pages", async ({
+test("external vacancies request referrals while registry interest goes to demand planning", async ({
   context,
 
   page,
@@ -407,21 +419,24 @@ test("external vacancy and registry training create local requests and open thei
 
   await page.goto(`/training/${program.id}`)
 
-  await page.getByRole("checkbox").check()
-
   await page
 
-    .getByRole("button", { name: "Request enrollment through PESO" })
+    .getByRole("button", { name: "Express training interest" })
 
     .click()
 
-  await expect(page).toHaveURL(/\/enrollments$/)
-
+  await expect(page).toHaveURL(/\/training-demand$/)
   await expect(
-    page.getByRole("heading", { name: program.title, exact: true }),
+    page.getByRole("heading", {
+      name: "Training demand & planning",
+      exact: true,
+    }),
   ).toBeVisible()
 
-  expect(state.enrollments).toHaveLength(1)
+  await expect(page.getByText(program.title, { exact: true })).toBeVisible()
+
+  expect(state.enrollments).toHaveLength(0)
+  expect(state.demands).toHaveLength(1)
 })
 
 test("charcoal theme persists, disabled dropdown prompts cannot be selected, and deletion waits five seconds", async ({
@@ -450,7 +465,6 @@ test("charcoal theme persists, disabled dropdown prompts cannot be selected, and
   expect(
     await page.evaluate(() =>
       getComputedStyle(document.documentElement)
-
         .getPropertyValue("--background")
 
         .trim(),

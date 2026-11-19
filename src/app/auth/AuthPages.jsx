@@ -14,8 +14,6 @@ import { destinationFor, useAuth } from "../../context/AuthContext.jsx"
 
 import { LogoLoading } from "../../platform/LoadingStates.jsx"
 
-import { withMinimumLoading } from "../../platform/loading.js"
-
 import {
   Alert,
   AuthButton,
@@ -120,9 +118,27 @@ export function LoginPage({ staffPortal = false }) {
 
   const [touched, setTouched] = useState({})
 
-  const [error, setError] = useState("")
-
+  const [failure, setFailure] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [accepted, setAccepted] = useState(false)
+  const [now, setNow] = useState(0)
+  const emailKey = email.trim().toLowerCase()
+  const currentFailure = failure?.email === emailKey ? failure : null
+  const lockedUntil = currentFailure?.lockedUntil || 0
+  const seconds = Math.max(0, Math.ceil((lockedUntil - now) / 1000))
+  const countdown = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`
+
+  useEffect(() => {
+    if (!lockedUntil) return
+    const tick = () => {
+      const time = Date.now()
+      setNow(time)
+      if (time >= lockedUntil) clearInterval(timer)
+    }
+    const timer = setInterval(tick, 1000)
+    tick()
+    return () => clearInterval(timer)
+  }, [lockedUntil])
 
   const emailError = touched.email
     ? !email.trim()
@@ -138,11 +154,9 @@ export function LoginPage({ staffPortal = false }) {
   async function submit(event) {
     event.preventDefault()
 
-    if (busy) return
+    if (busy || lockedUntil > Date.now()) return
 
     setTouched({ email: true, password: true })
-
-    setError("")
 
     if (!validEmail(email) || !password) {
       event.currentTarget
@@ -161,20 +175,24 @@ export function LoginPage({ staffPortal = false }) {
     setBusy(true)
 
     try {
-      const session = await withMinimumLoading(() =>
-        login({
-          email: email.trim(),
+      const session = await login({
+        email: email.trim(),
+        password,
+        website: new FormData(event.currentTarget).get("website") || "",
+      })
 
-          password,
-
-          website: new FormData(event.currentTarget).get("website") || "",
-        }),
-      )
-
-      await continueTo(session.onboarding, session.user)
-    } catch (failure) {
-      setError(failure.message || "We couldn't sign you in. Please try again.")
-
+      setAccepted(true)
+      if (panelRef.current) await continueTo(session.onboarding, session.user)
+    } catch (error) {
+      const time = Date.now()
+      setNow(time)
+      setFailure({
+        email: emailKey,
+        message: error.message || "We couldn't sign you in. Please try again.",
+        attemptsRemaining: error.attemptsRemaining,
+        lockedUntil: error.retryAfter > 0 ? time + error.retryAfter * 1000 : 0,
+      })
+      setAccepted(false)
       setBusy(false)
     }
   }
@@ -185,139 +203,162 @@ export function LoginPage({ staffPortal = false }) {
     return <Navigate to={destinationFor(onboarding, user)} replace />
 
   return (
-    <>
-      {busy && <LogoLoading fullScreen label="Signing in…" />}
-      <div inert={busy} aria-hidden={busy || undefined}>
-        <AuthLayout
-          panelRef={panelRef}
-          enter={location.state?.registrationComplete}
+    <AuthLayout
+      panelRef={panelRef}
+      enter={location.state?.registrationComplete}
+    >
+      <FormHeading
+        eyebrow="WELCOME BACK"
+        title={staffPortal ? "Your service desk awaits." : "Welcome back."}
+        description={
+          staffPortal
+            ? "Sign in to coordinate PESO services, employer referrals or training enrollment. Your assigned role opens the appropriate workspace."
+            : "Log in to manage your job opportunities, training recommendations, and PESO referrals."
+        }
+      />
+      {location.state?.registrationComplete && (
+        <div className="mb-5">
+          <Alert tone="success">
+            Account created. Log in to build your jobseeker profile. Email
+            verification is not enabled in this development version.
+          </Alert>
+        </div>
+      )}
+      <form noValidate onSubmit={submit} className="space-y-5">
+        <div hidden aria-hidden="true">
+          <label>
+            Leave this field empty
+            <input name="website" tabIndex={-1} autoComplete="off" />
+          </label>
+        </div>
+        <Field
+          label="Email Address"
+          type="email"
+          icon={Mail}
+          placeholder="you@example.com"
+          autoComplete="username"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          onBlur={() => setTouched((current) => ({ ...current, email: true }))}
+          error={emailError}
+          disabled={busy}
+        />
+        <Field
+          label="Password"
+          type="password"
+          icon={LockKeyhole}
+          placeholder="Enter your password"
+          autoComplete="current-password"
+          required
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          onBlur={() =>
+            setTouched((current) => ({ ...current, password: true }))
+          }
+          error={passwordError}
+          disabled={busy}
+        />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-muted-foreground">
+            Jobseeker, PESO & partner account access
+          </span>
+          <Link
+            className="flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
+            to="/forgot-password"
+          >
+            Forgot Password?
+          </Link>
+        </div>
+        {!accepted &&
+          currentFailure &&
+          (lockedUntil && !seconds ? (
+            <Alert>You can try signing in again.</Alert>
+          ) : (
+            <Alert tone="error">
+              <p>{currentFailure.message}</p>
+              {seconds > 0 && (
+                <p className="mt-1">
+                  Try again in{" "}
+                  <span
+                    role="timer"
+                    aria-live="off"
+                    className="font-semibold tabular-nums"
+                  >
+                    {countdown}
+                  </span>
+                  .
+                </p>
+              )}
+              {Number.isInteger(currentFailure.attemptsRemaining) && (
+                <p className="mt-1">
+                  {currentFailure.attemptsRemaining}{" "}
+                  {currentFailure.attemptsRemaining === 1
+                    ? "attempt"
+                    : "attempts"}{" "}
+                  left before a temporary lockout.
+                </p>
+              )}
+            </Alert>
+          ))}
+        <AuthButton
+          type="submit"
+          loading={busy || accepted}
+          loadingText="Signing in..."
+          disabled={busy || seconds > 0}
+          variant={seconds > 0 ? "secondary" : "primary"}
         >
-          <FormHeading
-            eyebrow="WELCOME BACK"
-            title={staffPortal ? "Your service desk awaits." : "Welcome back."}
-            description={
-              staffPortal
-                ? "Sign in to coordinate PESO services, employer referrals or training enrollment. Your assigned role opens the appropriate workspace."
-                : "Log in to manage your job opportunities, training recommendations, and PESO referrals."
-            }
-          />
-          {location.state?.registrationComplete && (
-            <div className="mb-5">
-              <Alert tone="success">
-                Account created. Log in to build your jobseeker profile. Email
-                verification is not enabled in this development version.
-              </Alert>
-            </div>
-          )}
-          <form noValidate onSubmit={submit} className="space-y-5">
-            <div hidden aria-hidden="true">
-              <label>
-                Leave this field empty
-                <input name="website" tabIndex={-1} autoComplete="off" />
-              </label>
-            </div>
-            <Field
-              label="Email Address"
-              type="email"
-              icon={Mail}
-              placeholder="you@example.com"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value)
-
-                setError("")
-              }}
-              onBlur={() =>
-                setTouched((current) => ({ ...current, email: true }))
-              }
-              error={emailError}
-              disabled={busy}
-            />
-            <Field
-              label="Password"
-              type="password"
-              icon={LockKeyhole}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value)
-
-                setError("")
-              }}
-              onBlur={() =>
-                setTouched((current) => ({ ...current, password: true }))
-              }
-              error={passwordError}
-              disabled={busy}
-            />
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs text-muted-foreground">
-                Jobseeker, PESO & partner account access
-              </span>
-              <Link
-                className="flex min-h-11 items-center text-sm font-semibold text-primary hover:underline"
-                to="/forgot-password"
-              >
-                Forgot Password?
-              </Link>
-            </div>
-            {error && <Alert tone="error">{error}</Alert>}
-            <AuthButton
-              type="submit"
-              loading={busy}
-              loadingText="Signing in..."
-            >
-              Log In
-              <ArrowRight size={17} />
-            </AuthButton>
-          </form>
-          {staffPortal ? (
-            <div className="mt-7 space-y-3 border-t border-border pt-5 text-sm leading-7 text-muted-foreground">
-              <p>
-                Administrators and PESO employees use the same secure sign-in.
-                Access is assigned by an administrator; roles cannot be selected
-                at sign-in.
-              </p>
-              <Link
-                className="font-semibold text-primary underline"
-                to="/login"
-              >
-                Jobseeker sign in
-              </Link>
-            </div>
+          {seconds > 0 ? (
+            <>
+              <LockKeyhole size={17} aria-hidden="true" />
+              Login temporarily locked
+            </>
           ) : (
             <>
-              <p className="mt-7 text-center text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link
-                  className="ml-1 inline-flex min-h-9 items-center font-semibold text-primary hover:underline"
-                  viewTransition
-                  onClick={() => {
-                    document.documentElement.dataset.pageTransition = "forward"
-                  }}
-                  to="/register"
-                >
-                  Create Account
-                </Link>
-              </p>
-              <p className="mt-3 text-center text-sm">
-                <Link
-                  to="/staff/login"
-                  className="inline-flex min-h-11 items-center font-semibold text-primary underline"
-                >
-                  PESO staff & partner sign in
-                </Link>
-              </p>
+              Log In
+              <ArrowRight size={17} aria-hidden="true" />
             </>
           )}
-          <TrustNote />
-        </AuthLayout>
-      </div>
-    </>
+        </AuthButton>
+      </form>
+      {staffPortal ? (
+        <div className="mt-7 space-y-3 border-t border-border pt-5 text-sm leading-7 text-muted-foreground">
+          <p>
+            Administrators and PESO employees use the same secure sign-in.
+            Access is assigned by an administrator; roles cannot be selected at
+            sign-in.
+          </p>
+          <Link className="font-semibold text-primary underline" to="/login">
+            Jobseeker sign in
+          </Link>
+        </div>
+      ) : (
+        <>
+          <p className="mt-7 text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link
+              className="ml-1 inline-flex min-h-9 items-center font-semibold text-primary hover:underline"
+              viewTransition
+              onClick={() => {
+                document.documentElement.dataset.pageTransition = "forward"
+              }}
+              to="/register"
+            >
+              Create Account
+            </Link>
+          </p>
+          <p className="mt-3 text-center text-sm">
+            <Link
+              to="/staff/login"
+              className="inline-flex min-h-11 items-center font-semibold text-primary underline"
+            >
+              PESO staff & partner sign in
+            </Link>
+          </p>
+        </>
+      )}
+      <TrustNote />
+    </AuthLayout>
   )
 }
 

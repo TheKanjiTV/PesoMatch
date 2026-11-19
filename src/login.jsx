@@ -239,6 +239,24 @@ const router = createBrowserRouter([
               })),
 
               {
+                path: "/training-demand",
+                lazy: feature(
+                  () => import("./platform/TrainingParticipation.jsx"),
+                  "TrainingDemandPage",
+                  {},
+                  jobstaff,
+                ),
+              },
+              {
+                path: "/ai-workspace",
+                lazy: feature(
+                  () => import("./platform/AiWorkspace.jsx"),
+                  "AiWorkspace",
+                  {},
+                  ["jobseeker"],
+                ),
+              },
+              {
                 path: "/matches",
 
                 lazy: feature(catalog, "MatchesPage", {}, ["jobseeker"]),

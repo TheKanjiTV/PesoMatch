@@ -1,6 +1,7 @@
 import { DeleteDialog } from "./DeleteDialog.jsx"
 
 import { PrivacyRequests } from "./PrivacyRequests.jsx"
+import { LoginAttemptSettings } from "./LoginAttemptSettings.jsx"
 
 import { useState } from "react"
 
@@ -720,6 +721,7 @@ export function RegistryPage() {
 export function AccessPage() {
   const r = useResource("/users")
 
+  const [adding, setAdding] = useState(false)
   const [removing, setRemoving] = useState(null)
 
   const { user } = useAuth()
@@ -742,9 +744,58 @@ export function AccessPage() {
         />
       )}
       <Heading
+        action={
+          <button className={addStyle} onClick={() => setAdding(true)}>
+            Add new account
+          </button>
+        }
         title="Account Access & Responsibilities"
         description="Public accounts begin as jobseekers. Only administrators can provision staff and partner access."
       />
+      {adding && (
+        <Editor
+          title="Add new account"
+          help="Give the account holder their temporary password through your approved private channel. No email is sent automatically."
+          fields={[
+            { name: "first_name", label: "First name", maxLength: 80 },
+            { name: "last_name", label: "Last name", maxLength: 80 },
+            { name: "email", label: "Email", type: "email", maxLength: 255 },
+            {
+              name: "role",
+              label: "Account role",
+              options: Object.entries(roles).map(([value, label]) => ({
+                value,
+                label,
+              })),
+            },
+            {
+              name: "password",
+              label:
+                "New account password (12+ characters, upper/lower case, number and symbol)",
+              type: "password",
+              minLength: 12,
+            },
+            {
+              name: "password_confirmation",
+              label: "Confirm new account password",
+              type: "password",
+              minLength: 12,
+            },
+            {
+              name: "current_password",
+              label: "Your administrator password",
+              type: "password",
+            },
+          ]}
+          onClose={() => setAdding(false)}
+          onSave={async (v) => {
+            await api("/users", "POST", v)
+            setMessage("Account created with role-based workspace access.")
+            await r.reload()
+          }}
+        />
+      )}
+      <LoginAttemptSettings />
       <div className="mb-7 grid gap-3 sm:grid-cols-2">
         {Object.entries(roles).map(([role, label]) => (
           <div

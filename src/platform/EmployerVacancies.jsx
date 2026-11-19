@@ -1,4 +1,5 @@
-import { Link } from "react-router"
+import { RecordLink as Link } from "./RecordLink.jsx"
+
 import { Badge, date, secondaryStyle } from "./ui.jsx"
 
 const rowAction =

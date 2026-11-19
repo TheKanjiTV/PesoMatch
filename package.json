@@ -11,7 +11,8 @@
     "test": "playwright test",
     "icons": "node scripts/generate-icons.mjs",
     "android:build": "node scripts/run-powershell.mjs android/build-local.ps1",
-    "mobile:preview": "node scripts/run-powershell.mjs scripts/start-mobile-preview.ps1"
+    "mobile:preview": "node scripts/run-powershell.mjs scripts/start-mobile-preview.ps1",
+    "local": "node scripts/run-powershell.mjs scripts/start-local.ps1"
   },
   "dependencies": {
     "lucide-react": "^1.49.0",

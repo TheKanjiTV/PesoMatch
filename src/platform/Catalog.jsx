@@ -1,3 +1,7 @@
+import { AiConsent } from "./AiWorkspace.jsx"
+import { Modal } from "./Modal.jsx"
+import { TrainingParticipants } from "./TrainingParticipation.jsx"
+import { RecordLink as Link } from "./RecordLink.jsx"
 import { useEffect, useState } from "react"
 
 import {
@@ -6,7 +10,7 @@ import {
   trainingConsentStatement,
 } from "./CollectionNotice.jsx"
 
-import { Link, useParams, useNavigate, useSearchParams } from "react-router"
+import { useParams, useNavigate, useSearchParams } from "react-router"
 
 import { ArrowRight, Bookmark, CalendarDays, MapPin } from "lucide-react"
 
@@ -191,13 +195,15 @@ const trainingFields = [
   F("description", "Program description", "textarea"),
 ]
 
-export function CatalogPage({ kind = "vacancies" }) {
+export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
   const { user } = useAuth(),
-    { id } = useParams()
+    paramsId = useParams().id
+  const id = previewId || paramsId
 
   const navigate = useNavigate()
   const [params] = useSearchParams()
 
+  const [statusOnly, setStatusOnly] = useState(false)
   const [removing, setRemoving] = useState(null)
 
   const [intake, setIntake] = useState(null)
@@ -266,6 +272,13 @@ export function CatalogPage({ kind = "vacancies" }) {
       : `${resourcePath}?${request}`,
   )
   const summary = useResource("/summary")
+  useEffect(() => {
+    if (id) return
+    const refresh = () => r.reload()
+    window.addEventListener("peso:catalog-changed", refresh)
+    return () => window.removeEventListener("peso:catalog-changed", refresh)
+  }, [id, r.reload])
+
   const staff = staffRole(user.role)
   const canManage =
     staff || user.role === (training ? "training_provider" : "employer")
@@ -294,7 +307,8 @@ export function CatalogPage({ kind = "vacancies" }) {
       document.title = `${detail?.title || "Record unavailable"} | PESO Employment Services`
   }, [id, detail?.title, r.data])
 
-  function edit(row = {}) {
+  function edit(row = {}, statusOnly = false) {
+    setStatusOnly(statusOnly)
     setEditor({
       ...row,
 
@@ -355,24 +369,26 @@ export function CatalogPage({ kind = "vacancies" }) {
 
     try {
       await api(
-        `${resourcePath}/${row.id}/${
-          save ? "save" : training ? "enroll" : "referrals"
-        }`,
+        training && row.external_enrollment && !save
+          ? "/training-demands"
+          : `${resourcePath}/${row.id}/${save ? "save" : training ? "enroll" : "referrals"}`,
 
         save && summary.data?.saved?.includes(row.id) ? "DELETE" : "POST",
 
         save
           ? undefined
-          : training
-            ? {
-                consent: true,
+          : training && row.external_enrollment
+            ? { topic: row.title, source_program_id: row.id }
+            : training
+              ? {
+                  consent: true,
 
-                consent_notice_version: trainingNoticeVersion,
+                  consent_notice_version: trainingNoticeVersion,
 
-                notes:
-                  "I have reviewed the program requirements and request provider review.",
-              }
-            : { notes: "Please review my profile for this vacancy." },
+                  notes:
+                    "I have reviewed the program requirements and request provider review.",
+                }
+              : { notes: "Please review my profile for this vacancy." },
       )
 
       setMessage(
@@ -381,12 +397,21 @@ export function CatalogPage({ kind = "vacancies" }) {
             ? "Vacancy removed from saved items."
             : "Vacancy saved to your account."
           : training
-            ? "Enrollment requested. Follow its progress in Training Enrollment."
+            ? row.external_enrollment
+              ? "Interest recorded for PESO planning. This is not enrollment."
+              : "Enrollment requested. Follow its progress in Training Enrollment."
             : "Referral requested. PESO will review your profile.",
       )
 
       if (!save) {
-        navigate(training ? "/enrollments" : "/referrals")
+        onPreviewClose?.()
+        navigate(
+          training
+            ? row.external_enrollment
+              ? "/training-demand"
+              : "/enrollments"
+            : "/referrals",
+        )
 
         return
       }
@@ -413,7 +438,7 @@ export function CatalogPage({ kind = "vacancies" }) {
           training
             ? user.role === "employer"
               ? "Browse published training and skills development programs. Training providers manage learner enrollment."
-              : "Explore upskilling pathways, review requirements, and follow provider-confirmed enrollment."
+              : "Explore offered training, check places and apply for a scheduled intake. PESO can manage participants and partner programs."
             : detail?.external_application
               ? "Review the official source and plan your application with PESO guidance."
               : directory
@@ -423,6 +448,7 @@ export function CatalogPage({ kind = "vacancies" }) {
                   : "Discover work opportunities or manage reviewed vacancies for PESO referrals."
         }
         action={
+          !previewId &&
           canManage &&
           (!employer || (!id && !directory)) && (
             <button className={addStyle} onClick={() => edit()}>
@@ -460,25 +486,13 @@ export function CatalogPage({ kind = "vacancies" }) {
           onDeleted={async () => {
             setMessage("Catalog item deleted. Linked history is preserved.")
 
-            if (id) navigate(catalogReturn)
-            else await r.reload()
+            if (id) {
+              onPreviewClose?.()
+              navigate(catalogReturn)
+            } else await r.reload()
           }}
         />
       )}
-      {detail &&
-        canManageRecord(detail) &&
-        (!employer || !detail.external_application) && (
-          <div className="mb-5 flex flex-wrap gap-3">
-            {training && detail.external_enrollment && staffRole(user.role) && (
-              <button className={addStyle} onClick={() => setIntake(detail)}>
-                Create verified local intake
-              </button>
-            )}
-            <button className={dangerStyle} onClick={() => setRemoving(detail)}>
-              Delete {training ? "training" : "vacancy"}
-            </button>
-          </div>
-        )}
       {intake && (
         <Editor
           title={`Verify local intake: ${intake.title}`}
@@ -549,11 +563,16 @@ export function CatalogPage({ kind = "vacancies" }) {
       {editor && (
         <Editor
           key={editor.id || "new"}
-          title={`${editor.id ? "Edit" : "Add"} ${
+          title={`${statusOnly ? "Update status:" : editor.id ? "Edit" : "Add"} ${
             training ? "training program" : "vacancy"
           }`}
           initial={editor}
-          fields={(training ? trainingFields : vacancyFields).map((f) => {
+          fields={(statusOnly
+            ? [vacancyFields.find((f) => f.name === "status")]
+            : training
+              ? trainingFields
+              : vacancyFields
+          ).map((f) => {
             if (f.name !== "status" || staff) return f
             return {
               ...f,
@@ -748,13 +767,43 @@ export function CatalogPage({ kind = "vacancies" }) {
             </Link>
           </Empty>
         ) : detail ? (
-          <>
+          <DetailSurface
+            title={detail.title}
+            embedded={Boolean(previewId)}
+            onClose={() => navigate(catalogReturn)}
+          >
             <Link
               to={catalogReturn}
+              onClick={onPreviewClose}
               className="mb-6 inline-flex min-h-11 items-center text-sm font-semibold text-primary"
             >
               ← Back to catalog
             </Link>
+            {detail &&
+              canManageRecord(detail) &&
+              (!employer || !detail.external_application) && (
+                <div className="mb-5 flex flex-wrap gap-3">
+                  {training &&
+                    detail.external_enrollment &&
+                    staffRole(user.role) && (
+                      <button
+                        className={addStyle}
+                        onClick={() => setIntake(detail)}
+                      >
+                        Create verified local intake
+                      </button>
+                    )}
+                  <button
+                    className={dangerStyle}
+                    onClick={() => setRemoving(detail)}
+                  >
+                    Delete {training ? "training" : "vacancy"}
+                  </button>
+                </div>
+              )}
+
+            {!previewId && message && <Notice>{message}</Notice>}
+            {!previewId && error && <Notice error>{error}</Notice>}
             <Detail
               record={detail}
               training={training}
@@ -765,7 +814,10 @@ export function CatalogPage({ kind = "vacancies" }) {
               edit={edit}
               action={action}
             />
-          </>
+            {training && staff && !detail.external_enrollment && (
+              <TrainingParticipants program={detail} onChanged={r.reload} />
+            )}
+          </DetailSurface>
         ) : employer ? (
           filtered.length ? (
             <EmployerVacancyTable
@@ -864,7 +916,7 @@ export function CatalogPage({ kind = "vacancies" }) {
                               : v.catalog_type === "overseas_training"
                                 ? "Overseas announcement · confirm intake"
                                 : "Self-paced · official provider"
-                            : `Starts ${date(v.starts_on)}`
+                            : `${Math.max(0, v.capacity - Number(v.occupied_places || 0))} / ${v.capacity} places available · Starts ${date(v.starts_on)}`
                           : v.external_application
                             ? "Confirm availability on source"
                             : `Apply by ${date(v.deadline)}`}
@@ -898,7 +950,7 @@ export function CatalogPage({ kind = "vacancies" }) {
   )
 }
 
-function Detail({
+export function Detail({
   record: v,
 
   training,
@@ -918,7 +970,7 @@ function Detail({
   const [consent, setConsent] = useState(false)
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[1.5fr_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
       <article className="rounded-lg border border-border bg-card p-6 sm:p-8">
         <div className="flex flex-wrap gap-2">
           <Badge>{training ? v.mode : v.employment_type}</Badge>
@@ -986,6 +1038,14 @@ function Detail({
                 ],
 
                 ["Schedule", v.schedule],
+                ...(!v.external_enrollment
+                  ? [
+                      [
+                        "Enrollment availability",
+                        `${Math.max(0, v.capacity - Number(v.occupied_places || 0))} available / ${v.capacity} places · ${v.occupied_places || 0} confirmed · ${v.pending_requests || 0} pending review`,
+                      ],
+                    ]
+                  : []),
 
                 [
                   "Program capacity",
@@ -1036,19 +1096,24 @@ function Detail({
                       : "Contact employer",
                 ],
               ]
-          )
-
-            .map(([k, value]) => (
-              <div key={k}>
-                <dt className="text-xs text-muted-foreground">{k}</dt>
-                <dd className="mt-1 font-medium">{value}</dd>
-              </div>
-            ))}
+          ).map(([k, value]) => (
+            <div key={k}>
+              <dt className="text-xs text-muted-foreground">{k}</dt>
+              <dd className="mt-1 font-medium">{value}</dd>
+            </div>
+          ))}
         </dl>
         <div className="mt-7 space-y-3">
           {role === "jobseeker" && (
             <>
-              <CollectionNotice kind={training ? "enrollment" : "referral"} />
+              {training && v.external_enrollment ? (
+                <Notice>
+                  Training interest helps PESO plan future offerings. It is not
+                  enrollment, provider confirmation or a reserved place.
+                </Notice>
+              ) : (
+                <CollectionNotice kind={training ? "enrollment" : "referral"} />
+              )}
               {(v.external_application || v.external_enrollment) && (
                 <p className="record-emphasis text-sm leading-6">
                   Submit here to PESO Bansud, Oriental Mindoro. PESO checks
@@ -1056,7 +1121,7 @@ function Detail({
                   provider before confirming the next step.
                 </p>
               )}
-              {training && (
+              {training && !v.external_enrollment && (
                 <label className="flex items-start gap-3 text-sm leading-6">
                   <input
                     type="checkbox"
@@ -1068,12 +1133,21 @@ function Detail({
                 </label>
               )}
               <button
-                disabled={busy || (training && !consent)}
+                disabled={
+                  busy ||
+                  (training &&
+                    !v.external_enrollment &&
+                    (!consent || Number(v.occupied_places) >= v.capacity))
+                }
                 className={`${primaryStyle} w-full`}
                 onClick={() => action(v)}
               >
                 {training
-                  ? "Request enrollment through PESO"
+                  ? v.external_enrollment
+                    ? "Express training interest"
+                    : Number(v.occupied_places) >= v.capacity
+                      ? "Training full"
+                      : "Apply for this training intake"
                   : "Apply through PESO · request referral"}
               </button>
               {!training && (
@@ -1087,10 +1161,21 @@ function Detail({
                 </button>
               )}
               <Link
-                to={training ? "/enrollments" : "/referrals"}
+                to={
+                  training
+                    ? v.external_enrollment
+                      ? "/training-demand"
+                      : "/enrollments"
+                    : "/referrals"
+                }
                 className="block py-2 text-center text-sm font-semibold text-primary underline"
               >
-                View my {training ? "enrollments" : "referrals"}
+                View my{" "}
+                {training
+                  ? v.external_enrollment
+                    ? "training interest"
+                    : "enrollments"
+                  : "referrals"}
               </Link>
             </>
           )}
@@ -1100,6 +1185,14 @@ function Detail({
               className={`${primaryStyle} w-full`}
             >
               Edit record
+            </button>
+          )}
+          {canManage && !training && !v.external_application && (
+            <button
+              onClick={() => edit(v, true)}
+              className={`${secondaryStyle} w-full`}
+            >
+              Update vacancy status
             </button>
           )}
           {v.source_url && (
@@ -1123,7 +1216,9 @@ function Detail({
         </div>
         <p className="mt-5 text-xs leading-6 text-muted-foreground">
           {training
-            ? "Your request is reviewed before a place is confirmed. Program completion does not automatically issue a TESDA National Certificate."
+            ? v.external_enrollment
+              ? "Interest is recorded for planning only. Apply separately when PESO publishes a scheduled intake. No place or certificate is promised."
+              : "Your application is reviewed before a place is confirmed. Program completion does not automatically issue a TESDA National Certificate."
             : v.external_application
               ? "PESO reviews and coordinates your application; the employer decides eligibility and hiring. A match or course does not guarantee employment."
               : "A PESO referral is an employment facilitation step. The employer decides hiring; a match does not guarantee a job."}
@@ -1134,7 +1229,39 @@ function Detail({
 }
 
 export function MatchesPage() {
-  const r = useResource("/matches")
+  const baseline = useResource("/matches")
+  const aiStatus = useResource("/ai/status")
+  const [semantic, setSemantic] = useState(null)
+  const [semanticBusy, setSemanticBusy] = useState(false)
+  const [semanticError, setSemanticError] = useState("")
+  const [aiConsent, setAiConsent] = useState(false)
+  const [language, setLanguage] = useState("en")
+  async function semanticPage(page = 1) {
+    setSemanticBusy(true)
+    setSemanticError("")
+    try {
+      const data = await api("/ai/semantic-matches", "POST", {
+        consent: aiConsent,
+        notice_version: aiStatus.data?.notice_version,
+        language,
+        page,
+      })
+      setSemantic(data)
+    } catch (e) {
+      setSemanticError(e.message)
+    } finally {
+      setSemanticBusy(false)
+    }
+  }
+  const r = semantic
+    ? {
+        data: semantic,
+        loading: semanticBusy,
+        error: "",
+        setPage: semanticPage,
+        reload: () => semanticPage(semantic.current_page),
+      }
+    : baseline
 
   const [tab, setTab] = useState("jobs")
 
@@ -1145,10 +1272,49 @@ export function MatchesPage() {
         description="Understand how your profile connects to vacancies, and which training can help address skill gaps."
       />
       <Notice>
-        Content-based recommendation baseline: 75% declared skill coverage and
-        25% TF-IDF profile similarity. These suggestions are advisory and do not
-        determine eligibility or hiring.
+        {semantic
+          ? `Semantic relevance from ${semantic.model}. Cosine similarity (-1 to 1) ranks meaning; it is not a probability of being hired. Explicit education, licenses and other qualifications require separate human review.`
+          : "TF-IDF comparison baseline: 75% declared skill coverage + 25% TF-IDF profile similarity. No pretrained AI model is used for these baseline results. Missing declared skills are not proof that a person lacks them."}
       </Notice>
+      <AiConsent
+        status={aiStatus.data}
+        consent={aiConsent}
+        onConsent={(v) => {
+          setAiConsent(v)
+          if (!v) setSemantic(null)
+        }}
+        language={language}
+        onLanguage={setLanguage}
+        disabled={semanticBusy}
+      />
+      {aiStatus.error && <Notice error>{aiStatus.error}</Notice>}
+      <div className="my-4 flex flex-wrap gap-3">
+        <button
+          className={primaryStyle}
+          disabled={!aiConsent || !aiStatus.data?.configured || semanticBusy}
+          onClick={() => semanticPage(1)}
+        >
+          {semanticBusy ? "Ranking with model…" : "Rank with semantic AI"}
+        </button>
+        <button
+          className={secondaryStyle}
+          disabled={semanticBusy}
+          onClick={() => {
+            setSemantic(null)
+            setSemanticError("")
+          }}
+        >
+          Show TF-IDF baseline
+        </button>
+      </div>
+      {semanticError && (
+        <Notice error>
+          {semanticError}{" "}
+          {semantic
+            ? "The previous semantic ranking remains displayed."
+            : "The TF-IDF baseline below remains explicitly labeled."}
+        </Notice>
+      )}
       <div className="my-6 flex flex-wrap gap-2">
         {[
           ["jobs", "Recommended vacancies"],
@@ -1191,17 +1357,19 @@ export function MatchesPage() {
                   </div>
                   <div className="text-right">
                     <span className="text-2xl font-semibold text-primary">
-                      {a.score}%
+                      {semantic
+                        ? a.semantic_similarity.toFixed(3)
+                        : `${a.score}%`}
                     </span>
                     <p className="text-xs text-muted-foreground">
-                      profile alignment
+                      {semantic ? "semantic relevance" : "baseline alignment"}
                     </p>
                   </div>
                 </div>
                 <div className="mt-5 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
                   <div>
                     <h3 className="text-xs font-semibold text-primary">
-                      Matched skills
+                      Declared skill overlap
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {a.matched_skills.join(", ") ||
@@ -1210,7 +1378,7 @@ export function MatchesPage() {
                   </div>
                   <div>
                     <h3 className="text-xs font-semibold text-accent">
-                      Skills to develop
+                      Required skills not declared
                     </h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {!v.skills.length
@@ -1266,7 +1434,20 @@ export function MatchesPage() {
                     Complete your profile to improve these suggestions.
                   </p>
                 )}
-                <div className="mt-5 flex items-center justify-between gap-4">
+                {semantic && (
+                  <p className="mt-4 text-xs leading-6 text-muted-foreground">
+                    Baseline comparison: {a.baseline_score}% alignment.
+                    Qualifications: not assessed. Review the vacancy
+                    requirements and your evidence with PESO.
+                  </p>
+                )}
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                  <Link
+                    to={`/ai-workspace?vacancy=${v.id}`}
+                    className={secondaryStyle}
+                  >
+                    Career advice, résumé & interview
+                  </Link>
                   <Sample record={v} />
                   <Source record={v} />
                   <ActionLink to={`/jobs/${v.id}`} secondary>
@@ -1323,5 +1504,15 @@ export function MatchesPage() {
         )}
       </ResourceState>
     </>
+  )
+}
+
+function DetailSurface({ embedded, title, onClose, children }) {
+  return embedded ? (
+    <>{children}</>
+  ) : (
+    <Modal title={title} onClose={onClose}>
+      {children}
+    </Modal>
   )
 }

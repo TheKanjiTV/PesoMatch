@@ -6,12 +6,13 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\LoginAttempts;
 use App\Services\OnboardingService;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -36,15 +37,35 @@ class AuthController extends Controller
         return $this->response($user, 201);
     }
 
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request, LoginAttempts $attempts): JsonResponse
     {
-        Auth::guard('web')->setRememberDuration(config('security.remember_minutes'));
-        if (! Auth::guard('web')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            throw ValidationException::withMessages(['email' => ['The email or password is incorrect.']]);
+        $guard = Auth::guard('web');
+        $guard->setRememberDuration(config('security.remember_minutes'));
+
+        try {
+            $failure = $attempts->attempt(
+                $request->validated('email'),
+                fn () => $guard->attempt($request->only('email', 'password'), $request->boolean('remember')),
+            );
+        } catch (LockTimeoutException) {
+            return response()->json(['message' => 'Sign-in is busy. Please try again shortly.'], 429)
+                ->header('Retry-After', '3');
         }
+
+        if (isset($failure['retry_after'])) {
+            return response()->json(['message' => 'Too many failed login attempts.'] + $failure, 429)
+                ->header('Retry-After', (string) $failure['retry_after']);
+        }
+
+        if ($failure !== null) {
+            $message = 'The email or password is incorrect.';
+
+            return response()->json(['message' => $message, 'errors' => ['email' => [$message]]] + $failure, 422);
+        }
+
         $request->session()->regenerate();
 
-        return $this->response(Auth::guard('web')->user());
+        return $this->response($guard->user());
     }
 
     public function user(Request $request): JsonResponse

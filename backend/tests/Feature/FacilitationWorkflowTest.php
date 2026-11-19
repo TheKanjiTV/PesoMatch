@@ -103,7 +103,8 @@ class FacilitationWorkflowTest extends TestCase
         $p = $this->program();
         $u = $this->person();
         $staff = $this->person('peso_staff');
-        $this->asUser($u)->postJson('/api/platform/training/'.$p->id.'/enroll', ['consent' => true])->assertCreated();
+        // Historical source requests remain reviewable; new catalog interest is separate.
+        Enrollment::create(['user_id' => $u->id, 'training_program_id' => $p->id, 'status' => 'requested']);
         $e = Enrollment::firstOrFail();
         $this->asUser($staff)->patchJson('/api/platform/enrollments/'.$e->id, ['status' => 'confirmed', 'notes' => 'No intake checked yet'])->assertUnprocessable();
         $data = ['provider' => 'Confirmed provider', 'location' => 'Bansud', 'mode' => 'In person', 'capacity' => 1, 'starts_on' => today()->addWeek()->toDateString(), 'ends_on' => today()->addMonth()->toDateString(), 'schedule' => 'Monday to Friday', 'fee' => 150, 'intake_verification' => 'Provider contacted and confirmed the exact dates, fees and one available place.'];
@@ -112,7 +113,7 @@ class FacilitationWorkflowTest extends TestCase
         $this->assertNull($p->fresh()->fee);
         $this->assertNull($p->fresh()->capacity);
         $second = $this->person();
-        $this->asUser($second)->postJson('/api/platform/training/'.$p->id.'/enroll', ['consent' => true])->assertCreated();
+        Enrollment::create(['user_id' => $second->id, 'training_program_id' => $p->id, 'status' => 'requested']);
         $other = Enrollment::where('user_id', $second->id)->firstOrFail();
         $this->asUser($staff)->patchJson('/api/platform/enrollments/'.$other->id, ['status' => 'confirmed', 'notes' => 'Attempt over capacity', 'intake_program_id' => $id])->assertUnprocessable();
         $this->assertSame($p->id, $other->fresh()->training_program_id);
@@ -154,6 +155,7 @@ class FacilitationWorkflowTest extends TestCase
     public function test_enrollment_removal_withdraws_active_request_without_changing_completed_training(): void
     {
         $p = $this->program();
+        $p->update(['external_enrollment' => false, 'source_name' => null, 'capacity' => 5, 'starts_on' => today()->addMonth()->toDateString()]);
         $u = $this->person();
         $this->asUser($u)->postJson('/api/platform/training/'.$p->id.'/enroll', ['consent' => true])->assertCreated();
         $e = Enrollment::firstOrFail();

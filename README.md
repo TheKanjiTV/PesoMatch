@@ -10,13 +10,12 @@ For a **new clone**, install dependencies, copy `backend/.env.example` to `backe
 
 For the measured October 13 performance revision, see [production baseline and optimization results](docs/PERFORMANCE.md) and the [production deployment checklist](docs/PRODUCTION-DEPLOYMENT.md).
 
-Keep the existing backend .env, application key and database. From backend/, run:
+Keep the existing backend .env, application key and database. Install dependencies as needed. For an existing installation, do not run seeders or regenerate its application key. From backend/, run:
 
 ```powershell
 composer install
-php artisan migrate
-php artisan db:seed
-php artisan serve --host=127.0.0.1 --port=8000
+# Apply only pending additive migrations with a deployment identity after backup.
+php artisan serve --host=127.0.0.1 --port=8017
 ```
 
 The active Laragon database is `peso_employment` on MySQL at 127.0.0.1:3306. At the original database migration, 134 then-existing accounts and all source rows were copied and compared before switching the connection; this historical transfer count is not the current account total. The original SQLite database and a private consistent backup under `.local/backups/` remain available. For a fresh installation, create the configured MySQL database, copy .env.example to .env, and generate an application key before migrating. Never run migrate:fresh against existing data.
@@ -28,7 +27,7 @@ pnpm install --frozen-lockfile
 pnpm dev --host 127.0.0.1
 ```
 
-Open [the local platform](http://127.0.0.1:8443). Vite proxies /api and /sanctum to Laravel at 127.0.0.1:8000. Keep one hostname per session. Both processes are required.
+Open [the local platform](http://127.0.0.1:8443). Vite proxies /api and /sanctum to Laravel at 127.0.0.1:8017. Keep one hostname per session. Both processes are required. Alternatively, run `pnpm local` from the root: it verifies the PesoMatch backend identity before starting/reusing the dedicated API and frontend. Port 8000 may belong to other coursework projects.
 
 Optional fictional catalog:
 
@@ -93,7 +92,7 @@ All new service actions are backed by Laravel. Reviewed PESO/government vacancie
 
 No TESDA/PEIS/government integration, official certification, scholarship reservation, email delivery or production deployment is configured. PESO facilitates; providers confirm enrollment; employers decide hiring. A provider completion reference is not a TESDA National Certificate.
 
-The résumé analyzer reads selectable PDF text using Poppler `pdftotext` (5 MB, first 20 pages), suggests catalog skills with evidence, and imports only reviewed skills and an optional reviewed mobile number. Scanned/image PDFs need OCR first. Education and work text are shown for review without inventing dates or credentials. No résumé is sent to an external model. Set `RESUME_PDFTOTEXT` to the executable path. See [résumé and data setup](docs/RESUME-AND-DATABASE.md).
+The résumé analyzer reads selectable PDF text using Poppler `pdftotext` (5 MB, first 20 pages), suggests catalog skills with evidence, and imports only reviewed skills and an optional reviewed mobile number. Scanned/image PDFs need OCR first. Education and work text are shown for review without inventing dates or credentials. The existing PDF extraction/skill importer runs locally. The separate AI résumé review sends only the minimized stored excerpt to Cohere after explicit consent. Set `RESUME_PDFTOTEXT` to the executable path. See [résumé and data setup](docs/RESUME-AND-DATABASE.md).
 
 Jobseekers sign in at `/login`; staff and partners can use `/staff/login`. Authentication is shared and server roles determine access. The former “Public services portal” link is now “Public home” and returns to `/`. First-time users receive a role-specific Next/Skip/Close tutorial; replay it in Account Settings.
 
@@ -109,3 +108,7 @@ php artisan test
 The current browser suite lives in tests/platform/. Earlier tests under tests/ describe the retired social/feed demo and are retained as historical references, outside the active test directory. PHPUnit always uses SQLite :memory:. See docs/VERIFICATION.md for actual results.
 
 See [requirements](docs/REQUIREMENTS.md), [design](docs/DESIGN.md), [PESO responsibilities](docs/PESO-RESPONSIBILITIES.md), [API contract](docs/API.md), and [implementation-aligned document](docs/PROJECT-DOCUMENTATION.md). The professor's manuscript/chapter template was not supplied; existing Markdown conventions are preserved pending that template.
+
+## November 19 revision
+
+Training demand is separated from actual intake enrollment; PESO can enroll consenting walk-ins and manage capacity. Workspace forms and record previews use accessible dialogs. Administrators can create role-scoped staff/partner accounts. Four pretrained AI features are enabled locally and verified with real Cohere inference in English and Filipino; 465 available vacancies are indexed. Full five-answer practice sessions and separate held-out synthetic outputs were collected. Independent human evaluation remains **pending**, so no AI accuracy or improvement percentage is claimed. See [activation results](docs/AI-ACTIVATION-2026-11-19.md). See [AI setup and limitations](docs/AI-IMPLEMENTATION.md), [evaluation protocol](docs/AI-EVALUATION-PROTOCOL.md), and [Git/SSH release workflow](docs/HOSTINGER-SSH-WORKFLOW.md). SSH key login, a private Hostinger Git checkout and PHP/Node/pnpm runtime selection are ready. No push or live deployment was performed.

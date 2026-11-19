@@ -24,11 +24,11 @@ export default defineConfig({
 
   webServer: [
     {
-      command: "php artisan serve --host=127.0.0.1 --port=8000",
+      command: "php artisan serve --host=127.0.0.1 --port=8017",
 
       cwd: "./backend",
 
-      url: "http://127.0.0.1:8000/up",
+      url: "http://127.0.0.1:8017/api/public/health",
 
       reuseExistingServer: true,
     },

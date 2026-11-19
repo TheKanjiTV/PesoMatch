@@ -1,8 +1,9 @@
+import { RecordLink as Link } from "./RecordLink.jsx"
 import { useState } from "react"
 
 import { CollectionNotice } from "./CollectionNotice.jsx"
 
-import { Link, useSearchParams } from "react-router"
+import { useSearchParams } from "react-router"
 
 import { useAuth } from "../context/AuthContext.jsx"
 
@@ -50,7 +51,7 @@ const configs = {
     title: "Training Enrollment",
 
     description:
-      "Follow enrollment review, confirmation, training progress, and provider-recorded completion.",
+      "Track applications, PESO-assisted enrollment, confirmed places and training progress.",
   },
 
   placements: {
@@ -665,7 +666,9 @@ export function RecordsPage({ kind }) {
                         {heading}
                       </h2>
                       <p className="mt-2 text-sm text-muted-foreground">
-                        {staff || !jobseeker ? row.user?.name : ""}
+                        {staff || !jobseeker
+                          ? row.user?.name || row.walk_in_name || "Participant"
+                          : ""}
                         {related
                           ? `${
                               !jobseeker ? " · " : ""

@@ -1,3 +1,4 @@
+import { Link } from "react-router"
 import { useEffect, useState } from "react"
 
 import { FileText, Upload, Trash2 } from "lucide-react"
@@ -38,7 +39,6 @@ export function ResumePanel({ onApplied }) {
     let active = true
 
     withMinimumLoading(() => accountRequest("/api/jobseeker/resume"))
-
       .then((r) => {
         if (active) accept(r.data)
       })
@@ -85,6 +85,9 @@ export function ResumePanel({ onApplied }) {
       className="resume-panel mb-7 rounded-lg border border-border bg-card p-5 sm:p-7"
       aria-labelledby="resume-title"
     >
+      <Link to="/ai-workspace" className={`${secondaryStyle} mb-5`}>
+        Review this résumé against a vacancy with AI
+      </Link>
       <div className="flex items-start gap-3">
         <FileText size={24} className="shrink-0 text-primary" />
         <div>

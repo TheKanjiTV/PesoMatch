@@ -57,6 +57,7 @@ class AccountController extends Controller
             if ($resume) {
                 abort_unless(Storage::disk('local')->delete($resume->path), 503, 'Your document could not be removed. Please try again or contact the operator.');
             }
+            DB::table('ai_embeddings')->where('source_type', 'profile')->where('source_id', $user->id)->delete();
             $user->delete();
         });
         $request->session()->invalidate();

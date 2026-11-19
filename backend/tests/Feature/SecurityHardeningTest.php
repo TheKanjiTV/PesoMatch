@@ -158,8 +158,8 @@ class SecurityHardeningTest extends TestCase
 
     public function test_login_and_registration_limits_are_enforced(): void
     {
-        for ($i = 0; $i < 5; $i++) {
-            $this->postJson('/api/auth/login', ['email' => 'rate@example.test', 'password' => 'incorrect'])->assertUnprocessable();
+        for ($i = 0; $i < 30; $i++) {
+            $this->postJson('/api/auth/login', ['email' => "rate-{$i}@example.test", 'password' => 'incorrect'])->assertUnprocessable();
         }
         $this->postJson('/api/auth/login', ['email' => 'rate@example.test', 'password' => 'incorrect'])->assertStatus(429);
         for ($i = 0; $i < 5; $i++) {

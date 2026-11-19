@@ -6,7 +6,7 @@ React JSX + Vite + Tailwind CSS frontend; Laravel 12 PHP + Sanctum backend. Form
 
 Local production preview serves live `dist`: preserve prior content-hashed assets for open tabs (`build.emptyOutDir: false`), use current bundle outputs for PWA release hashing, and return 404 for missing assets before SPA fallback. `tests/platform/chunk-recovery.spec.js` rebuilds sequentially and requires production preview; never run another build alongside it. Do not clean an output directory currently serving users. See docs/CHUNK-RECOVERY.md.
 
-Use pnpm install --frozen-lockfile, then pnpm dev. Check existing listeners before starting another process. Frontend: http://127.0.0.1:8443. Laravel API: 127.0.0.1:8000. Keep cookie hostname consistent.
+Use pnpm install --frozen-lockfile, then pnpm dev. Check existing listeners before starting another process. Frontend: http://127.0.0.1:8443. Laravel API: 127.0.0.1:8017. Keep cookie hostname consistent.
 
 ## Structure
 

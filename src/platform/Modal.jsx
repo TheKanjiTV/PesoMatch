@@ -1,0 +1,59 @@
+import { useEffect, useId, useRef } from "react"
+import { X } from "lucide-react"
+
+export function Modal({
+  title,
+  onClose,
+  busy = false,
+  initialFocusSelector,
+  children,
+}) {
+  const ref = useRef(null)
+  const heading = useId()
+  useEffect(() => {
+    const previous = document.activeElement
+    const dialog = ref.current
+    dialog.showModal()
+    if (initialFocusSelector)
+      dialog.querySelector(initialFocusSelector)?.focus({ preventScroll: true })
+    const overflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      dialog.close()
+      document.body.style.overflow = overflow
+      if (previous?.isConnected) previous.focus()
+    }
+  }, [])
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby={heading}
+      className="workspace-modal"
+      onCancel={(event) => {
+        event.preventDefault()
+        if (!busy) onClose()
+      }}
+    >
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <h2
+          id={heading}
+          tabIndex={-1}
+          className="font-display text-2xl text-primary"
+        >
+          {title}
+        </h2>
+        <button
+          type="button"
+          autoFocus
+          disabled={busy}
+          onClick={onClose}
+          aria-label="Close dialog"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border hover:bg-muted disabled:opacity-50"
+        >
+          <X size={20} />
+        </button>
+      </div>
+      {children}
+    </dialog>
+  )
+}

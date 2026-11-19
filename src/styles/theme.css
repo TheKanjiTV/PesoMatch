@@ -65,3 +65,12 @@
  --radius-lg: var(--radius);
  --radius-xl: .6rem;
 }
+
+.workspace-modal {
+  margin: auto; width: min(1050px, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem);
+  overflow-y: auto; overscroll-behavior: contain; padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--color-border); border-radius: 12px;
+  background: var(--color-card); color: var(--color-foreground);
+}
+.workspace-modal::backdrop { background: rgb(0 0 0 / .55); }
+.workspace-modal #record-editor { padding: 0; border: 0; margin-bottom: 0; }

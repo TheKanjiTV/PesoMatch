@@ -63,6 +63,13 @@ const nav = [
   ["Vacancy Management", "/jobs", BriefcaseBusiness],
 
   ["Job Matching", "/matches", Route, ["jobseeker"]],
+  ["AI Career Workspace", "/ai-workspace", BookOpen, ["jobseeker"]],
+  [
+    "Training Demand",
+    "/training-demand",
+    GraduationCap,
+    ["jobseeker", "peso_staff", "admin"],
+  ],
 
   [
     "Referrals",
@@ -574,7 +581,11 @@ function WorkspaceFrame() {
                 key={label}
                 to={to}
                 className={({ isActive }) =>
-                  ["app-tab", isActive && "app-tab-active", to === "/matches" && "app-tab-matching"]
+                  [
+                    "app-tab",
+                    isActive && "app-tab-active",
+                    to === "/matches" && "app-tab-matching",
+                  ]
                     .filter(Boolean)
                     .join(" ")
                 }

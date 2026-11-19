@@ -1,3 +1,5 @@
+import { RecordLink } from "./RecordLink.jsx"
+import { Modal } from "./Modal.jsx"
 import { useEffect, useId, useRef, useState } from "react"
 
 import { Link } from "react-router"
@@ -14,7 +16,7 @@ export const title =
 export const roles = {
   jobseeker: "Jobseeker",
 
-  peso_staff: "PESO officer",
+  peso_staff: "PESO Staff",
 
   admin: "Administrator",
 
@@ -27,7 +29,6 @@ export const staffRole = (role) => ["peso_staff", "admin"].includes(role)
 
 export const human = (value) =>
   String(value || "")
-
     .replaceAll("_", " ")
 
     .replace(/\b\w/g, (c) => c.toUpperCase())
@@ -228,10 +229,10 @@ export function Empty({ title = "No records yet", children, action }) {
 
 export function ActionLink({ to, children, secondary = false }) {
   return (
-    <Link to={to} className={secondary ? secondaryStyle : primaryStyle}>
+    <RecordLink to={to} className={secondary ? secondaryStyle : primaryStyle}>
       {children}
       <ArrowRight size={16} />
-    </Link>
+    </RecordLink>
   )
 }
 
@@ -372,30 +373,6 @@ export function Editor({
     }
   }, [errors])
 
-  useEffect(() => {
-    const previous = document.activeElement
-
-    const editor = document.getElementById("record-editor")
-
-    editor
-
-      ?.querySelector("input, select, textarea")
-
-      ?.focus({ preventScroll: true })
-
-    editor?.scrollIntoView({
-      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
-
-      block: "start",
-    })
-
-    return () => {
-      if (previous?.isConnected) previous.focus()
-    }
-  }, [])
-
   async function submit(e) {
     e.preventDefault()
 
@@ -441,82 +418,78 @@ export function Editor({
   }
 
   return (
-    <section
-      id="record-editor"
-      aria-label={title}
-      className="mb-8 scroll-mt-6 rounded-lg border border-[#bacbbe] bg-card p-5 sm:p-7"
+    <Modal
+      title={title}
+      onClose={onClose}
+      busy={busy}
+      initialFocusSelector="input, select, textarea"
     >
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <h2 className="font-display text-2xl text-primary">{title}</h2>
-        <button
-          aria-label="Close form"
-          disabled={busy}
-          onClick={onClose}
-          className={secondaryStyle}
-        >
-          <X size={17} />
-        </button>
-      </div>
-      {help && (
-        <p className="mb-6 max-w-2xl text-sm leading-6 text-muted-foreground">
-          {help}
-        </p>
-      )}
-      <form
-        onSubmit={submit}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && !busy) {
-            event.preventDefault()
-
-            onClose()
-          }
-
-          if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-            event.preventDefault()
-
-            event.currentTarget.requestSubmit()
-          }
-        }}
-        className="grid gap-5 sm:grid-cols-2"
+      <section
+        id="record-editor"
+        aria-label={title}
+        className="mb-8 scroll-mt-6 rounded-lg border border-[#bacbbe] bg-card p-5 sm:p-7"
       >
-        {fields.map((f) => (
-          <div
-            key={f.name}
-            className={f.type === "textarea" ? "sm:col-span-2" : ""}
-          >
-            <Field
-              {...f}
-              error={errors[f.name]}
-              value={values[f.name]}
-              disabled={busy}
-              onChange={(v) => {
-                setValues((s) => ({ ...s, [f.name]: v }))
-
-                setErrors((current) => ({ ...current, [f.name]: undefined }))
-              }}
-            />
-          </div>
-        ))}
-        {error && (
-          <div className="sm:col-span-2">
-            <Notice error>{error}</Notice>
-          </div>
+        {help && (
+          <p className="mb-6 max-w-2xl text-sm leading-6 text-muted-foreground">
+            {help}
+          </p>
         )}
-        <div className="flex flex-wrap gap-3 border-t border-border pt-5 sm:col-span-2">
-          <button disabled={busy} className={addStyle}>
-            {busy ? pendingLabel : submitLabel}
-            <Check size={16} />
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={onClose}
-            className={`${secondaryStyle} action-cancel`}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    </section>
+        <form
+          onSubmit={submit}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && !busy) {
+              event.preventDefault()
+
+              onClose()
+            }
+
+            if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+              event.preventDefault()
+
+              event.currentTarget.requestSubmit()
+            }
+          }}
+          className="grid gap-5 sm:grid-cols-2"
+        >
+          {fields.map((f) => (
+            <div
+              key={f.name}
+              className={f.type === "textarea" ? "sm:col-span-2" : ""}
+            >
+              <Field
+                {...f}
+                error={errors[f.name]}
+                value={values[f.name]}
+                disabled={busy}
+                onChange={(v) => {
+                  setValues((s) => ({ ...s, [f.name]: v }))
+
+                  setErrors((current) => ({ ...current, [f.name]: undefined }))
+                }}
+              />
+            </div>
+          ))}
+          {error && (
+            <div className="sm:col-span-2">
+              <Notice error>{error}</Notice>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-3 border-t border-border pt-5 sm:col-span-2">
+            <button disabled={busy} className={addStyle}>
+              {busy ? pendingLabel : submitLabel}
+              <Check size={16} />
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onClose}
+              className={`${secondaryStyle} action-cancel`}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+    </Modal>
   )
 }

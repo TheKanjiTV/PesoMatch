@@ -60,9 +60,9 @@ class EmploymentMatcher
         return ['score' => (int) round(100 * (.75 * $coverage + .25 * $similarity)), 'matched_skills' => $matched, 'missing_skills' => $missing, 'profile_incomplete' => ! $profile?->profile_completed_at, 'method' => 'content-based-tfidf-v1', 'explanation' => '75% declared skill coverage + 25% TF-IDF profile/occupation similarity. Advisory only; PESO reviews referrals and employers decide hiring.'];
     }
 
-    public function recommendations(User $user, int $page = 1): array
+    public function recommendations(User $user, int $page = 1, int $perPage = 100, ?array $semanticScores = null, $candidateSet = null): array
     {
-        $vacancies = Vacancy::available()->where('is_sample', false)->orderBy('id')->get();
+        $vacancies = $candidateSet ?? Vacancy::available()->where('is_sample', false)->orderBy('id')->get();
         $corpus = $vacancies->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
         // Compute corpus frequencies once, rather than rescanning every listing
         // for every token of every other listing as the public catalog grows.
@@ -76,14 +76,26 @@ class EmploymentMatcher
                 $bySkill[mb_strtolower($skill)][$program->id] = true;
             }
         }
-        $ranked = $vacancies->map(fn ($v) => ['vacancy' => $v, 'assessment' => $this->assess($user, $v, null, $weights)])
-            ->sortByDesc('assessment.score')->values();
+        $ranked = $vacancies->map(function ($v) use ($user, $weights, $semanticScores) {
+            $assessment = $this->assess($user, $v, null, $weights);
+            if ($semanticScores !== null) {
+                $assessment['baseline_score'] = $assessment['score'];
+                $assessment['semantic_similarity'] = $semanticScores[$v->id];
+                $assessment['method'] = 'cohere-semantic-v1';
+                $assessment['qualification_status'] = 'Not assessed. Explicit education, licenses and other requirements need human evidence review.';
+            }
+
+            return ['vacancy' => $v, 'assessment' => $assessment];
+        });
+        $ranked = $semanticScores === null
+            ? $ranked->sortByDesc('assessment.score')->values()
+            : $ranked->sort(fn ($a, $b) => ($b['assessment']['semantic_similarity'] <=> $a['assessment']['semantic_similarity']) ?: ($a['vacancy']->id <=> $b['vacancy']->id))->values();
         $gaps = $ranked->take(5)->flatMap(fn ($m) => $m['assessment']['missing_skills'])->unique()->values()->all();
-        $lastPage = max(1, (int) ceil($ranked->count() / 100));
+        $lastPage = max(1, (int) ceil($ranked->count() / $perPage));
         $page = max(1, $page);
         $summaries = $programs->keyBy('id');
         $needed = [];
-        $matches = $ranked->slice(($page - 1) * 100, 100)->map(function ($match) use ($bySkill, $summaries, &$needed) {
+        $matches = $ranked->slice(($page - 1) * $perPage, $perPage)->map(function ($match) use ($bySkill, $summaries, &$needed) {
             $missing = $match['assessment']['missing_skills'];
             $ids = [];
             foreach ($missing as $skill) {
@@ -119,6 +131,6 @@ class EmploymentMatcher
         $training = $training->map($hydrate);
 
         return ['matches' => $matches, 'training' => $training, 'method' => 'content-based-tfidf-v1',
-            'current_page' => $page, 'last_page' => $lastPage, 'per_page' => 100, 'total' => $ranked->count(), 'training_total' => $programs->count()];
+            'current_page' => $page, 'last_page' => $lastPage, 'per_page' => $perPage, 'total' => $ranked->count(), 'training_total' => $programs->count()];
     }
 }

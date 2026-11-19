@@ -87,6 +87,7 @@ class RemovalController extends Controller
                 DB::table('sessions')->where('user_id', $id)->delete();
             }
             DB::table('audit_events')->insert(['actor_id' => $r->user()->id, 'entity' => $row->getTable(), 'entity_id' => $id, 'action' => $type.'.deleted', 'changes' => json_encode(['removal' => $type === 'account' ? 'account_erasure' : 'soft_delete']), 'created_at' => now()]);
+            if ($type === 'account') DB::table('ai_embeddings')->where('source_type', 'profile')->where('source_id', $id)->delete();
             $row->delete();
             $r->session()->forget('removal_intent');
 

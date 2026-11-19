@@ -55,7 +55,7 @@ export function accountRequest(path, options = {}) {
 }
 
 export class AccountError extends Error {
-  constructor(message, status, errors = {}) {
+  constructor(message, status, errors = {}, details = {}) {
     super(message)
 
     this.name = "AccountError"
@@ -63,6 +63,8 @@ export class AccountError extends Error {
     this.status = status
 
     this.errors = errors
+    this.attemptsRemaining = details.attempts_remaining
+    this.retryAfter = details.retry_after
   }
 }
 
@@ -171,6 +173,7 @@ async function performAccountRequest(
         response.status,
 
         response.status >= 500 ? {} : json?.errors || {},
+        path === "/api/auth/login" ? json || {} : {},
       )
 
     // A followed HTML redirect is not a successful account/API response.

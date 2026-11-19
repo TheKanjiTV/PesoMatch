@@ -16,6 +16,11 @@ class TrainingProgram extends Model
 
     protected $appends = ['catalog_type', 'availability_status'];
 
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
     public function scopeAvailable($q)
     {
         return $q->where('status', 'published')->where(fn ($q) => $q->where(fn ($external) => $external->where('external_enrollment', true)->where('source_checked_at', '>=', now()->subDays(30))->where(fn ($end) => $end->whereNull('ends_on')->orWhereDate('ends_on', '>=', today())))->orWhere(fn ($local) => $local->where('external_enrollment', false)->whereDate('starts_on', '>=', today())));

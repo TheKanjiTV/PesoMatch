@@ -1,0 +1,81 @@
+# Pretrained AI integration and workflow revision
+
+19 November 2026. This revision implements real backend calls to pretrained models, authenticated routes and working frontend flows. **The four features are operational locally using actual Cohere inference.** Both exact models were reached, 465 available vacancies were indexed, and authenticated live-model workflows completed in English and Filipino. Automated mocked checks remain separate from real inference. Independent PESO relevance, factual-grounding and language-quality evaluation is still pending; operational does not mean validated employment effectiveness. See [activation evidence](AI-ACTIVATION-2026-11-19.md).
+
+## What works locally
+
+- PESO/provider local programs can be created without a TESDA connection. Scheduled local intakes accept jobseeker applications. Authorized PESO personnel can directly enroll consenting registered applicants or walk-ins without creating online accounts. Capacity is enforced under a program-row transaction lock, includes confirmed/in-progress/completed places, rejects duplicates, and is displayed with pending applications separately. Withdrawal releases a place; a pending application does not reserve one. Providers/PESO continue to confirm local enrollment and record progress/completion. Existing external-source enrollment requests retain the legacy verified-intake review path; no historical request is silently deleted or converted.
+- New interest in a source catalog listing goes to **Training Demand**, not enrollment. Unique people are grouped by normalized topic; PESO sees demand counts and decides what can be offered with partners/resources. Counts never automatically approve or schedule a program. An offered program can recruit participants even with no prior demand requests.
+- Add/edit/status/report/event/account forms and vacancy/program previews use native dialogs with keyboard containment, Escape handling, initial focus and focus restoration. Existing delete dialogs retain the five-second server-enforced wait and preserve linked history. Catalog record links keep the underlying workspace; direct record URLs also open detail dialogs.
+- Administrators can create accounts through a modal with password reauthentication, password rules and an explicit role. **PESO Staff** uses the existing `peso_staff` role, staff sign-in and staff-specific navigation: vacancy/program management, referrals, enrollment, placement and outcomes. Public registration stays jobseeker-only. Staff cannot create privileged accounts or access administrator role/audit tools.
+- Four AI features are locally enabled: semantic ranking in Job Matching and the **AI Career Workspace** for advice, résumé review and text interview practice. Profile résumé and matching screens link to the workspace. Without model access, the UI reports unavailable and uses only the clearly labeled baseline where requested.
+
+## Exact models and roles
+
+| Provider model ID/version | Role | Integration |
+| --- | --- | --- |
+| `embed-multilingual-v3.0` | Pretrained multilingual text embeddings, 1,024 dimensions; semantic profile/vacancy relevance | Cohere `POST https://api.cohere.com/v2/embed`, `search_query` for profile / `search_document` for vacancies |
+| `command-a-03-2025` | Shared pretrained language model for grounded career advice, constrained résumé rewriting and text interview questions/feedback | Cohere `POST https://api.cohere.com/v2/chat`, JSON Schema response format, temperature 0, max 2,600 output tokens |
+
+These are versioned provider model identifiers, not locally trained weights. No training or fine-tuning was performed. The provider controls serving internals; no immutable weight digest is exposed by this integration. Official API/model references: [Embed API](https://docs.cohere.com/reference/embed), [Embed models](https://docs.cohere.com/docs/cohere-embed), [Command A model](https://docs.cohere.com/v2/docs/command-a), [structured output contract](https://docs.cohere.com/v2/docs/structured-outputs). These describe provider capabilities, not measured results for this project. English and Filipino real-model collection and full five-answer practice sessions completed. Independent Filipino/English quality, code switching and factual-grounding ratings are pending. Do not infer measured quality from a generic multilingual model label.
+
+The inspected local machine has about 8 GB RAM and Intel UHD integrated graphics. A server-side hosted integration avoids requiring local LLM weights or GPU inference on Hostinger shared hosting. SSH authentication and the account runtime paths are now verified: PHP 8.4.27, Node 24.22.3 and pnpm 10.29.3. The existing production Composer platform check passes under PHP 8.4. Hosting RAM, remote Cohere inference and production request timeouts have not been tested; local activation does not enable the hosted backend. No frontend API key, SDK or new PHP/Python model runtime dependency is introduced.
+
+## Configuration
+
+1. Apply additive migrations after a private backup using a schema-capable identity. Local migration was applied with an encrypted backup; protected row counts matched. Keep runtime CRUD-only credentials and APP_KEY unchanged.
+2. Obtain Cohere access for both exact model IDs. Configure only **backend/.env** or the host's backend environment:
+
+```dotenv
+AI_ENABLED=true
+COHERE_API_KEY=<private-server-side-key>
+```
+
+Do not put this key in `VITE_*`, Git, screenshots or frontend storage. The existing free trial key is saved only in the ignored local backend environment; no key was committed and no paid plan was enabled. Prefer `php artisan peso:ai-configure` for a hidden interactive key prompt: it verifies both real model endpoints before atomically saving configuration and encrypts the previous environment with the existing APP_KEY. `php artisan peso:ai-configure --key-file=/private/key-file` supports private noninteractive setup; delete that temporary file afterward. `php artisan peso:ai-configure --check` verifies existing access without writing configuration. Clear an existing configuration cache before setup. Clearing caches is necessary after changing environment configuration:
+
+```bash
+cd backend
+php artisan optimize:clear
+php artisan peso:ai-index       # sends only published non-sample vacancy data
+php artisan config:cache        # production after environment is correct
+```
+
+3. After editing/adding/importing vacancies, run `php artisan peso:ai-index` again. Only changed content is re-embedded. The Laravel scheduler also refreshes changed public vectors hourly when AI is enabled, without overlapping runs; review provider usage/limits before enabling it. A stale or incomplete index returns an explicit 503; the system never silently ranks a subset or calls TF-IDF AI. Changing profile source facts causes lazy re-embedding on the next consented semantic request.
+4. Run Laravel's scheduler once per minute on the server. `peso:ai-prune` runs hourly to erase expired practice records and orphan profile vectors. It can also be run manually. An expired practice is immediately inaccessible, even before physical cleanup. The interface lets users delete a practice immediately. Account erasure cascades practices and explicitly removes profile vectors.
+5. Sign in as a jobseeker, complete relevant profile information, select a published vacancy and consent before each AI workflow. The UI privacy notice explains Cohere processing and links to the provider policy. Résumé review also requires a readable uploaded PDF. The existing secure extractor reports scanned/unreadable files as errors.
+
+For Git + SSH and initial server mapping, see [the release workflow](HOSTINGER-SSH-WORKFLOW.md). No push or live deployment has been performed.
+
+## Semantic relevance versus qualification
+
+Inputs are declared skills, education level/course, job duties/industry, license name/expiry and certification names. Names, addresses, contact fields and license numbers are excluded from structured profile context; free text is additionally redacted. Public vacancy descriptions/requirements form the document. Text is split into UTF-8 byte-bounded 480-byte chunks to avoid losing later work experience to the model's 512-token context; normalized chunk vectors are mean-pooled then normalized. This pooling choice is an implementation heuristic that needs relevance evaluation.
+
+Cosine similarity ranks the same available non-sample vacancy set, with stable ID ties. It is displayed as a value from -1 to 1, **not a hiring percentage**. Declared skill overlap and required skills not declared remain separate. Education, licenses, experience duration and other explicit qualifications are **not automatically approved** by either cosine or TF-IDF.
+
+The baseline remains `100 × (0.75 × declared skill coverage + 0.25 × TF-IDF cosine)`. Coverage is the fraction of listed skill names explicitly present in declared skills; TF-IDF uses the declared skills/preferred occupation/industry against the vacancy corpus. It is a transparent content-based comparator, not evidence of a pretrained model. Baseline percentage means alignment only. The semantic view shows both measures separately; it does not mix the baseline's 75/25 weights into semantic cosine. Referral snapshots remain explicitly labeled baseline assessments; referrals and hiring authority are unchanged.
+
+## Grounding and writing controls
+
+Advice receives evidence IDs/text, one selected vacancy and up to 12 actually available database training candidates matched by declared topic. The model selects evidence IDs from the supplied set; the server inserts the actual source text as the quote rather than trusting model transcription. Returned training IDs must belong to that database candidate set. Links are constructed on the server as `/training/{id}`. No model-created URL, date, fee or slot count is trusted. The linked record shows current system/source availability. Topic retrieval is intentionally limited; it can miss semantically relevant programs.
+
+Résumé review uses only the owner's **stored extracted excerpt, up to 6,000 characters**, not the entire PDF. The existing secure extraction/storage pipeline is reused; no file is silently sent for model analysis. The UI and response label the excerpt scope. Additional facts can answer follow-up questions. Original substrings must exist in the excerpt; edits reject new content vocabulary outside supplied résumé/facts (apart from English/Filipino connectives), unsupported numbers and dropped negative qualifiers. Each unsafe rewrite is withheld, and the UI shows a system-validation notice with the count; validated feedback/questions and safe suggestions remain available. These constraints may reject otherwise reasonable paraphrases. They do not prove entailment. The user accepts/rejects each suggestion in memory and copies accepted text; the original PDF/profile is never overwritten. Refreshing clears these decisions.
+
+Mock interviews store server-owned state for a five-answer sequence. The model receives the selected vacancy, minimized actual experience and prior question/answer data, generates one question, then four rubric scores (relevance, clarity, specific examples, organization) with actual answer quotations. The fifth feedback response includes a final practice summary. Its structured schema requires an empty next question, and the server controls completion. Rubric scores use the provider-compatible integer enum 1–4 and independent backend range validation. State versions prevent double submissions from advancing twice; expired/completed sessions reject further answers. Scores assess practice responses only, never personality, honesty, emotion, employability or hiring likelihood. No voice/video analysis exists.
+
+## Security, persistence and limits
+
+- Sanctum/session identity, jobseeker role and ownership are enforced on every AI route. Invalid consent versions, unavailable vacancies, missing readable résumés, malformed outputs and fabricated evidence/record IDs are rejected. AI endpoints share an eight-request/minute limit per authenticated platform context, with a broader platform limit. Provider requests have five-second connect and 25-second per-request timeouts, no automatic retries. Chunked indexing may require multiple calls; bulk indexing belongs in the CLI, not a web request.
+- Prompts treat every résumé, vacancy and answer as untrusted data in a separate user message; the model has no tools or database mutation ability. JSON Schema and Laravel validation bound accepted fields/types/counts. These are mitigations; adversarial live-model testing and independent review remain necessary.
+- Public and private vectors are encrypted under APP_KEY in `ai_embeddings`, keyed by source type/ID/model and a content hash including the pooling algorithm version. Source changes invalidate cache entries; cache presence never bypasses consent. Interview context/answers are encrypted in `ai_practices`, expire in seven days and can be deleted. No raw résumé, profile text, answer, request body, provider body or key is intentionally logged by this integration. Operators must also avoid request-body logging in proxies/APM tools.
+- Raw PDFs stay in the existing private résumé store. Résumé/advice model responses are not persisted; the browser holds them in memory only. Free-text redaction is best effort: users are told to review identifiers before external processing. Cohere provider retention/terms must be reviewed by the actual operator; this code cannot enforce deletion from an external provider.
+- The current catalog has no structured required-license or education eligibility engine. The interface explicitly requires human documentary review. Sparse evidence, spelling/topic mismatches, résumé excerpt truncation, strict rewriting constraints, chunk pooling, provider outages and independently unrated Filipino quality are material limits.
+
+## Verification and pending evidence
+
+Backend suite and UI results for this revision are recorded in [revision verification](REVISION-2026-11-19.md). Mocked tests cover consent, authorization, evidence/record grounding, numeric fact preservation, prompt roles, content-hash invalidation, same-candidate semantic sorting, multi-turn ownership/version/expiry, encrypted storage, walk-in capacity, duplicate participants and admin reauthentication. Mocked scores/text are test fixtures only.
+
+Actual development and held-out collection completed on 19 November; each has English, Filipino and document-injection synthetic cases covering all four features. The opt-in `PESO_LIVE_AI=1 php artisan test --filter=LiveAiEmploymentTest` also passed two full authenticated five-answer sessions (44 assertions), using real Cohere responses and an isolated SQLite database. Default tests use mocked provider outputs and skip these live calls. [Activation evidence](AI-ACTIVATION-2026-11-19.md) records artifacts, initial failures and fixes. [Evaluation materials](AI-EVALUATION-PROTOCOL.md) include the independent-review procedure and blank records. All human ratings, model-effectiveness measures and improvement claims remain **pending**.
+
+## Maikling paliwanag para sa defense
+
+“May dalawang pretrained model integration ang system. Ang embedding model ang nagko-convert ng profile at job requirements sa numerical vectors para ma-rank ang semantic relevance. Iba ito sa lumang 75% declared skill coverage at 25% TF-IDF baseline; hindi hiring probability o patunay ng qualification ang alinmang score. Ang language model naman ang ginagamit sa career advice, résumé writing review at text interview practice. Profile evidence, napiling vacancy at tunay na training records lang ang context; may consent at validation bago tanggapin ang output. Hindi kami ang nag-train ng mga model. Nasuri ang application safeguards gamit ang automated tests, at gumana ang tunay na model inference sa English at Filipino, kasama ang five-answer interview at hiwalay na held-out cases. Pending pa ang independent PESO evaluation, kaya wala pa kaming claim ng validated AI accuracy o improvement.”

@@ -64,7 +64,7 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" })
 })
 
-test("sign-in shows the PESO loader until authentication, then the dashboard uses only skeletons", async ({
+test("sign-in keeps the form visible until authentication, then the dashboard uses skeletons", async ({
   page,
 }) => {
   let finishLogin
@@ -129,10 +129,14 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
   await page.getByRole("button", { name: "Log In", exact: true }).click()
 
   await expect(
-    page.getByRole("status", { name: "PESO Signing in…" }),
+    page.getByRole("button", { name: "Signing in...", exact: true }),
   ).toBeVisible()
+  await expect(
+    page.getByRole("heading", { name: "Welcome back." }),
+  ).toBeVisible()
+  await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
 
-  await page.screenshot({ path: `${folder}/sign-in-logo.png` })
+  await page.screenshot({ path: `${folder}/sign-in-button.png` })
 
   await expect.poll(() => typeof finishLogin).toBe("function")
 
@@ -151,6 +155,127 @@ test("sign-in shows the PESO loader until authentication, then the dashboard use
   await expect(page.locator('[data-skeleton="screen"]')).toHaveCount(0)
 
   await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
+})
+
+test("staff sign-in shows remaining attempts and unlocks after the countdown", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 850 })
+  await page.route("**/sanctum/csrf-cookie", (route) =>
+    route.fulfill({ status: 204 }),
+  )
+  await page.route("**/api/auth/user", (route) =>
+    route.fulfill({ status: 401, json: {} }),
+  )
+  let requests = 0
+  await page.route("**/api/auth/login", (route) => {
+    requests++
+    return requests === 1
+      ? route.fulfill({
+          status: 422,
+          json: {
+            message: "The email or password is incorrect.",
+            attempts_remaining: 1,
+          },
+        })
+      : route.fulfill({
+          status: 429,
+          json: {
+            message: "Too many failed login attempts.",
+            retry_after: 300,
+          },
+        })
+  })
+
+  await page.clock.install()
+  await page.goto("/staff/login")
+  await page.getByLabel("Email Address").fill("signin.review@example.test")
+  await page
+    .locator('input[autocomplete="current-password"]')
+    .fill("Wrong-Test-Password")
+  const submit = page.getByRole("button", { name: "Log In", exact: true })
+  await submit.click()
+  await expect(page.getByRole("alert")).toContainText("1 attempt left")
+  await submit.click()
+  await expect(page.getByRole("timer")).toHaveText(/^[45]:[0-5][0-9]$/)
+  await expect(
+    page.getByRole("button", { name: "Login temporarily locked" }),
+  ).toBeDisabled()
+  await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
+  await page.screenshot({ path: `${folder}/sign-in-locked-mobile.png` })
+
+  await page.clock.fastForward(300_000)
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "You can try signing in again." }),
+  ).toBeVisible()
+  await expect(submit).toBeEnabled()
+  expect(requests).toBe(2)
+})
+
+test("admin can edit and reload login attempt settings in Account Access", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 850 })
+  await page.route("**/sanctum/csrf-cookie", (route) =>
+    route.fulfill({ status: 204 }),
+  )
+  await page.route("**/api/auth/user*", (route) =>
+    route.fulfill({
+      json: {
+        user: user("admin"),
+        onboarding: { completed: true, current_step: 5 },
+      },
+    }),
+  )
+  await page.route("**/api/privacy/requests*", (route) =>
+    route.fulfill({ json: { data: [] } }),
+  )
+  await page.route("**/api/platform/users?*", (route) =>
+    route.fulfill({ json: { data: [user("admin")] } }),
+  )
+  let stages = [
+    { attempts: 3, lockout_minutes: 5 },
+    { attempts: 3, lockout_minutes: 10 },
+    { attempts: 5, lockout_minutes: 60 },
+  ]
+  await page.route("**/api/platform/login-policy*", (route) => {
+    if (route.request().method() === "PATCH")
+      stages = route.request().postDataJSON().stages
+    return route.fulfill({ json: { stages } })
+  })
+  await page.goto("/users")
+  await expect(
+    page.getByRole("heading", { name: "Account Access & Responsibilities" }),
+  ).toBeVisible()
+  await expect(page.getByRole("table")).toContainText("Loading Review")
+  const settings = page.getByRole("region", { name: "Login attempts" })
+  const minutes = settings
+    .getByRole("group", { name: "First lockout", exact: true })
+    .getByRole("spinbutton", { name: "Lockout minutes" })
+  await expect(minutes).toHaveValue("5")
+  await minutes.fill("4")
+  await settings
+    .getByRole("button", { name: "Save login attempt settings" })
+    .click()
+  await expect(
+    settings.getByText("Login attempt settings saved."),
+  ).toBeVisible()
+  expect(stages[0]).toEqual({ attempts: 3, lockout_minutes: 4 })
+  await page.reload()
+  await expect(minutes).toHaveValue("4")
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  ).toBe(true)
+  await settings.screenshot({ path: `${folder}/login-settings-mobile.png` })
+  await page.goto("/settings")
+  await expect(
+    page.getByRole("heading", { name: "Account Settings" }),
+  ).toBeVisible()
+  await expect(settings).toHaveCount(0)
 })
 
 test("home, login and registration use the PESO logo and never generic card skeletons", async ({
@@ -305,13 +430,15 @@ test("every workspace resource uses its own layout through a slow request and er
 
     await page.setViewportSize({ width: 390, height: 844 })
 
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth + 1,
-      ),
-
-      layout,
-    ).toBe(true)
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth + 1,
+          ),
+        { message: layout },
+      )
+      .toBe(true)
 
     await page.screenshot({
       path: `${folder}/${layout}-mobile.png`,
@@ -457,11 +584,13 @@ test("Overview mirrors its banner, pathway, four counters and two content column
 
     await page.setViewportSize({ width: 390, height: 844 })
 
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth + 1,
-      ),
-    ).toBe(true)
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth + 1,
+        ),
+      )
+      .toBe(true)
 
     await page.screenshot({
       path: `${folder}/overview-skeleton-mobile-${theme}.png`,
