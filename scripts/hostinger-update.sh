@@ -57,11 +57,12 @@ fi
 # Confirm PHP web-SAPI can load this private release before changing the live entry.
 PROBE_DIRECTORY="$PUBLIC_ROOT/.well-known/peso-stage-$REVISION"
 mkdir -p "$PROBE_DIRECTORY"; chmod 755 "$PUBLIC_ROOT/.well-known" "$PROBE_DIRECTORY"
-python3 - "$RELEASE" "$PROBE_DIRECTORY/index.php" <<'PY'
+python3 - "$RELEASE" "$PROBE_DIRECTORY/index.php" "$SITE_URL" <<'PY'
 from pathlib import Path
 import sys
-release, target = map(Path, sys.argv[1:])
-code = "<?php\nrequire "+repr(str(release/'backend/vendor/autoload.php'))+";\n$app=require "+repr(str(release/'backend/bootstrap/app.php'))+";\n$kernel=$app->make(Illuminate\\Contracts\\Http\\Kernel::class);$response=$kernel->handle(Illuminate\\Http\\Request::create('/api/public/health'));$response->send();\n"
+release, target = map(Path, sys.argv[1:3])
+url = sys.argv[3]+"/api/public/health"
+code = "<?php\nrequire "+repr(str(release/'backend/vendor/autoload.php'))+";\n$app=require "+repr(str(release/'backend/bootstrap/app.php'))+";\n$kernel=$app->make(Illuminate\\Contracts\\Http\\Kernel::class);$response=$kernel->handle(Illuminate\\Http\\Request::create("+repr(url)+"));$response->send();\n"
 target.write_text(code)
 PY
 chmod 644 "$PROBE_DIRECTORY/index.php"
