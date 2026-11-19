@@ -1,5 +1,6 @@
 # Local AI activation and SSH evidence — 19 November 2026
 
+Historical November 19 snapshot. See [November 20 published release and final interview protocol](RELEASE-2026-11-20.md).
 The four features are operational **locally** with genuine pretrained inference. SSH key authentication and the private Hostinger source workflow are ready. Independent employment relevance/factual/language validation is pending. No commit, push, production migration or live deployment was performed.
 
 ## Models and configuration

@@ -55,7 +55,7 @@ Plan is read-only. Apply uses a deployment lock and detached Git worktree under 
 
 HTTP checks require the PesoMatch identity, an unauthenticated 401 session response instead of 404, a reachable AI workspace and a true 404 for missing assets. Generated CSP is translated to Apache/LiteSpeed headers, with the PHP 8.4 handler retained. Backups are private under apps/pesomatch/backups and require an operator retention policy.
 
-Laravel cache clearing is not source synchronization. Migrate changes schema; it does not copy local records/PDFs/credentials. Deploy against current production data. Verify a once-per-minute scheduler against current/backend for expiry cleanup and changed-vacancy indexing. Avoid routine production source edits/commits.
+Laravel cache clearing is not source synchronization. Migrate changes schema; it does not copy local records/PDFs/credentials. Deploy against current production data. The separate once-per-minute scheduler against current/backend was saved in hPanel and its command output verified; Laravel runs expiry cleanup and changed-vacancy indexing hourly. Avoid routine production source edits/commits.
 
 ## Limits
 

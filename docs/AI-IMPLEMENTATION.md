@@ -1,6 +1,6 @@
 # Pretrained AI integration and workflow revision
 
-19 November 2026. This revision implements real backend calls to pretrained models, authenticated routes and working frontend flows. **The four features are operational locally using actual Cohere inference.** Both exact models were reached, 465 available vacancies were indexed, and authenticated live-model workflows completed in English and Filipino. Automated mocked checks remain separate from real inference. Independent PESO relevance, factual-grounding and language-quality evaluation is still pending; operational does not mean validated employment effectiveness. See [activation evidence](AI-ACTIVATION-2026-11-19.md).
+19 November 2026. This revision implements real backend calls to pretrained models, authenticated routes and working frontend flows. **The four features are operational locally and on Hostinger using actual Cohere inference.** See [November 20 release evidence](RELEASE-2026-11-20.md). Both exact models were reached, 465 available vacancies were indexed, and authenticated live-model workflows completed in English and Filipino. Automated mocked checks remain separate from real inference. Independent PESO relevance, factual-grounding and language-quality evaluation is still pending; operational does not mean validated employment effectiveness. See [activation evidence](AI-ACTIVATION-2026-11-19.md).
 
 ## What works locally
 
@@ -19,7 +19,7 @@
 
 These are versioned provider model identifiers, not locally trained weights. No training or fine-tuning was performed. The provider controls serving internals; no immutable weight digest is exposed by this integration. Official API/model references: [Embed API](https://docs.cohere.com/reference/embed), [Embed models](https://docs.cohere.com/docs/cohere-embed), [Command A model](https://docs.cohere.com/v2/docs/command-a), [structured output contract](https://docs.cohere.com/v2/docs/structured-outputs). These describe provider capabilities, not measured results for this project. English and Filipino real-model collection and full five-answer practice sessions completed. Independent Filipino/English quality, code switching and factual-grounding ratings are pending. Do not infer measured quality from a generic multilingual model label.
 
-The inspected local machine has about 8 GB RAM and Intel UHD integrated graphics. A server-side hosted integration avoids requiring local LLM weights or GPU inference on Hostinger shared hosting. SSH authentication and the account runtime paths are now verified: PHP 8.4.27, Node 24.22.3 and pnpm 10.29.3. The existing production Composer platform check passes under PHP 8.4. Hosting RAM, remote Cohere inference and production request timeouts have not been tested; local activation does not enable the hosted backend. No frontend API key, SDK or new PHP/Python model runtime dependency is introduced.
+The inspected local machine has about 8 GB RAM and Intel UHD integrated graphics. A server-side hosted integration avoids requiring local LLM weights or GPU inference on Hostinger shared hosting. SSH authentication and the account runtime paths are now verified: PHP 8.4.27, Node 24.22.3 and pnpm 10.29.3. The existing production Composer platform check passes under PHP 8.4. Hosted Cohere access and four synthetic production route workflows now pass. Host resource guarantees and independent effectiveness ratings remain unmeasured. No frontend API key, SDK or new PHP/Python model runtime dependency is introduced.
 
 ## Configuration
 
@@ -44,7 +44,7 @@ php artisan config:cache        # production after environment is correct
 4. Run Laravel's scheduler once per minute on the server. `peso:ai-prune` runs hourly to erase expired practice records and orphan profile vectors. It can also be run manually. An expired practice is immediately inaccessible, even before physical cleanup. The interface lets users delete a practice immediately. Account erasure cascades practices and explicitly removes profile vectors.
 5. Sign in as a jobseeker, complete relevant profile information, select a published vacancy and consent before each AI workflow. The UI privacy notice explains Cohere processing and links to the provider policy. Résumé review also requires a readable uploaded PDF. The existing secure extractor reports scanned/unreadable files as errors.
 
-For Git + SSH and initial server mapping, see [the release workflow](HOSTINGER-SSH-WORKFLOW.md). No push or live deployment has been performed.
+Source was pushed and deployed November 20. See [routine SSH updates](HOSTINGER-SSH-WORKFLOW.md) and [actual release evidence](RELEASE-2026-11-20.md), which separates mocked, real-model and browser checks.
 
 ## Semantic relevance versus qualification
 
