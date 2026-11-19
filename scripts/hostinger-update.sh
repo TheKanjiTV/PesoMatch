@@ -54,23 +54,8 @@ gzip -t "$BACKUP/database.sql.gz"; [[ -s "$BACKUP/database.sql.gz" ]]
 if (cd "$RELEASE/backend"; php -r 'require "vendor/autoload.php";$a=require "bootstrap/app.php";$a->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();exit(app(App\Services\AiProvider::class)->configured()?0:1);'); then
   (cd "$RELEASE/backend"; php artisan peso:ai-configure --check; php artisan peso:ai-index)
 fi
-# Confirm PHP web-SAPI can load this private release before changing the live entry.
-PROBE_DIRECTORY="$PUBLIC_ROOT/.well-known/peso-stage-$REVISION"
-mkdir -p "$PROBE_DIRECTORY"; chmod 755 "$PUBLIC_ROOT/.well-known" "$PROBE_DIRECTORY"
-python3 - "$RELEASE" "$PROBE_DIRECTORY/index.php" "$SITE_URL" <<'PY'
-from pathlib import Path
-import sys
-release, target = map(Path, sys.argv[1:3])
-url = sys.argv[3]+"/api/public/health"
-code = "<?php\nrequire "+repr(str(release/'backend/vendor/autoload.php'))+";\n$app=require "+repr(str(release/'backend/bootstrap/app.php'))+";\n$kernel=$app->make(Illuminate\\Contracts\\Http\\Kernel::class);$response=$kernel->handle(Illuminate\\Http\\Request::create("+repr(url)+"));$response->send();\n"
-target.write_text(code)
-PY
-chmod 644 "$PROBE_DIRECTORY/index.php"
-if ! probe=$(curl --fail --silent --show-error --max-time 25 "$SITE_URL/.well-known/peso-stage-$REVISION/index.php"); then
-  rm -f -- "$PROBE_DIRECTORY/index.php"; rmdir -- "$PROBE_DIRECTORY"; echo 'Staged web-SAPI probe failed; previous live mapping retained.' >&2; exit 1
-fi
-rm -f -- "$PROBE_DIRECTORY/index.php"; rmdir -- "$PROBE_DIRECTORY"
-[[ "$probe" = *'"application":"pesomatch"'* ]] || { echo 'Staged backend identity mismatch; live mapping retained.' >&2; exit 1; }
+# CLI/config/DB/model checks above precede publication. The HTTP checks below
+# run against the actual entry point and restore the prior web release on error.
 OLD_CURRENT=$(readlink "$SITE_ROOT/current" || true)
 WEB_CHANGED=0
 rollback() {
