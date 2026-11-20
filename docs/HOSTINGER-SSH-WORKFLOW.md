@@ -1,5 +1,7 @@
 # Hostinger Git + SSH release workflow
 
+**Current domain-folder workflow:** see [HOSTINGER.md](../HOSTINGER.md). The actual checkout/running backend now belong in `domains/pesomatch.site/app`; `backend/.env` is an actual ignored private file there. `scripts/hostinger-domain-release.sh` archives the old domain directories before replacement and verifies clean tracked source against GitHub. The separate-checkout/release details below describe the earlier setup and rollback history, not a second primary source to edit.
+
 20 November 2026. Laptop key authentication, private Git checkout and PHP/Node/pnpm have been verified. A directory-preserving release replaces the earlier unexecuted proposal to make public_html a symlink. Actual release results are recorded in [the November 20 record](RELEASE-2026-11-20.md).
 
 ## Local start and Git

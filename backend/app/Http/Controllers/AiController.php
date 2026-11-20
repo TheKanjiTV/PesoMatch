@@ -72,6 +72,7 @@ class AiController extends Controller
         $facts = $r->validate(['additional_facts' => 'nullable|string|max:3000'])['additional_facts'] ?? '';
         $facts = $context->redact($facts, $r->user());
         $out = $ai->generate(AiPrompts::resume(), ['resume' => $resume, 'additional_facts' => $facts, 'vacancy' => $context->vacancy($v)], AiOutputs::resume(), AiOutputs::rules('resume'), $options['language']);
+        AiOutputs::writingScope($out, $resume['text'].' '.$facts);
         $out = AiOutputs::acceptedRevisions($out, $resume['text'], $resume['text'].' '.$facts);
 
         return response()->json(['data' => $out, 'scope' => $resume['scope'], 'model' => config('ai.language_model'), 'generated' => true]);
@@ -112,7 +113,13 @@ class AiController extends Controller
         $conversation = array_map(fn ($turn) => ['question' => $turn['output']['question'], 'answer' => $turn['answer'] ?? null], $transcript['turns']);
         $conversation[count($conversation) - 1]['answer'] = $answer;
         $answered = count($conversation);
-        $out = $ai->generate(AiPrompts::interview($answered), array_replace($transcript['context'], ['conversation' => $conversation]), AiOutputs::interview($answered >= 5), AiOutputs::rules('interview'), $practice->language);
+        $focus = ['the actual steps used to perform the stated task', 'which tools or software were actually used, if any', 'how the applicant checked the work for errors, if they did', 'a real difficulty or lesson from that task, or clarify if none was experienced'];
+        $followUpContext = array_replace($transcript['context'], ['conversation' => $conversation, 'answered_count' => $answered, 'latest_answer' => $answer, 'previous_questions' => array_column($conversation, 'question'), 'follow_up_focus' => $focus[$answered - 1] ?? 'final summary of the actual conversation']);
+        $out = $ai->generate(AiPrompts::interview($answered), $followUpContext, AiOutputs::interview($answered >= 5), AiOutputs::rules('interview'), $practice->language);
+        if ($answered < 5 && AiOutputs::repeatsQuestion($out['question'] ?? '', $conversation)) {
+            $out = $ai->generate(AiPrompts::interview($answered).' The previous output repeated an earlier question and was rejected. Ask about a DIFFERENT concrete missing detail in latest_answer; previous_questions are forbidden repeats. Do not paraphrase any earlier question.', $followUpContext, AiOutputs::interview(), AiOutputs::rules('interview'), $practice->language);
+            abort_if(AiOutputs::repeatsQuestion($out['question'] ?? '', $conversation), 502, 'The model repeated an earlier interview question. Your answer was not saved; retry to request a new follow-up.');
+        }
         abort_unless(count($out['feedback']) === 4 && substr_count($out['question'] ?? '', '?') <= 1, 502, 'Incomplete interview rubric feedback.');
         foreach ($out['feedback'] as $f) {
             abort_unless(empty($f['evidence_quote']) || str_contains($answer, $f['evidence_quote']), 502, 'Interview feedback evidence could not be verified.');

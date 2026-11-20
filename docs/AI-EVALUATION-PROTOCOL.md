@@ -1,4 +1,6 @@
-# Four-feature AI evaluation — live collection complete, human review pending
+# Four-feature AI evaluation — AI-assisted assessment completed
+
+20 November update: the requested assistant assessment is recorded in [AI-assisted results](AI-ASSISTED-ASSESSMENT-2026-11-20.md), including nine actual AI relevance judgments, computed ranking diagnostics and factual/language issues found in real saved model outputs. These are **AI-generated judgments, not independent human/PESO ratings**. The human-review protocol below remains available for a separate study; no human identity, respondent score or accuracy percentage is fabricated.
 
 19 November 2026. Real Cohere outputs were collected for three development and three held-out synthetic cases, and two full authenticated five-answer interview/workspace sessions in English and Filipino. Human relevance judgments, participants, reviewer ratings, accuracy and improvement percentages have not been collected. Automated mock tests check application behavior; their pass counts are not AI effectiveness results. See [dated collection results and limitations](AI-ACTIVATION-2026-11-19.md).
 

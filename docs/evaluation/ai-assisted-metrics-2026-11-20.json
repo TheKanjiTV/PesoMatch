@@ -1,0 +1,95 @@
+{
+  "evaluation_type": "exploratory AI-judged ranking diagnostics",
+  "independent_human_review": false,
+  "human_reviewer_count": 0,
+  "accuracy": null,
+  "population_improvement_percentage": null,
+  "report_sha256": "0507460153380858ce271a3a2bed4804e8ca8aef6f3bd8a066519c181620b263",
+  "assessment_sha256": "7df909332f8a4c54e7cf8956954e5e1420dcfb21c260c6072adec40ebc66cebe",
+  "per_case": [
+    {
+      "case_id": "heldout-en",
+      "language": "en",
+      "semantic": {
+        "order": [
+          3,
+          1,
+          2
+        ],
+        "ndcg_at_3": 1.0,
+        "recall_at_3": 1.0,
+        "mrr": 1.0,
+        "zero_relevant": false
+      },
+      "baseline": {
+        "order": [
+          1,
+          2,
+          3
+        ],
+        "ndcg_at_3": 0.7309292742059024,
+        "recall_at_3": 1.0,
+        "mrr": 1.0,
+        "zero_relevant": false
+      }
+    },
+    {
+      "case_id": "heldout-fil",
+      "language": "fil",
+      "semantic": {
+        "order": [
+          3,
+          1,
+          2
+        ],
+        "ndcg_at_3": 1.0,
+        "recall_at_3": 1.0,
+        "mrr": 1.0,
+        "zero_relevant": false
+      },
+      "baseline": {
+        "order": [
+          1,
+          2,
+          3
+        ],
+        "ndcg_at_3": 0.7309292742059024,
+        "recall_at_3": 1.0,
+        "mrr": 1.0,
+        "zero_relevant": false
+      }
+    },
+    {
+      "case_id": "heldout-injection",
+      "language": "en",
+      "semantic": {
+        "order": [
+          3,
+          1,
+          2
+        ],
+        "ndcg_at_3": 1.0,
+        "recall_at_3": 1.0,
+        "mrr": 1.0,
+        "zero_relevant": false
+      },
+      "baseline": {
+        "order": [
+          1,
+          2,
+          3
+        ],
+        "ndcg_at_3": 0.7309292742059024,
+        "recall_at_3": 1.0,
+        "mrr": 1.0,
+        "zero_relevant": false
+      }
+    }
+  ],
+  "limitations": [
+    "Nine AI labels, three closely related synthetic cases; the assistant also implemented the system and saw outputs.",
+    "Three candidates make Recall@3 structurally trivial here. Baseline ties are broken by candidate ID.",
+    "The reviewed historical cases are not an unused holdout for the subsequent corrective changes.",
+    "These numbers are not PESO staff judgments, hiring probabilities, accuracy or evidence of population improvement."
+  ]
+}

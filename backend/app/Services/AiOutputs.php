@@ -6,6 +6,22 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class AiOutputs
 {
+    public static function writingScope(array $output, string $source): void
+    {
+        $text = implode(' ', array_merge([$output['relevance'], $output['clarity'], $output['completeness']], array_column($output['suggestions'], 'reason')));
+        abort_if(preg_match('/\b(?:disqualif\w*|ineligible|unqualified|not qualified|does not qualify|hiring probability)\b|diskwalipikado|hindi\s+kwalipikado/iu', $text), 502, 'AI writing feedback included a qualification decision and was withheld. Retry for writing feedback only; PESO reviews qualifications.');
+        if (preg_match('/not (?:stated|declared)|no [^.]{0,60}(?:declared|stated)|walang nakasaad/iu', $source)) {
+            abort_if(preg_match('/(?:lacks|does not have|has no|absence of)[^.]{0,65}(?:licen[cs]e|lisens)|(?:walang|wala siyang)[^.]{0,40}(?:lisens|license)/iu', $text), 502, 'AI turned missing license evidence into an absence claim; the feedback was withheld. Please retry.');
+        }
+    }
+
+    public static function repeatsQuestion(string $question, array $conversation): bool
+    {
+        $normalize = fn ($text) => preg_replace('/[^\pL\pN]+/u', '', mb_strtolower($text));
+
+        return filled($question) && in_array($normalize($question), array_map(fn ($turn) => $normalize($turn['question']), $conversation), true);
+    }
+
     public static function string(): array
     {
         return ['type' => 'string'];

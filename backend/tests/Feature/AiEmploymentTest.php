@@ -181,7 +181,7 @@ class AiEmploymentTest extends TestCase
         $this->actingAs($u);
         $feedback = array_map(fn ($c) => ['criterion' => $c, 'score' => 3, 'evidence_quote' => 'I recorded the request', 'comment' => 'You provided an actual action.'], ['relevance', 'clarity', 'specific_examples', 'organization']);
         for ($i = 1; $i <= 5; $i++) {
-            $this->fakeOutput(['question' => $i === 5 ? '' : 'What details did you record?', 'feedback' => $feedback, 'improvement' => 'Explain the request using your own facts.', 'summary' => $i === 5 ? 'You practised giving relevant actions.' : '']);
+            $this->fakeOutput(['question' => $i === 5 ? '' : "What details did you record in task $i?", 'feedback' => $feedback, 'improvement' => 'Explain the request using your own facts.', 'summary' => $i === 5 ? 'You practised giving relevant actions.' : '']);
             $this->postJson("/api/platform/ai/interviews/$id/answer", $this->payload($v, ['version' => $i, 'answer' => 'I recorded the request']))->assertOk();
         }
         $this->assertNotNull(AiPractice::findOrFail($id)->completed_at);
@@ -203,5 +203,32 @@ class AiEmploymentTest extends TestCase
         $this->getJson('/api/platform/ai/interviews/'.$p->id)->assertStatus(410);
         $this->artisan('peso:ai-prune')->assertSuccessful();
         $this->assertDatabaseCount('ai_practices', 0);
+    }
+
+    public function test_writing_feedback_cannot_decide_eligibility_or_turn_not_stated_into_missing_license(): void
+    {
+        $u = $this->person();
+        $v = $this->vacancy();
+        ResumeDocument::create(['user_id' => $u->id, 'filename' => 'synthetic.pdf', 'path' => 'private-fixture', 'excerpt' => 'Encoded attendance records. No teaching license is declared.', 'detected' => []]);
+        $this->actingAs($u);
+        foreach (['This disqualifies the candidate.', 'The candidate lacks a teaching license.', 'Diskwalipikado ang aplikante.'] as $claim) {
+            $this->fakeOutput(['relevance' => $claim, 'clarity' => 'Tasks are stated.', 'completeness' => 'Ask for details.', 'questions' => [], 'suggestions' => []]);
+            $this->postJson('/api/platform/ai/resume-review', $this->payload($v))->assertStatus(502)->assertJsonMissingPath('data');
+        }
+        $this->fakeOutput(['relevance' => 'Records tasks relate to the vacancy.', 'clarity' => 'Duties are stated.', 'completeness' => 'License evidence is not stated; PESO must verify documents.', 'questions' => ['Which spreadsheet software did you use?'], 'suggestions' => []]);
+        $this->postJson('/api/platform/ai/resume-review', $this->payload($v))->assertOk();
+    }
+
+    public function test_repeated_interview_question_is_retried_then_rejected_without_consuming_answer(): void
+    {
+        $u = $this->person();
+        $v = $this->vacancy();
+        $p = AiPractice::create(['user_id' => $u->id, 'vacancy_id' => $v->id, 'model' => config('ai.language_model'), 'language' => 'en', 'transcript' => ['context' => [], 'turns' => [['output' => ['question' => 'Describe a task?']]]], 'expires_at' => now()->addDay()]);
+        $feedback = array_map(fn ($c) => ['criterion' => $c, 'score' => 2, 'evidence_quote' => 'I recorded requests.', 'comment' => 'An action is stated.'], ['relevance', 'clarity', 'specific_examples', 'organization']);
+        $this->fakeOutput(['question' => 'DESCRIBE A TASK!', 'feedback' => $feedback, 'improvement' => 'Describe your actual process.', 'summary' => '']);
+        $this->actingAs($u)->postJson("/api/platform/ai/interviews/$p->id/answer", $this->payload($v, ['version' => 1, 'answer' => 'I recorded requests.']))->assertStatus(502);
+        Http::assertSentCount(2);
+        $this->assertSame(1, $p->fresh()->version);
+        $this->assertCount(1, $p->fresh()->transcript['turns']);
     }
 }

@@ -3,4 +3,4 @@
 export PATH="/opt/alt/php84/usr/bin:/opt/alt/alt-nodejs24/root/usr/bin:$PATH"
 pnpm() { corepack pnpm@10.29.3 "$@"; }
 export -f pnpm
-cd "$HOME/apps/pesomatch/PesoMatch" || return 1
+cd "$HOME/domains/pesomatch.site/app" || return 1

@@ -6,6 +6,9 @@ REVISION=${2:-}
 if [[ "$MODE" != --plan && "$MODE" != --apply ]] || [[ ! "$REVISION" =~ ^[0-9a-f]{40}$ ]]; then
   echo 'Usage: SITE_ROOT=... PUBLIC_ROOT=... SITE_URL=https://... bash scripts/hostinger-update.sh --plan|--apply FULL_COMMIT_SHA' >&2; exit 2
 fi
+if [[ -d "$HOME/domains/pesomatch.site/app/.git" ]]; then
+  exec bash "$HOME/domains/pesomatch.site/app/scripts/hostinger-domain-release.sh" "$MODE" "$REVISION"
+fi
 : "${SITE_ROOT:?Private application root required}"
 : "${PUBLIC_ROOT:?Existing public_html directory required}"
 : "${SITE_URL:?Canonical HTTPS origin required}"
