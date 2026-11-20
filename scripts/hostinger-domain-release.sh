@@ -97,7 +97,6 @@ if [[ ! -L "$SHARED/backend.env" ]]; then
 fi
 ln -s "$APP" "$SITE_ROOT/current.next"; mv -Tf "$SITE_ROOT/current.next" "$SITE_ROOT/current"; CURRENT_CHANGED=1
 (cd "$APP/backend"; php artisan optimize:clear; php artisan config:cache; php artisan route:cache; php artisan view:cache; php "$APP/deploy/hostinger-verify.php"; php artisan up)
-MAINTENANCE=0
 cp "$APP/deploy/hostinger-runtime.sh" "$SITE_ROOT/runtime.sh"
 [[ "$(curl --fail --silent --show-error --max-time 25 https://pesomatch.site/api/public/health)" = *'"application":"pesomatch"'* ]]
 [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 25 -H 'Accept: application/json' https://pesomatch.site/api/auth/user)" = 401 ]]
@@ -106,6 +105,7 @@ curl --fail --silent --show-error --max-time 25 https://pesomatch.site/ai-worksp
 git -C "$APP" diff --exit-code HEAD
 [[ -z "$(git -C "$APP" status --porcelain)" ]]
 bash "$APP/scripts/hostinger-workspace.sh"
+MAINTENANCE=0
 trap - ERR
 rmdir "$STAGE"
 printf 'Published exact Git source %s to %s. Private ignored .env/storage preserved. Backup: %s\n' "$REVISION" "$APP" "$BACKUP"
