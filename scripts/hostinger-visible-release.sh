@@ -26,7 +26,7 @@ run bash scripts/hostinger-update.sh --plan "$REVISION"
 run bash scripts/hostinger-update.sh --apply "$REVISION"
 run bash scripts/hostinger-workspace.sh
 printf '%s\n' "$REVISION" > "$SITE_ROOT/logs/visible-$REVISION.done"
-printf '\nRelease finished. Your SSH shell stays open for inspection.\n'
+printf '\nRelease finished. Named paths and the private release log are ready for inspection.\n'
 }
 # This shared host has no /dev/fd for Bash process substitution. A normal pipe
 # works with its restricted filesystem; pipefail preserves deployment failures.
