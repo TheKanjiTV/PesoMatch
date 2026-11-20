@@ -74,6 +74,31 @@ async function mock(context, role = "peso_staff", configured = false) {
         placements: 0,
         services: 0,
       }
+    else if (
+      ["/api/platform/matches", "/api/platform/ai/semantic-matches"].includes(
+        path,
+      )
+    )
+      json = {
+        matches: [
+          {
+            vacancy,
+            assessment: {
+              score: 75,
+              baseline_score: 75,
+              semantic_similarity: 0.83,
+              matched_skills: [],
+              missing_skills: [],
+            },
+            training: [],
+          },
+        ],
+        training: [],
+        current_page: 1,
+        last_page: 1,
+        total: 1,
+        model: "embed-multilingual-v3.0",
+      }
     else if (path === "/api/platform/training")
       json = list([{ ...program, occupied_places: 1 + participants.length }])
     else if (path === "/api/platform/vacancies") json = list([vacancy])
@@ -338,9 +363,17 @@ test("AI has explicit unavailable state and consent-gated model suggestions on m
   await expect(
     page.getByRole("button", { name: "Generate career advice" }),
   ).toBeDisabled()
+  await page
+    .getByRole("button", { name: "Privacy & consent", exact: true })
+    .click()
   await page.getByRole("checkbox", { name: "I consent", exact: false }).check()
+  await page.getByRole("button", { name: "Continue with AI enabled" }).click()
   await page.getByRole("button", { name: "Generate career advice" }).click()
   await expect(page.getByText("License is not stated.")).toBeVisible()
+  await expect(
+    page.getByRole("dialog", { name: "Career & skills advice" }),
+  ).toBeVisible()
+  await page.getByRole("button", { name: "Close dialog", exact: true }).click()
   await page.getByRole("button", { name: "Résumé review", exact: true }).click()
   await page
     .getByRole("button", { name: "Review résumé for this vacancy" })
@@ -364,7 +397,7 @@ test("AI has explicit unavailable state and consent-gated model suggestions on m
   expect(axe.violations).toEqual([])
   await page.screenshot({
     path: "artifacts/revision-2026-11-19/ai-review-mobile.png",
-    fullPage: true,
+    fullPage: false,
   })
 })
 
@@ -378,7 +411,11 @@ test("text interview submits actual answers one at a time and reaches final prac
     .getByRole("button", { name: "Mock interview", exact: true })
     .click()
   await page.getByLabel("Selected vacancy").selectOption(String(vacancy.id))
+  await page
+    .getByRole("button", { name: "Privacy & consent", exact: true })
+    .click()
   await page.getByRole("checkbox", { name: "I consent", exact: false }).check()
+  await page.getByRole("button", { name: "Continue with AI enabled" }).click()
   await page
     .getByRole("button", { name: "Start five-question practice" })
     .click()
@@ -406,4 +443,165 @@ test("text interview submits actual answers one at a time and reaches final prac
   expect(
     await page.evaluate(() => localStorage.getItem("ai-practice")),
   ).toBeNull()
+})
+
+test("matching announces privacy without consent, groups ranking controls, and supports AI opt-out", async ({
+  page,
+  context,
+}) => {
+  await mock(context, "jobseeker", true)
+  let modelCalls = 0
+  page.on("request", (request) => {
+    if (request.url().includes("/ai/semantic-matches")) modelCalls++
+  })
+  await page.goto("/matches")
+  const notice = page.getByRole("dialog", {
+    name: "AI privacy & response preferences",
+  })
+  await expect(notice).toBeVisible()
+  await page.screenshot({
+    path: "artifacts/revision-2026-11-19/privacy-notice-desktop.png",
+  })
+  await expect(
+    notice.getByRole("checkbox", { name: "I consent", exact: false }),
+  ).not.toBeChecked()
+  expect(modelCalls).toBe(0)
+  await notice.getByRole("button", { name: "Continue without AI" }).click()
+  await expect(
+    page.getByRole("button", { name: "Rank with semantic AI" }),
+  ).toBeDisabled()
+  await page.getByRole("switch", { name: "Allow Cohere AI" }).click()
+  await notice
+    .getByRole("checkbox", { name: "I consent", exact: false })
+    .check()
+  await notice
+    .getByLabel("Response language", { exact: true })
+    .selectOption("fil")
+  await notice.getByRole("button", { name: "Continue with AI enabled" }).click()
+  await page.getByRole("button", { name: "Rank with semantic AI" }).click()
+  await expect(page.getByText("0.830", { exact: true })).toBeVisible()
+  await page.getByRole("switch", { name: "Allow Cohere AI" }).uncheck()
+  await expect(page.getByText("0.830", { exact: true })).toHaveCount(0)
+  await expect(
+    page.getByRole("button", { name: "Show TF-IDF baseline" }),
+  ).toHaveAttribute("aria-pressed", "true")
+  await page.screenshot({
+    path: "artifacts/revision-2026-11-19/matching-controls-desktop.png",
+    fullPage: true,
+  })
+})
+
+test("AI action buttons have a real gap and practice opens in a large accessible modal", async ({
+  page,
+  context,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 1000 })
+  await mock(context, "jobseeker", true)
+  await page.goto("/ai-workspace")
+  await page
+    .getByRole("button", { name: "Mock interview", exact: true })
+    .click()
+  await page.getByLabel("Selected vacancy").selectOption(String(vacancy.id))
+  await page
+    .getByRole("button", { name: "Privacy & consent", exact: true })
+    .click()
+  await page.getByRole("checkbox", { name: "I consent", exact: false }).check()
+  await page.getByRole("button", { name: "Continue with AI enabled" }).click()
+  const review = await page
+    .getByRole("link", { name: "Review vacancy details" })
+    .boundingBox()
+  const start = await page
+    .getByRole("button", { name: "Start five-question practice" })
+    .boundingBox()
+  expect(start.x - (review.x + review.width)).toBeGreaterThanOrEqual(10)
+  await page
+    .getByRole("button", { name: "Start five-question practice" })
+    .click()
+  const dialog = page.getByRole("dialog", {
+    name: "Five-question interview practice",
+  })
+  await expect(dialog).toBeVisible()
+  expect((await dialog.boundingBox()).width).toBeGreaterThan(1200)
+  await expect(
+    dialog.getByRole("heading", { name: "Question 1:", exact: false }),
+  ).toBeVisible()
+  await page.screenshot({
+    path: "artifacts/revision-2026-11-19/interview-dialog-desktop.png",
+    fullPage: true,
+  })
+  await page.getByRole("button", { name: "Close dialog", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Continue interview practice" })
+    .click()
+  await expect(
+    dialog.getByRole("heading", { name: "Question 1:", exact: false }),
+  ).toBeVisible()
+})
+
+test("withdrawing a referral hides interview scheduling and omits its date", async ({
+  page,
+  context,
+}) => {
+  await mock(context, "jobseeker")
+  let submitted
+  await context.route("**/api/platform/referrals/1", async (route) => {
+    submitted = route.request().postDataJSON()
+    await route.fulfill({ json: { message: "Referral withdrawn." } })
+  })
+  await page.goto("/referrals")
+  await page
+    .getByRole("button", { name: "Withdraw request", exact: true })
+    .click()
+  const dialog = page.getByRole("dialog")
+  await dialog.getByLabel("Next referral status").selectOption("withdrawn")
+  await expect(
+    dialog.getByLabel("Interview date & time (Philippine time)"),
+  ).toHaveCount(0)
+  await dialog
+    .getByLabel("Notes / reason", { exact: false })
+    .fill("I am withdrawing this synthetic request.")
+  await dialog.getByRole("button", { name: /Save/ }).click()
+  await expect.poll(() => submitted?.status).toBe("withdrawn")
+  expect(submitted).not.toHaveProperty("interview_at")
+})
+
+test("duplicate referral feedback is focused inside the vacancy modal", async ({
+  page,
+  context,
+}) => {
+  await mock(context, "jobseeker")
+  await context.route(
+    `**/api/platform/vacancies/${vacancy.id}/referrals`,
+    (route) =>
+      route.fulfill({
+        status: 409,
+        json: {
+          message: "You already have a referral request for this vacancy.",
+        },
+      }),
+  )
+  await page.goto(`/jobs/${vacancy.id}`)
+  await page
+    .getByRole("button", { name: "Apply through PESO", exact: false })
+    .click()
+  const feedback = page.getByRole("dialog").getByLabel("Request feedback")
+  await expect(feedback).toContainText(
+    "You already have a referral request for this vacancy.",
+  )
+  await expect(feedback).toBeFocused()
+  await expect(feedback).toBeInViewport()
+})
+
+test("planning a training topic opens a draft intake without enrolling anyone", async ({
+  page,
+  context,
+}) => {
+  await mock(context)
+  await page.goto("/training?create=training&topic=Computer%20literacy")
+  const dialog = page.getByRole("dialog")
+  await expect(dialog).toBeVisible()
+  await expect(
+    dialog.getByRole("textbox", { name: "Program title", exact: true }),
+  ).toHaveValue("Computer literacy")
+  await expect(dialog.getByLabel("Publication status")).toHaveValue("draft")
 })

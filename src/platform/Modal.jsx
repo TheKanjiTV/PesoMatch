@@ -1,6 +1,9 @@
 import { useEffect, useId, useRef } from "react"
 import { X } from "lucide-react"
 
+let openDialogs = 0
+let originalOverflow = ""
+
 export function Modal({
   title,
   onClose,
@@ -16,11 +19,13 @@ export function Modal({
     dialog.showModal()
     if (initialFocusSelector)
       dialog.querySelector(initialFocusSelector)?.focus({ preventScroll: true })
-    const overflow = document.body.style.overflow
+    if (openDialogs === 0) originalOverflow = document.body.style.overflow
+    openDialogs += 1
     document.body.style.overflow = "hidden"
     return () => {
       dialog.close()
-      document.body.style.overflow = overflow
+      openDialogs -= 1
+      if (openDialogs === 0) document.body.style.overflow = originalOverflow
       if (previous?.isConnected) previous.focus()
     }
   }, [])
@@ -34,7 +39,7 @@ export function Modal({
         if (!busy) onClose()
       }}
     >
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="workspace-modal-header">
         <h2
           id={heading}
           tabIndex={-1}
@@ -53,7 +58,7 @@ export function Modal({
           <X size={20} />
         </button>
       </div>
-      {children}
+      <div className="workspace-modal-body">{children}</div>
     </dialog>
   )
 }

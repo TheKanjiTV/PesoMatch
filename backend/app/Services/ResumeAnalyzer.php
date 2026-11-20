@@ -81,9 +81,66 @@ class ResumeAnalyzer
         } if ($mobile) {
             $mobile = '+'.$mobile;
         }
-        preg_match('/(?:education|academic background)\s*[:\n]?(.{0,900}?)(?=\n\s*(?:skills|experience|employment|certifications|references)|\z)/isu', $text, $education);
-        preg_match('/(?:work experience|employment history|professional experience)\s*[:\n]?(.{0,1400}?)(?=\n\s*(?:education|skills|certifications|references)|\z)/isu', $text, $experience);
+        $sections = $this->sections($text);
 
-        return ['skills' => $skills, 'email' => $email[0] ?? null, 'mobile_number' => $mobile ?: null, 'education_excerpt' => trim($education[1] ?? ''), 'experience_excerpt' => trim($experience[1] ?? ''), 'method' => 'local-pdf-text-skill-evidence-v1', 'note' => 'Detected mentions are suggestions, not verified proficiency. Review before adding them. No resume is sent to an external AI service.'];
+        return ['skills' => $skills, 'email' => $email[0] ?? null, 'mobile_number' => $mobile ?: null,
+            'education_excerpt' => $sections['education'], 'experience_excerpt' => $sections['experience'], 'certifications_excerpt' => $sections['certifications'],
+            'experience_draft' => $this->experienceDraft($sections['experience']),
+            'method' => 'local-pdf-text-skill-evidence-v2', 'note' => 'Detected mentions are unverified suggestions. Skills, experience and certificates have separate review actions. Exact missing dates must be supplied by you. Local PDF extraction does not send your resume to an external AI service.'];
+    }
+
+    private function sections(string $text): array
+    {
+        $sections = ['education' => [], 'experience' => [], 'certifications' => []];
+        $headers = [
+            'education' => 'education(?:al background|al attainment)?|academic background|academic qualifications|edukasyon',
+            'experience' => 'work experience|professional experience|employment history|work history|experience|karanasan sa trabaho',
+            'certifications' => 'certifications?(?: and training)?|certificates?(?: and training)?|certificates? of completion|training(?:s| and seminars)?|seminars?(?: and trainings?)?|courses|mga sertipiko',
+            'other' => 'skills|technical skills|personal information|contact information|references|character references|objective|career objective|profile|projects|languages|interests',
+        ];
+        $current = null;
+        foreach (preg_split('/\R/u', $text) as $line) {
+            $line = trim($line, " \t\x0B\0\x0C");
+            $heading = false;
+            foreach ($headers as $key => $pattern) {
+                if (preg_match('/^(?:'.$pattern.')\s*(?::\s*(.*))?$/iu', $line, $match)) {
+                    $current = $key === 'other' ? null : $key;
+                    $line = trim($match[1] ?? '');
+                    $heading = true;
+                    break;
+                }
+            }
+            // Non-degree completion courses must not become formal education.
+            if (preg_match('/certificate of completion|AIClassASEAN|code\.?org|AI for Oceans/iu', $line)) {
+                $sections['certifications'][] = $line;
+
+                continue;
+            }
+            if ($current && $line !== '') {
+                $sections[$current][] = $line;
+            }
+        }
+        foreach ($sections as $key => $lines) {
+            $sections[$key] = mb_substr(implode("\n", array_unique($lines)), 0, $key === 'experience' ? 5000 : 2000);
+        }
+
+        return $sections;
+    }
+
+    private function experienceDraft(string $text): array
+    {
+        $draft = ['description' => $text];
+        foreach (['job_title' => 'job title|position|role', 'company_name' => 'company|employer|organization', 'industry' => 'industry'] as $key => $label) {
+            if (preg_match('/^(?:'.$label.')\s*:\s*(.+)$/imu', $text, $m)) {
+                $draft[$key] = mb_substr(trim($m[1]), 0, 255);
+            }
+        }
+        foreach (['start_date' => 'start date', 'end_date' => 'end date'] as $key => $label) {
+            if (preg_match('/^'.$label.'\s*:\s*(\d{4}-\d{2}-\d{2})\s*$/imu', $text, $m)) {
+                $draft[$key] = $m[1];
+            }
+        }
+
+        return $draft;
     }
 }

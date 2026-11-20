@@ -704,6 +704,13 @@ function OnboardingFlow() {
                       <CollectionNotice />
                       {step === 3 && (
                         <ResumePanel
+                          onReviewed={(kind, entry) => {
+                            if (kind === "certification")
+                              update("certifications", (latest) => [
+                                ...latest,
+                                { ...entry, _key: crypto.randomUUID() },
+                              ])
+                          }}
                           onApplied={(ids) =>
                             update("skills", [
                               ...new Set([...data.skills.skills, ...ids]),

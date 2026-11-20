@@ -59,4 +59,17 @@ Laravel cache clearing is not source synchronization. Migrate changes schema; it
 
 ## Limits
 
+### Named frontend/backend entry points
+
+The existing Git layout stays intact. After a release, run `SITE_ROOT="$HOME/apps/pesomatch" bash scripts/hostinger-workspace.sh`. It creates only private navigation shortcuts under `~/apps/pesomatch/workspace/`:
+
+| Folder | Actual content |
+| --- | --- |
+| `source/react-frontend` | Original Git root with `src/`, `public/`, `package.json`, `.gitignore` |
+| `source/laravel-backend` | The same checkout's `backend/` |
+| `live/react-frontend` | Current release's built `dist/` |
+| `live/laravel-backend` | Current release's operational Laravel backend |
+
+No second clone, moved Git metadata or duplicated private storage is created. Live shortcuts follow the current release. Source shortcuts are for reviewing code; use `live/laravel-backend` for operational Artisan commands. `scripts/hostinger-visible-release.sh FULL_SHA` shows paths, Git status, `.gitignore`, runtimes and the guarded release in the user's visible SSH terminal, retaining a private release log. It never commits production edits.
+
 Authenticated AI requires consent and a readable owner PDF for resume review. Synthetic live checks do not establish independent PESO effectiveness, physical-device support or provider intake confirmation. See [AI implementation](AI-IMPLEMENTATION.md) and [review protocol](AI-EVALUATION-PROTOCOL.md).

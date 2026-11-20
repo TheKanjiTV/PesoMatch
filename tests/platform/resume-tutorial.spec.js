@@ -4,9 +4,20 @@ import AxeBuilder from "@axe-core/playwright"
 
 import fs from "node:fs/promises"
 
-function resumePdf() {
+function resumePdf(
+  lines = [
+    "Local Test Resume. Skills: Microsoft Excel spreadsheets and PHP programming. Contact 09171234567.",
+  ],
+) {
   const stream =
-    "BT /F1 12 Tf 40 750 Td (Local Test Resume. Skills: Microsoft Excel spreadsheets and PHP programming. Contact 09171234567.) Tj ET"
+    "BT /F1 12 Tf 40 750 Td " +
+    lines
+      .map(
+        (line, index) =>
+          `${index ? "0 -20 Td " : ""}(${line.replace(/[()\\]/g, "\\$&")}) Tj`,
+      )
+      .join(" ") +
+    " ET"
 
   const objects = [
     "<< /Type /Catalog /Pages 2 0 R >>",
@@ -118,9 +129,9 @@ test("PDF review persists skills and official courses expose local requests with
     fullPage: true,
   })
 
-  const resume = await (await apiCall(account.request, "/api/jobseeker/resume"))
-
-    .json()
+  const resume = await (
+    await apiCall(account.request, "/api/jobseeker/resume")
+  ).json()
 
   expect(resume.data.path).toBeUndefined()
 
@@ -151,8 +162,16 @@ test("PDF review persists skills and official courses expose local requests with
   ).toHaveAttribute("href", official[0].source_url)
 
   await expect(
+    page.getByRole("button", { name: "Express training interest" }),
+  ).toBeVisible()
+  await expect(
+    page.getByText("Training interest helps PESO plan future offerings.", {
+      exact: false,
+    }),
+  ).toBeVisible()
+  await expect(
     page.getByRole("button", { name: "Request enrollment through PESO" }),
-  ).toBeDisabled()
+  ).toHaveCount(0)
 
   const checked = new Date(official[0].source_checked_at).toLocaleDateString(
     "en-PH",
@@ -185,6 +204,80 @@ test("PDF review persists skills and official courses expose local requests with
   await expect(page.getByText("local-resume.pdf", { exact: true })).toHaveCount(
     0,
   )
+})
+
+test("reviewed PDF work and completion certificates save to their separate profile sections", async ({
+  page,
+  account,
+}) => {
+  await page.goto("/profile")
+  await page.getByLabel("Résumé PDF · up to 5 MB").setInputFiles({
+    name: "reviewed-work.pdf",
+    mimeType: "application/pdf",
+    buffer: resumePdf([
+      "Education",
+      "Bachelor of Science in Information Technology",
+      "Work Experience",
+      "Job title: Records Assistant",
+      "Employer: Synthetic Records Office",
+      "Start date: 2024-01-15",
+      "End date: 2025-03-20",
+      "Recorded customer requests using spreadsheets.",
+      "Certifications",
+      "AIClassASEAN.org AI for Oceans | 2025",
+      "Code.Org Certificate of Completion | 2026",
+    ]),
+  })
+  await page.getByRole("button", { name: "Analyze PDF", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Review & add work experience", exact: true })
+    .click()
+  let dialog = page.getByRole("dialog")
+  await expect(
+    dialog.getByRole("textbox", { name: "Job title", exact: true }),
+  ).toHaveValue("Records Assistant")
+  await dialog.getByLabel("Do you currently work here?").selectOption("no")
+  await dialog.getByLabel("Confirm these profile facts").selectOption("yes")
+  await dialog
+    .getByRole("button", { name: "Add reviewed work experience", exact: true })
+    .click()
+  await expect(dialog).toHaveCount(0)
+  await expect(
+    page.getByText("Records Assistant", { exact: true }),
+  ).toBeVisible()
+  await page
+    .getByRole("button", { name: "Review & add certificate", exact: true })
+    .click()
+  dialog = page.getByRole("dialog")
+  await dialog.getByLabel("Certificate / course name").fill("AI for Oceans")
+  await dialog
+    .getByLabel("Issuing organization (optional)")
+    .fill("AIClassASEAN.org")
+  await dialog.getByLabel("Confirm these profile facts").selectOption("yes")
+  await dialog
+    .getByRole("button", { name: "Add reviewed certificate", exact: true })
+    .click()
+  await expect(dialog).toHaveCount(0)
+  await page.reload()
+  const response = await apiCall(account.request, "/api/jobseeker/profile")
+  const profile = (await response.json()).data
+  expect(profile.work_experience.experiences).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        job_title: "Records Assistant",
+        company_name: "Synthetic Records Office",
+      }),
+    ]),
+  )
+  expect(profile.skills.certifications).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        certification_name: "AI for Oceans",
+        issued_at: "",
+      }),
+    ]),
+  )
+  expect(JSON.stringify(profile.education)).not.toContain("AI for Oceans")
 })
 
 test.describe("New user guidance", () => {
@@ -366,7 +459,7 @@ test("staff entrance opens assigned employee and administrator workspaces", asyn
     await expect(page).toHaveURL(/\/dashboard$/)
 
     await expect(page.locator(".workspace-identity")).toContainText(
-      role === "admin" ? "Administrator" : "PESO officer",
+      role === "admin" ? "Administrator" : "PESO Staff",
     )
 
     if (role === "admin") {

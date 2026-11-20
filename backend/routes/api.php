@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmploymentController as Employment;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\RemovalController;
 use App\Http\Controllers\ResumeController;
+use App\Http\Controllers\TrainingParticipationController;
 use App\Http\Middleware\EnsureSessionIdentity;
 use App\Http\Middleware\ValidatePlatformQuery;
 use App\Models\Skill;
@@ -20,20 +22,20 @@ Route::get('/public/source-coverage', fn () => response()->json(json_decode(file
 Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
     Route::post('/delete-intents', [RemovalController::class, 'intent']);
     Route::delete('/remove/{type}/{id}', [RemovalController::class, 'destroy'])->whereNumber('id');
-    Route::get('/training-demands', [\App\Http\Controllers\TrainingParticipationController::class, 'demands']);
-    Route::post('/training-demands', [\App\Http\Controllers\TrainingParticipationController::class, 'demand'])->middleware('throttle:10,1');
-    Route::get('/training/{program}/participants', [\App\Http\Controllers\TrainingParticipationController::class, 'roster']);
-    Route::post('/training/{program}/participants', [\App\Http\Controllers\TrainingParticipationController::class, 'store'])->middleware('throttle:20,1');
+    Route::get('/training-demands', [TrainingParticipationController::class, 'demands']);
+    Route::post('/training-demands', [TrainingParticipationController::class, 'demand'])->middleware('throttle:10,1');
+    Route::get('/training/{program}/participants', [TrainingParticipationController::class, 'roster']);
+    Route::post('/training/{program}/participants', [TrainingParticipationController::class, 'store'])->middleware('throttle:20,1');
     Route::post('/users', [Employment::class, 'createAccount'])->middleware('throttle:6,1');
     Route::prefix('ai')->middleware('throttle:8,1')->group(function () {
-        Route::get('/status', [\App\Http\Controllers\AiController::class, 'status']);
-        Route::post('/semantic-matches', [\App\Http\Controllers\AiController::class, 'semantic']);
-        Route::post('/adviser', [\App\Http\Controllers\AiController::class, 'adviser']);
-        Route::post('/resume-review', [\App\Http\Controllers\AiController::class, 'resume']);
-        Route::post('/interviews', [\App\Http\Controllers\AiController::class, 'start']);
-        Route::get('/interviews/{practice}', [\App\Http\Controllers\AiController::class, 'show']);
-        Route::post('/interviews/{practice}/answer', [\App\Http\Controllers\AiController::class, 'answer']);
-        Route::delete('/interviews/{practice}', [\App\Http\Controllers\AiController::class, 'destroy']);
+        Route::get('/status', [AiController::class, 'status']);
+        Route::post('/semantic-matches', [AiController::class, 'semantic']);
+        Route::post('/adviser', [AiController::class, 'adviser']);
+        Route::post('/resume-review', [AiController::class, 'resume']);
+        Route::post('/interviews', [AiController::class, 'start']);
+        Route::get('/interviews/{practice}', [AiController::class, 'show']);
+        Route::post('/interviews/{practice}/answer', [AiController::class, 'answer']);
+        Route::delete('/interviews/{practice}', [AiController::class, 'destroy']);
     });
     Route::get('/summary', [Employment::class, 'summary']);
     Route::get('/vacancies', [Employment::class, 'vacancies']);
@@ -90,6 +92,9 @@ Route::middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platf
         Route::get('/resume', [ResumeController::class, 'show']);
         Route::post('/resume', [ResumeController::class, 'upload'])->middleware('throttle:10,1');
         Route::post('/resume/apply', [ResumeController::class, 'apply']);
+        Route::post('/resume/reanalyze', [ResumeController::class, 'reanalyze'])->middleware('throttle:6,1');
+        Route::post('/resume/experience', [ResumeController::class, 'experience'])->middleware('throttle:10,1');
+        Route::post('/resume/certification', [ResumeController::class, 'certification'])->middleware('throttle:10,1');
         Route::get('/resume/download', [ResumeController::class, 'download']);
         Route::delete('/resume', [ResumeController::class, 'destroy']);
         Route::get('/profile', [OnboardingController::class, 'show']);

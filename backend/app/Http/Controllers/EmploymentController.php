@@ -13,12 +13,14 @@ use App\Models\ServiceRequest;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
+use App\Rules\PasswordBytes;
 use App\Services\EmploymentMatcher;
 use App\Services\TrainingSources;
 use App\Services\VacancySources;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class EmploymentController extends Controller
@@ -294,7 +296,7 @@ class EmploymentController extends Controller
                 abort_unless($row->vacancy?->owner_id === $r->user()->id
                     && in_array($row->status, Referral::EMPLOYER_OPEN_STATES, true), 403);
             }
-            $data = $r->validate(['status' => ['required', Rule::in(['referred', 'accepted', 'interviewing', 'offered', 'not_selected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'interview_at' => 'nullable|date|after:now', 'source_confirmation' => 'nullable|string|min:20|max:2000']);
+            $data = $r->validate(['status' => ['required', Rule::in(['referred', 'accepted', 'interviewing', 'offered', 'not_selected', 'withdrawn'])], 'notes' => 'required|string|max:4000', 'interview_at' => [Rule::excludeIf($r->input('status') !== 'interviewing'), 'required_if:status,interviewing', 'date', 'after:now'], 'source_confirmation' => 'nullable|string|min:20|max:2000']);
             if ($r->user()->role === 'jobseeker') {
                 abort_unless($data['status'] === 'withdrawn', 403);
                 unset($data['interview_at']);
@@ -589,11 +591,13 @@ class EmploymentController extends Controller
     public function createAccount(Request $r)
     {
         $this->roles($r, ['admin']);
-        $data = $r->validate(['current_password' => 'required|current_password:web', 'first_name' => 'required|string|max:80', 'last_name' => 'required|string|max:80', 'email' => 'required|email|max:255|unique:users,email', 'password' => ['required', 'string', 'confirmed', new \App\Rules\PasswordBytes, \Illuminate\Validation\Rules\Password::min(12)->letters()->mixedCase()->numbers()->symbols()], 'role' => ['required', Rule::in(['jobseeker', 'peso_staff', 'employer', 'training_provider', 'admin'])]]);
+        $data = $r->validate(['current_password' => 'required|current_password:web', 'first_name' => 'required|string|max:80', 'last_name' => 'required|string|max:80', 'email' => 'required|email|max:255|unique:users,email', 'password' => ['required', 'string', 'confirmed', new PasswordBytes, Password::min(12)->letters()->mixedCase()->numbers()->symbols()], 'role' => ['required', Rule::in(['jobseeker', 'peso_staff', 'employer', 'training_provider', 'admin'])]]);
+
         return DB::transaction(function () use ($r, $data) {
             $row = User::create(['name' => $data['first_name'].' '.$data['last_name'], 'first_name' => $data['first_name'], 'last_name' => $data['last_name'], 'email' => strtolower($data['email']), 'password' => $data['password']]);
             $row->forceFill(['role' => $data['role']])->save();
             $this->audit($r, 'user.created', $row, ['role' => $row->role]);
+
             return response()->json(['data' => $row], 201);
         });
     }

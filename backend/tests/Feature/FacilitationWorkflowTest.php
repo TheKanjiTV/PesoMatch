@@ -200,4 +200,14 @@ class FacilitationWorkflowTest extends TestCase
         $this->postJson('/api/platform/events', $base + ['reference_name' => 'DOLE XI · 2026 Job Fair Schedules', 'reference_url' => 'javascript:alert(1)'])->assertUnprocessable();
         $this->postJson('/api/platform/events', $base + ['reference_name' => 'DOLE XI · 2026 Job Fair Schedules', 'reference_url' => 'https://ro11.dole.gov.ph/job-fair-schedules/'])->assertOk()->assertJsonPath('data.reference_name', 'DOLE XI · 2026 Job Fair Schedules');
     }
+
+    public function test_withdrawing_a_referral_does_not_validate_or_require_an_interview_date(): void
+    {
+        $u = $this->person();
+        $v = $this->vacancy();
+        $row = Referral::create(['user_id' => $u->id, 'vacancy_id' => $v->id, 'status' => 'requested', 'notes' => 'Synthetic fixture']);
+        $this->asUser($u)->patchJson('/api/platform/referrals/'.$row->id, ['status' => 'withdrawn', 'notes' => 'I am withdrawing this request.', 'interview_at' => 'not-a-date'])->assertOk();
+        $this->assertSame('withdrawn', $row->fresh()->status);
+        $this->assertNull($row->fresh()->interview_at);
+    }
 }

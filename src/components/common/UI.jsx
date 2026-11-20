@@ -317,7 +317,7 @@ export function Modal({
       className={`${
         placement === "sheet"
           ? "fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] w-full max-w-none rounded-t-2xl sm:inset-y-0 sm:left-auto sm:right-0 sm:h-dvh sm:max-h-dvh sm:w-[420px] sm:rounded-none"
-          : "m-auto max-h-[90dvh] w-[calc(100%_-_32px)] max-w-xl rounded-xl"
+          : "m-auto max-h-[90dvh] w-[calc(100%_-_32px)] max-w-4xl rounded-xl"
       } overflow-auto border border-border bg-card p-0 text-foreground shadow-xl backdrop:bg-[#15203d]/45`}
     >
       <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-border bg-background px-6 py-3">

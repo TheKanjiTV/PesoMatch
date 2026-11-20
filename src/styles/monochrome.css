@@ -44,7 +44,7 @@
 button:disabled { cursor: not-allowed; }
 .action-add:disabled,.action-delete:disabled,.action-view:disabled { background: var(--neutral-bg); color: var(--neutral-text); border-color: var(--border); opacity: 1; filter: none; }
 .status-error { color: var(--error-text); background: var(--error-bg); }
-.delete-dialog { width: min(94vw, 560px); max-height: 88dvh; overflow-y: auto; margin: auto; padding: 1.75rem; border: 1px solid var(--border); border-radius: .8rem; background: var(--card); color: var(--foreground); box-shadow: 0 18px 60px #0005; }
+.delete-dialog { width: min(94vw, 760px); max-height: 94dvh; overflow-y: auto; margin: auto; padding: 1.75rem; border: 1px solid var(--border); border-radius: .8rem; background: var(--card); color: var(--foreground); box-shadow: 0 18px 60px #0005; }
 .delete-dialog::backdrop { background: #101214a6; }
 .record-emphasis { padding: 1rem; border-radius: .5rem; background: var(--info-bg); color: var(--info-text); font-weight: 700; }
 .appearance-theme-option { display: inline-flex; align-items: center; gap: .6rem; min-height: 48px; padding: .7rem 1.1rem; border: 1px solid var(--border); border-radius: .5rem; color: var(--foreground); background: var(--card); font-weight: 700; }

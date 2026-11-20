@@ -262,7 +262,10 @@ export function RecordsPage({ kind }) {
 
             "datetime-local",
 
-            { required: false },
+            {
+              required: true,
+              when: (values) => values.status === "interviewing",
+            },
           ),
 
           notes,
@@ -467,6 +470,9 @@ export function RecordsPage({ kind }) {
 
   async function save(data) {
     const body = { ...data }
+
+    if (kind === "referrals" && body.status !== "interviewing")
+      delete body.interview_at
 
     if (body.interview_at) body.interview_at += ":00+08:00"
 

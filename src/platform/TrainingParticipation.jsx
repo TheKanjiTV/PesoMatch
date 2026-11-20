@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { api, useResource } from "./api.js"
 import { useAuth } from "../context/AuthContext.jsx"
+import { RecordLink } from "./RecordLink.jsx"
 import { ResourceState } from "./ResourceState.jsx"
 import { TableSkeleton } from "./LoadingStates.jsx"
 import { Badge, Editor, Notice, primaryStyle, secondaryStyle } from "./ui.jsx"
@@ -131,10 +132,47 @@ export function TrainingDemandPage() {
       <h1 className="mb-4 font-display text-3xl text-primary">
         Training demand & planning
       </h1>
+      <p className="mb-6 max-w-3xl text-sm leading-7 text-muted-foreground">
+        {user.role === "jobseeker"
+          ? "This page shows only the topics you requested, not the full training catalog. A single request appears as a single topic here. Browse the catalog to discover other programs."
+          : "Compare the number of people interested in each topic before deciding which intake PESO and its partners can offer."}
+      </p>
+      <ol
+        aria-label="From training interest to enrollment"
+        className="mb-6 grid gap-5 border-y border-border py-5 sm:grid-cols-2 xl:grid-cols-4"
+      >
+        {[
+          [
+            "Request a topic",
+            "A jobseeker records a skill or course they want to learn.",
+          ],
+          [
+            "PESO reviews demand",
+            "Staff compare interest, partners, resources and availability.",
+          ],
+          [
+            "Publish a real intake",
+            "PESO records a provider, schedule and confirmed capacity.",
+          ],
+          [
+            "Apply or enroll",
+            "Jobseekers apply; PESO may enroll consenting walk-ins. Confirmed places fill the intake.",
+          ],
+        ].map(([title, text], i) => (
+          <li key={title}>
+            <h2 className="text-sm font-semibold">
+              {i + 1}. {title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {text}
+            </p>
+          </li>
+        ))}
+      </ol>
       <Notice>
-        Training interest is a planning signal. PESO decides which programs can
-        be offered with partners, schedules and resources. An interest request
-        does not create enrollment or reserve a place.
+        An interest request does not enroll you, reserve a place or
+        automatically approve a program. PESO may also offer a training even
+        without prior requests.
       </Notice>
       {user.role === "jobseeker" && (
         <button
@@ -172,16 +210,45 @@ export function TrainingDemandPage() {
               key={d.topic_key}
               className="flex flex-wrap justify-between gap-3 py-5"
             >
-              <span className="font-semibold">{d.topic}</span>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-semibold">{d.topic}</h2>
+                <p className="mt-2 text-xs leading-6 text-muted-foreground">
+                  Interest recorded for planning · enrollment has not started
+                  from this request.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {d.source_program_id && (
+                    <RecordLink
+                      to={`/training/${d.source_program_id}`}
+                      className="text-sm font-semibold underline"
+                    >
+                      View source listing
+                    </RecordLink>
+                  )}
+                  {user.role !== "jobseeker" && (
+                    <Link
+                      className="text-sm font-semibold underline"
+                      to={`/training?create=training&topic=${encodeURIComponent(d.topic)}`}
+                    >
+                      Plan a training intake
+                    </Link>
+                  )}
+                </div>
+              </div>
               {user.role !== "jobseeker" && (
                 <span>{d.interested_jobseekers} interested jobseeker(s)</span>
               )}
             </div>
           ))}
         </div>
-        <a href="/training" className={`${secondaryStyle} mt-5`}>
-          Browse offered training
-        </a>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link to="/training" className={secondaryStyle}>
+            Browse training catalog
+          </Link>
+          <Link to="/enrollments" className={secondaryStyle}>
+            View actual enrollments
+          </Link>
+        </div>
       </ResourceState>
     </>
   )

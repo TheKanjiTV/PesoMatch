@@ -352,6 +352,7 @@ export function Editor({
   submitLabel = "Save record",
 
   pendingLabel = "Saving…",
+  context,
 }) {
   const [values, setValues] = useState(initial)
 
@@ -434,6 +435,7 @@ export function Editor({
             {help}
           </p>
         )}
+        {context}
         <form
           onSubmit={submit}
           onKeyDown={(event) => {
@@ -451,24 +453,29 @@ export function Editor({
           }}
           className="grid gap-5 sm:grid-cols-2"
         >
-          {fields.map((f) => (
-            <div
-              key={f.name}
-              className={f.type === "textarea" ? "sm:col-span-2" : ""}
-            >
-              <Field
-                {...f}
-                error={errors[f.name]}
-                value={values[f.name]}
-                disabled={busy}
-                onChange={(v) => {
-                  setValues((s) => ({ ...s, [f.name]: v }))
+          {fields
+            .filter((f) => !f.when || f.when(values))
+            .map((f) => (
+              <div
+                key={f.name}
+                className={f.type === "textarea" ? "sm:col-span-2" : ""}
+              >
+                <Field
+                  {...f}
+                  error={errors[f.name]}
+                  value={values[f.name]}
+                  disabled={busy}
+                  onChange={(v) => {
+                    setValues((s) => ({ ...s, [f.name]: v }))
 
-                  setErrors((current) => ({ ...current, [f.name]: undefined }))
-                }}
-              />
-            </div>
-          ))}
+                    setErrors((current) => ({
+                      ...current,
+                      [f.name]: undefined,
+                    }))
+                  }}
+                />
+              </div>
+            ))}
           {error && (
             <div className="sm:col-span-2">
               <Notice error>{error}</Notice>

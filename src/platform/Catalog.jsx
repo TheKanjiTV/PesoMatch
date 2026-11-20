@@ -2,7 +2,7 @@ import { AiConsent } from "./AiWorkspace.jsx"
 import { Modal } from "./Modal.jsx"
 import { TrainingParticipants } from "./TrainingParticipation.jsx"
 import { RecordLink as Link } from "./RecordLink.jsx"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
   CollectionNotice,
@@ -271,6 +271,18 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
       ? `/employers?${new URLSearchParams({ search: query, sort: sort === "-title" ? "-title" : "title" })}`
       : `${resourcePath}?${request}`,
   )
+  const feedback = useRef(null)
+  useEffect(() => {
+    if (error) {
+      feedback.current?.focus({ preventScroll: true })
+      feedback.current?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      })
+    }
+  }, [error])
   const summary = useResource("/summary")
   useEffect(() => {
     if (id) return
@@ -292,7 +304,8 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
   const detail = id ? records.find((v) => String(v.id) === id) : null
 
   useEffect(() => {
-    setEditor(null)
+    if (!(training && staff && params.get("create") === "training"))
+      setEditor(null)
     setRemoving(null)
     setSearch("")
     setFilter("all")
@@ -301,6 +314,22 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
     setAvailabilityFilter("all")
     setSort("newest")
   }, [view, organization])
+
+  const openedDraft = useRef(false)
+  useEffect(() => {
+    if (
+      training &&
+      staff &&
+      params.get("create") === "training" &&
+      !openedDraft.current
+    ) {
+      openedDraft.current = true
+      edit({
+        title: (params.get("topic") || "").slice(0, 160),
+        status: "draft",
+      })
+    }
+  }, [training, staff])
 
   useEffect(() => {
     if (id && r.data)
@@ -555,8 +584,13 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
           <Notice>{message}</Notice>
         </div>
       )}
-      {error && (
-        <div className="mb-5">
+      {error && !detail && (
+        <div
+          ref={feedback}
+          tabIndex={-1}
+          aria-label="Request feedback"
+          className="mb-5 scroll-mt-28"
+        >
           <Notice error>{error}</Notice>
         </div>
       )}
@@ -803,7 +837,16 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
               )}
 
             {!previewId && message && <Notice>{message}</Notice>}
-            {!previewId && error && <Notice error>{error}</Notice>}
+            {error && (
+              <div
+                ref={feedback}
+                tabIndex={-1}
+                aria-label="Request feedback"
+                className="mb-5 scroll-mt-28"
+              >
+                <Notice error>{error}</Notice>
+              </div>
+            )}
             <Detail
               record={detail}
               training={training}
@@ -1286,27 +1329,43 @@ export function MatchesPage() {
         language={language}
         onLanguage={setLanguage}
         disabled={semanticBusy}
+        autoOpen
       />
       {aiStatus.error && <Notice error>{aiStatus.error}</Notice>}
-      <div className="my-4 flex flex-wrap gap-3">
-        <button
-          className={primaryStyle}
-          disabled={!aiConsent || !aiStatus.data?.configured || semanticBusy}
-          onClick={() => semanticPage(1)}
-        >
-          {semanticBusy ? "Ranking with model…" : "Rank with semantic AI"}
-        </button>
-        <button
-          className={secondaryStyle}
-          disabled={semanticBusy}
-          onClick={() => {
-            setSemantic(null)
-            setSemanticError("")
-          }}
-        >
-          Show TF-IDF baseline
-        </button>
-      </div>
+      <section
+        aria-label="Ranking method"
+        className="my-5 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card p-4 sm:p-5"
+      >
+        <div>
+          <h2 className="font-semibold">Ranking method</h2>
+          <p className="mt-1 text-xs leading-6 text-muted-foreground">
+            {semantic
+              ? "Semantic AI is active. Qualifications still need review."
+              : "TF-IDF baseline is active. External AI processing is optional."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            aria-pressed={Boolean(semantic)}
+            className={semantic ? primaryStyle : secondaryStyle}
+            disabled={!aiConsent || !aiStatus.data?.configured || semanticBusy}
+            onClick={() => semanticPage(1)}
+          >
+            {semanticBusy ? "Ranking with model…" : "Rank with semantic AI"}
+          </button>
+          <button
+            aria-pressed={!semantic}
+            className={!semantic ? primaryStyle : secondaryStyle}
+            disabled={semanticBusy}
+            onClick={() => {
+              setSemantic(null)
+              setSemanticError("")
+            }}
+          >
+            Show TF-IDF baseline
+          </button>
+        </div>
+      </section>
       {semanticError && (
         <Notice error>
           {semanticError}{" "}
@@ -1315,17 +1374,20 @@ export function MatchesPage() {
             : "The TF-IDF baseline below remains explicitly labeled."}
         </Notice>
       )}
-      <div className="my-6 flex flex-wrap gap-2">
+      <div
+        className="my-6 flex flex-wrap gap-x-6 border-b border-border"
+        aria-label="Recommendation views"
+      >
         {[
           ["jobs", "Recommended vacancies"],
 
-          ["training", "Skills Development Recommendation"],
+          ["training", "Skills development recommendations"],
         ].map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
             aria-pressed={tab === id}
-            className={tab === id ? primaryStyle : secondaryStyle}
+            className={`min-h-12 border-b-2 px-1 py-3 text-sm font-semibold transition-colors ${tab === id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"}`}
           >
             {label}
           </button>

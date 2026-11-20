@@ -13,9 +13,10 @@ import { withMinimumLoading } from "./loading.js"
 
 import { useWorkspaceActivity } from "./WorkspaceLoading.jsx"
 
+import { ResumeProfileReview } from "./ResumeProfileReview.jsx"
 import { CollectionNotice } from "./CollectionNotice.jsx"
 
-export function ResumePanel({ onApplied }) {
+export function ResumePanel({ onApplied, onReviewed }) {
   const [resume, setResume] = useState(null),
     [loading, setLoading] = useState(true),
     [selected, setSelected] = useState([]),
@@ -95,8 +96,8 @@ export function ResumePanel({ onApplied }) {
             Build your profile from a résumé
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Upload a PDF, review detected skills, and add them to your profile
-            for job matching. Your existing skills stay saved.
+            Upload a PDF, then review skills, work experience and certificates
+            separately before adding profile facts. Existing entries stay saved.
           </p>
         </div>
       </div>
@@ -235,29 +236,28 @@ export function ResumePanel({ onApplied }) {
             </label>
           )}
 
-          {[
-            ["Education", resume.detected.education_excerpt],
-
-            ["Work experience", resume.detected.experience_excerpt],
-          ]
-
-            .filter((x) => x[1])
-
-            .map(([label, value]) => (
-              <details className="mt-4 text-sm" key={label}>
-                <summary className="cursor-pointer font-semibold">
-                  {label} found in the PDF
-                </summary>
-                <p className="mt-3 whitespace-pre-wrap leading-7 text-muted-foreground">
-                  {value}
-                </p>
-                <p className="mt-2 text-xs">
-                  Review this text when completing the corresponding profile
-                  form. Dates and qualifications are not inferred.
-                </p>
-              </details>
-            ))}
-
+          {resume.detected.education_excerpt && (
+            <details className="mt-5 text-sm">
+              <summary className="cursor-pointer font-semibold">
+                Formal education found in the PDF
+              </summary>
+              <p className="mt-3 whitespace-pre-wrap leading-7 text-muted-foreground">
+                {resume.detected.education_excerpt}
+              </p>
+              <p className="mt-2 text-xs">
+                Review this evidence in the education form. Completion
+                certificates are shown separately below.
+              </p>
+            </details>
+          )}
+          <ResumeProfileReview
+            resume={resume}
+            onReviewed={async (kind, entry, message) => {
+              setMessage(message)
+              await onReviewed?.(kind, entry)
+              if (!onReviewed) await onApplied?.([])
+            }}
+          />
           <div className="mt-5 flex flex-wrap gap-3">
             <button
               type="button"
@@ -283,7 +283,24 @@ export function ResumePanel({ onApplied }) {
                 })
               }
             >
-              Add reviewed skills
+              Add reviewed skills only
+            </button>
+            <button
+              type="button"
+              className={secondaryStyle}
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  const result = await accountRequest(
+                    "/api/jobseeker/resume/reanalyze",
+                    { method: "POST" },
+                  )
+                  accept(result.data)
+                  setMessage(result.message)
+                })
+              }
+            >
+              Re-analyze PDF sections
             </button>
             <button
               type="button"
