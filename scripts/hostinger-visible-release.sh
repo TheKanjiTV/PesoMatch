@@ -10,8 +10,8 @@ export PUBLIC_ROOT="$HOME/domains/pesomatch.site/public_html"
 export SITE_URL=https://pesomatch.site
 [[ "$(git rev-parse HEAD)" = "$REVISION" ]]
 mkdir -p "$SITE_ROOT/logs"
-exec > >(tee -a "$SITE_ROOT/logs/visible-$REVISION.log") 2>&1
 run() { printf '\n+ '; printf '%q ' "$@"; printf '\n'; "$@"; }
+perform_release() {
 run pwd
 run ls -la
 run git status --short
@@ -27,3 +27,7 @@ run bash scripts/hostinger-update.sh --apply "$REVISION"
 run bash scripts/hostinger-workspace.sh
 printf '%s\n' "$REVISION" > "$SITE_ROOT/logs/visible-$REVISION.done"
 printf '\nRelease finished. Your SSH shell stays open for inspection.\n'
+}
+# This shared host has no /dev/fd for Bash process substitution. A normal pipe
+# works with its restricted filesystem; pipefail preserves deployment failures.
+perform_release 2>&1 | tee -a "$SITE_ROOT/logs/visible-$REVISION.log"
