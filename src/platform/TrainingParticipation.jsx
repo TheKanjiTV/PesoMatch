@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router"
 import { api, useResource } from "./api.js"
 import { useAuth } from "../context/AuthContext.jsx"
 import { RecordLink } from "./RecordLink.jsx"

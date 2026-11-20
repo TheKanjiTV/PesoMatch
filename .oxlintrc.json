@@ -1,0 +1,8 @@
+{
+  "plugins": ["react"],
+  "env": { "browser": true, "es2021": true },
+  "rules": {
+    "no-undef": "error",
+    "react/jsx-no-undef": "error"
+  }
+}
