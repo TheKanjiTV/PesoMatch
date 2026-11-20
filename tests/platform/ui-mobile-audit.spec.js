@@ -362,10 +362,22 @@ test.describe("Controlled network failures", () => {
           })
         : route.continue(),
     )
-    await form.evaluate((element) => {
-      element.noValidate = true
-      element.requestSubmit()
-    })
+    // Reach server validation with a valid client-side payload; disabling
+    // native validation does not bypass the editor's own required-field guard.
+    const dialog = page.getByRole("dialog")
+    await dialog
+      .getByLabel("Event / program title")
+      .fill("Synthetic validation event")
+    await dialog.getByLabel("Service type").selectOption("Job fair")
+    await dialog.getByLabel("Venue / location").fill("Local browser test venue")
+    await dialog
+      .getByLabel("Start time (Philippine time)")
+      .fill("2027-01-01T09:00")
+    await dialog.getByLabel("Publication status").selectOption("draft")
+    await dialog
+      .getByLabel("Program details & coordination instructions")
+      .fill("Synthetic client/server validation test only.")
+    await form.getByRole("button", { name: "Save record", exact: true }).click()
     const title = page.getByLabel("Event / program title")
     await expect(title).toHaveAttribute("aria-invalid", "true")
     await expect(title).toBeFocused()

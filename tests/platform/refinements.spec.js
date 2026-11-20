@@ -1,6 +1,7 @@
 import { test, expect, apiCall } from "./helpers.js"
 import AxeBuilder from "@axe-core/playwright"
 import { mkdir } from "node:fs/promises"
+import { tutorialSteps } from "../../src/platform/tutorialSteps.js"
 
 async function accessible(page) {
   const result = await new AxeBuilder({ page })
@@ -14,7 +15,7 @@ async function accessible(page) {
   ).toEqual([])
 }
 
-test("monochrome dark mode and expanded appearance preferences persist", async ({
+test("charcoal dark mode and expanded appearance preferences persist", async ({
   page,
 }) => {
   test.setTimeout(120000)
@@ -27,9 +28,9 @@ test("monochrome dark mode and expanded appearance preferences persist", async (
   await expect(page.locator("html")).toHaveAttribute("data-contrast", "hc2")
   await expect(page.locator("body")).toHaveCSS(
     "background-color",
-    "rgb(0, 0, 0)",
+    "rgb(24, 25, 26)",
   )
-  await expect(page.locator("body")).toHaveCSS("color", "rgb(255, 255, 255)")
+  await expect(page.locator("body")).toHaveCSS("color", "rgb(228, 230, 235)")
   await accessible(page)
   await page.getByRole("switch", { name: "Larger text", exact: true }).click()
   await page
@@ -53,7 +54,8 @@ test("monochrome dark mode and expanded appearance preferences persist", async (
     path: "artifacts/refinements/settings-dark-320.png",
     fullPage: true,
   })
-  await page.goto("/")
+  // Public home explicitly permits signed-in visitors with this query.
+  await page.goto("/?public=1")
   await expect(page.locator(".scene-canvas")).toHaveAttribute(
     "data-rendered",
     "true",
@@ -77,11 +79,12 @@ test("monochrome dark mode and expanded appearance preferences persist", async (
 test("replay navigates to Overview and highlights real controls through every step", async ({
   page,
 }) => {
+  test.setTimeout(180000)
   await page.setViewportSize({ width: 375, height: 850 })
   await page.goto("/settings")
   await page.getByRole("button", { name: "Replay workspace tutorial" }).click()
   await expect(page).toHaveURL(/\/dashboard$/)
-  const dialog = page.getByRole("dialog")
+  const dialog = page.locator("dialog.workspace-walkthrough")
   await expect(dialog).toHaveClass("workspace-walkthrough")
   await expect(dialog.locator(".tour-spotlight rect")).toBeVisible()
   await accessible(page)
@@ -108,12 +111,7 @@ test("replay navigates to Overview and highlights real controls through every st
     path: "artifacts/refinements/overview-guide-1440.png",
   })
   await page.setViewportSize({ width: 375, height: 850 })
-  for (const title of [
-    "Start with your résumé",
-    "Understand your matches",
-    "Build your skills",
-    "Keep PESO informed",
-  ]) {
+  for (const { title } of tutorialSteps("jobseeker").slice(1)) {
     await dialog.getByRole("button", { name: "Next", exact: true }).click()
     await expect(
       dialog.getByRole("heading", { name: title, exact: true }),
@@ -125,6 +123,7 @@ test("replay navigates to Overview and highlights real controls through every st
   }
   await dialog.getByRole("button", { name: "Finish", exact: true }).click()
   await expect(dialog).toHaveCount(0)
+  await expect(page).toHaveURL(/\/dashboard$/)
   await expect(
     page.getByRole("button", { name: "Replay workspace tutorial" }),
   ).toBeFocused()

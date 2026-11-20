@@ -67,25 +67,16 @@ export function WorkspaceTutorial({ requested = false, onDismiss }) {
     } catch {}
 
     updateAccountPreferences({ dashboard_tour_completed: true })
-
       .then(refresh)
 
       .catch(() => {})
 
-    onDismiss?.()
+    onDismiss?.({
+      opener: restore.current,
+      path: returnOverview === true ? "/dashboard" : pathname,
+    })
 
     if (returnOverview === true) navigate("/dashboard")
-
-    requestAnimationFrame(() => {
-      const target = restore.current?.isConnected
-        ? restore.current
-        : document.querySelector("[data-tour-launcher]") ||
-          document.querySelector("#workspace-main h1")
-
-      if (target?.tagName === "H1") target.tabIndex = -1
-
-      target?.focus({ preventScroll: true })
-    })
   }
 
   useEffect(() => {

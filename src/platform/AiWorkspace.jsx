@@ -28,10 +28,24 @@ export function AiConsent({
   const [open, setOpen] = useState(false)
   const announced = useRef(false)
   useEffect(() => {
-    if (autoOpen && status && !announced.current) {
+    if (!autoOpen || !status || announced.current) return
+    // Queue automatic notices behind the active guide/task instead of covering
+    // its controls with a second native modal. Manual consent stays explicit.
+    const announce = () => {
+      if (announced.current || document.querySelector("dialog[open]")) return
       announced.current = true
+      observer.disconnect()
       setOpen(true)
     }
+    const observer = new MutationObserver(announce)
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["open"],
+    })
+    announce()
+    return () => observer.disconnect()
   }, [autoOpen, status])
   return (
     <>

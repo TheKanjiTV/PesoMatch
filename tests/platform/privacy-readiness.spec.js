@@ -91,6 +91,7 @@ publicTest(
 test("collection notices precede profile resume and service inputs and enrollment evidence persists", async ({
   page,
   account,
+  workflowCatalog,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" })
   await page.setViewportSize({ width: 390, height: 844 })
@@ -118,20 +119,17 @@ test("collection notices precede profile resume and service inputs and enrollmen
   ).toContainText("Avoid unrelated IDs")
   await accessible(page)
   await page.getByRole("button", { name: "Cancel", exact: true }).click()
-  const programs = (
-    await (
-      await apiCall(account.request, "/api/platform/training?include_samples=1")
-    ).json()
-  ).data
-  const program = programs.find((p) => p.is_sample && !p.external_enrollment)
-  expect(program).toBeTruthy()
+  const { program } = workflowCatalog
   await page.goto(`/training/${program.id}`)
   await expect(
     page.getByRole("complementary", { name: "Privacy before you submit" }),
   ).toContainText("named provider")
   await expect(page.getByRole("checkbox")).not.toBeChecked()
   await expect(
-    page.getByRole("button", { name: "Request enrollment", exact: true }),
+    page.getByRole("button", {
+      name: "Apply for this training intake",
+      exact: true,
+    }),
   ).toBeDisabled()
   await accessible(page)
   await page.getByRole("checkbox").check()
@@ -142,7 +140,10 @@ test("collection notices precede profile resume and service inputs and enrollmen
         r.request().method() === "POST",
     ),
     page
-      .getByRole("button", { name: "Request enrollment", exact: true })
+      .getByRole("button", {
+        name: "Apply for this training intake",
+        exact: true,
+      })
       .click(),
   ])
   expect(response.status()).toBe(201)

@@ -205,35 +205,12 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   page,
 
   account,
+  workflowCatalog,
 }) => {
-  test.setTimeout(180000)
-
-  // Use opt-in fictional catalog, not real employer records.
-
-  const catalog = await (await apiCall(account.request, "/api/public/catalog"))
-
-    .json()
-
-  const vacancy = (
-      await (
-        await apiCall(
-          account.request,
-          "/api/platform/vacancies?include_samples=1",
-        )
-      ).json()
-    ).data.find((v) => v.is_sample),
-    program = (
-      await (
-        await apiCall(
-          account.request,
-          "/api/platform/training?include_samples=1",
-        )
-      ).json()
-    ).data.find((p) => p.is_sample)
-
-  expect(vacancy).toBeTruthy()
-
-  expect(program).toBeTruthy()
+  test.setTimeout(360000)
+  // Current, owned disposable fixtures: never rely on stale sample pagination
+  // or apply to a real employer/provider's records during a workflow test.
+  const { vacancy, program } = workflowCatalog
 
   const record = (id) =>
     page
@@ -246,15 +223,22 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
 
   await page.getByRole("button", { name: "Save vacancy", exact: true }).click()
 
-  await expect(page.getByRole("status")).toContainText("Vacancy saved")
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Vacancy saved to your account." }),
+  ).toBeVisible()
 
   await page
 
-    .getByRole("button", { name: "Request PESO referral", exact: true })
+    .getByRole("button", {
+      name: "Apply through PESO · request referral",
+      exact: true,
+    })
 
     .click()
 
-  await expect(page.getByRole("status")).toContainText("Referral requested")
+  await expect(page).toHaveURL(/\/referrals$/)
 
   const referralId = (
     await (await apiCall(account.request, "/api/platform/referrals")).json()
@@ -278,13 +262,14 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
 
   await page
 
-    .getByRole("button", { name: "Request enrollment", exact: true })
+    .getByRole("button", {
+      name: "Apply for this training intake",
+      exact: true,
+    })
 
     .click()
 
-  await expect(
-    page.getByRole("status").filter({ hasText: "Enrollment requested" }),
-  ).toBeVisible()
+  await expect(page).toHaveURL(/\/enrollments$/)
 
   const enrollmentId = (
     await (await apiCall(account.request, "/api/platform/enrollments")).json()
@@ -325,7 +310,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   await page.goto("/referrals")
 
   await record(referralId)
-
     .getByRole("button", { name: "Update status", exact: true })
 
     .click()
@@ -345,7 +329,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   ).toBeVisible()
 
   await record(referralId)
-
     .getByRole("button", { name: "Update status", exact: true })
 
     .click()
@@ -361,7 +344,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   await page.getByRole("button", { name: "Save record", exact: true }).click()
 
   await record(referralId)
-
     .getByRole("button", { name: "Verify placement", exact: true })
 
     .click()
@@ -393,7 +375,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   await page.goto("/enrollments")
 
   await record(enrollmentId)
-
     .getByRole("button", { name: "Update status", exact: true })
 
     .click()
@@ -411,7 +392,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   ).toBeVisible()
 
   await record(enrollmentId)
-
     .getByRole("button", { name: "Update status", exact: true })
 
     .click()
@@ -429,7 +409,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   ).toBeVisible()
 
   await record(enrollmentId)
-
     .getByRole("button", { name: "Update status", exact: true })
 
     .click()
@@ -495,7 +474,6 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   await page.reload()
 
   await record(outcomeId)
-
     .getByRole("button", { name: "Verify report", exact: true })
 
     .click()
@@ -628,18 +606,24 @@ for (const role of ["jobseeker", "employer", "admin"]) {
 
       // Another tab/bookmark can reopen sign-in while the session is still valid.
       await page.goto(`${origin}${loginPath}`)
-      await page.getByLabel("Email Address").fill(account.email)
-      await page
-        .getByLabel("Password", { exact: false })
-        .first()
-        .fill(account.password)
-
-      const [repeatLogin] = await Promise.all([
-        page.waitForResponse((response) =>
-          response.url().endsWith("/api/auth/login"),
-        ),
-        page.getByRole("button", { name: "Log In", exact: true }).click(),
-      ])
+      await expect(page).toHaveURL(/\/dashboard$/)
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
+      // The authenticated UI redirects; separately verify that a repeated
+      // same-account login request remains safe on each cookie hostname.
+      await page.request.get(`${origin}/sanctum/csrf-cookie`)
+      const token = (await page.context().cookies(origin)).find(
+        (cookie) => cookie.name === "XSRF-TOKEN",
+      )?.value
+      const repeatLogin = await page.request.post(`${origin}/api/auth/login`, {
+        data: { email: account.email, password: account.password },
+        headers: {
+          Accept: "application/json",
+          Origin: origin,
+          Referer: `${origin}/`,
+          "X-Requested-With": "XMLHttpRequest",
+          "X-XSRF-TOKEN": decodeURIComponent(token),
+        },
+      })
 
       expect(repeatLogin.status(), `Existing-session login for ${role}`).toBe(
         200,

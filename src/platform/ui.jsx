@@ -282,7 +282,12 @@ export function Field({
       if (localError) setLocalError(validate(e.target))
     },
 
-    onBlur: (event) => setLocalError(validate(event.target)),
+    onBlur: (event) => {
+      // Dismissing is not a validation attempt. Inserting an error between
+      // pointer-down and pointer-up can move Cancel away from the click.
+      if (event.relatedTarget?.closest("[data-dismiss-dialog]")) return
+      setLocalError(validate(event.target))
+    },
 
     onInvalid: (event) => setLocalError(validate(event.target)),
 
@@ -488,6 +493,7 @@ export function Editor({
             </button>
             <button
               type="button"
+              data-dismiss-dialog
               disabled={busy}
               onClick={onClose}
               className={`${secondaryStyle} action-cancel`}

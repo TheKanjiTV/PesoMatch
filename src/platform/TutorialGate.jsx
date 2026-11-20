@@ -2,7 +2,8 @@ import { lazy, Suspense, useEffect, useState } from "react"
 
 import { useAuth } from "../context/AuthContext.jsx"
 
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate, useNavigation } from "react-router"
+import { useWorkspaceLoading } from "./WorkspaceLoading.jsx"
 
 const Tutorial = lazy(() =>
   import("./Tutorial.jsx").then((m) => ({ default: m.WorkspaceTutorial })),
@@ -14,6 +15,31 @@ export function TutorialGate() {
   const { pathname, state } = useLocation()
 
   const navigate = useNavigate()
+  const navigation = useNavigation()
+  const workspace = useWorkspaceLoading()
+  const [restore, setRestore] = useState(null)
+
+  // This gate survives the dismissed tutorial and destination navigation.
+  // Restore focus only after the destination controls have mounted.
+  useEffect(() => {
+    if (
+      !restore ||
+      restore.path !== pathname ||
+      navigation.state !== "idle" ||
+      workspace?.loading
+    )
+      return
+    const frame = requestAnimationFrame(() => {
+      const target = restore.opener?.isConnected
+        ? restore.opener
+        : document.querySelector("[data-tour-launcher]") ||
+          document.querySelector("#workspace-main h1")
+      if (target?.tagName === "H1") target.tabIndex = -1
+      target?.focus({ preventScroll: true })
+      setRestore(null)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [restore, pathname, navigation.state, workspace?.loading])
 
   const [requested, setRequested] = useState(false)
 
@@ -58,7 +84,8 @@ export function TutorialGate() {
       <Tutorial
         key={run}
         requested
-        onDismiss={() => {
+        onDismiss={(focus) => {
+          setRestore(focus)
           setRequested(false)
           setDismissed(true)
         }}

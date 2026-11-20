@@ -570,16 +570,10 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
           }}
         />
       )}
-      {showSourceStatus &&
-        (!id ||
-          detail?.external_application ||
-          detail?.external_enrollment) && (
-          <PesoVacancySource
-            training={training}
-            onArea={!id ? setSearch : undefined}
-          />
-        )}
-      {message && (
+      {showSourceStatus && !id && (
+        <PesoVacancySource training={training} onArea={setSearch} />
+      )}
+      {message && !detail && (
         <div className="mb-5">
           <Notice>{message}</Notice>
         </div>
@@ -813,6 +807,10 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
             >
               ← Back to catalog
             </Link>
+            {showSourceStatus &&
+              (detail.external_application || detail.external_enrollment) && (
+                <PesoVacancySource training={training} />
+              )}
             {detail &&
               canManageRecord(detail) &&
               (!employer || !detail.external_application) && (
@@ -836,7 +834,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
                 </div>
               )}
 
-            {!previewId && message && <Notice>{message}</Notice>}
+            {message && <Notice>{message}</Notice>}
             {error && (
               <div
                 ref={feedback}

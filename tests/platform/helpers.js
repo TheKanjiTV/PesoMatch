@@ -41,6 +41,20 @@ export async function provisionAndSignIn(account, page, role) {
 export const test = base.extend({
   tourComplete: [true, { option: true }],
   completeProfile: [true, { option: true }],
+  autoDismissAiPrivacy: [true, { option: true }],
+
+  page: async ({ page, autoDismissAiPrivacy }, use) => {
+    if (autoDismissAiPrivacy) {
+      // Routine page checks explicitly continue without external AI. Dedicated
+      // consent tests use their own base fixture and inspect the notice itself.
+      await page.addLocatorHandler(
+        page.getByRole("dialog", { name: "AI privacy & response preferences" }),
+        async (dialog) =>
+          dialog.getByRole("button", { name: "Continue without AI" }).click(),
+      )
+    }
+    await use(page)
+  },
 
   account: async ({ playwright, tourComplete, completeProfile }, use) => {
     const request = await playwright.request.newContext({
@@ -156,4 +170,73 @@ export const test = base.extend({
   },
 
   storageState: async ({ account }, use) => use(account.state),
+
+  workflowCatalog: async ({ account, page }, use) => {
+    let vacancy, program
+    try {
+      await provisionAndSignIn(account, page, "peso_staff")
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      })
+      const description = "Disposable local browser workflow fixture."
+      const vacancyResponse = await apiCall(
+        account.request,
+        "/api/platform/vacancies",
+        "POST",
+        {
+          title: `Browser workflow vacancy ${account.user.id}`,
+          organization: "Synthetic local employer",
+          location: "Mansalay",
+          industry: "Services",
+          employment_type: "Full-time",
+          description,
+          skills: ["Computer Literacy"],
+          slots: 2,
+          deadline: today,
+          status: "published",
+        },
+      )
+      expect(vacancyResponse.status()).toBe(200)
+      vacancy = (await vacancyResponse.json()).data
+      const programResponse = await apiCall(
+        account.request,
+        "/api/platform/training",
+        "POST",
+        {
+          title: `Browser workflow training ${account.user.id}`,
+          provider: "Synthetic local provider",
+          location: "Mansalay",
+          mode: "In person",
+          description,
+          requirements: "Review the synthetic participant's consent.",
+          skills: ["Computer Literacy"],
+          capacity: 2,
+          starts_on: today,
+          ends_on: today,
+          schedule: "Local test schedule",
+          fee: 0,
+          status: "published",
+        },
+      )
+      expect(programResponse.status()).toBe(200)
+      program = (await programResponse.json()).data
+      await provisionAndSignIn(account, page, "jobseeker")
+      await use({ vacancy, program })
+    } finally {
+      if (vacancy || program)
+        execFileSync(
+          "php",
+          [
+            fileURLToPath(
+              new URL("./cleanup-workflow-catalog.php", import.meta.url),
+            ),
+            String(account.user.id),
+            account.email,
+            String(vacancy?.id || 0),
+            String(program?.id || 0),
+          ],
+          { cwd: backend, windowsHide: true, stdio: "pipe" },
+        )
+    }
+  },
 })

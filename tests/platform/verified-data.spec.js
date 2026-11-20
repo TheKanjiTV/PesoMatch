@@ -8,7 +8,9 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
   account,
 }) => {
   const vacancies = (
-    await (await apiCall(account.request, "/api/platform/vacancies")).json()
+    await (
+      await apiCall(account.request, "/api/platform/vacancies?location=Pasay")
+    ).json()
   ).data
 
   const official = vacancies.filter(
@@ -105,9 +107,9 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
     fullPage: true,
   })
 
-  const result = await (await apiCall(account.request, "/api/platform/matches"))
-
-    .json()
+  const result = await (
+    await apiCall(account.request, "/api/platform/matches")
+  ).json()
 
   const matches = result.matches
 
@@ -143,7 +145,7 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
     await page
 
       .getByRole("button", {
-        name: "Skills Development Recommendation",
+        name: "Skills development recommendations",
 
         exact: true,
       })

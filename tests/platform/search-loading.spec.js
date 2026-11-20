@@ -384,7 +384,10 @@ test("record forms expose field errors, keyboard submit, and Escape restores foc
   await page.getByLabel("Employer / organization").fill("Test employer")
   await page.getByLabel("Work location").fill("Manila")
   await page.getByLabel("Industry", { exact: false }).fill("Services")
-  await page.getByLabel("Employment type").selectOption("Full-time")
+  await page
+    .getByRole("dialog")
+    .getByRole("combobox", { name: /^Employment type/ })
+    .selectOption("Full-time")
   await page.getByLabel("Application deadline").fill("2027-01-01")
   await page
     .getByLabel("Required skills (comma separated)")

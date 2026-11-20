@@ -113,6 +113,27 @@ async function workspace(
         },
       })
 
+    if (path === "/api/platform/login-policy")
+      return route.fulfill({
+        json: {
+          stages: [
+            { attempts: 5, lockout_minutes: 15 },
+            { attempts: 3, lockout_minutes: 30 },
+            { attempts: 2, lockout_minutes: 60 },
+          ],
+        },
+      })
+
+    if (path === "/api/platform/ai/status")
+      return route.fulfill({
+        json: {
+          configured: false,
+          notice_version: "cohere-employment-v1",
+          notice:
+            "Synthetic privacy notice. No external AI request is made by this guide test.",
+        },
+      })
+
     if (path === "/api/public/source-coverage")
       return route.fulfill({ json: { review_date: "2026-11-07", sources: [] } })
 
@@ -355,7 +376,7 @@ test("initial shell includes identity and actions, then navigation stays usable 
       .getByRole("navigation", { name: "Employment services", exact: true })
 
       .getByRole("link"),
-  ).toHaveCount(11)
+  ).toHaveCount(13)
 
   await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
 })
@@ -368,7 +389,7 @@ test("loaded shell stays stable across module navigation, searches and cancelled
   await page.emulateMedia({ reducedMotion: "reduce" })
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto("/jobs")
-  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(11)
+  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(13)
   await expect(
     page.locator('[data-skeleton-layout="vacancy-catalog"]'),
   ).toHaveCount(0)
@@ -410,7 +431,7 @@ test("loaded shell stays stable across module navigation, searches and cancelled
   await expect(
     page.getByRole("link", { name: "Public home", exact: true }),
   ).toBeVisible()
-  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(11)
+  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(13)
   await page.screenshot({
     path: "artifacts/workspace-guide/content-only-desktop.png",
   })
@@ -766,6 +787,38 @@ for (const [role, paths] of [
     await expect(page.getByRole("dialog")).toHaveCount(0)
   })
 }
+
+test("AI privacy waits for the active guide and opens without consent after it closes", async ({
+  context,
+  page,
+}) => {
+  const state = await workspace(context, { newUser: true })
+  await page.goto("/dashboard")
+  const guide = page.locator("dialog.workspace-walkthrough")
+  for (let step = 0; step < 3; step++) {
+    await expect(
+      guide.getByRole("button", { name: "Next", exact: true }),
+    ).toBeEnabled()
+    await guide.getByRole("button", { name: "Next", exact: true }).click()
+  }
+  await expect(page).toHaveURL(/\/matches$/)
+  const privacy = page.getByRole("dialog", {
+    name: "AI privacy & response preferences",
+  })
+  await expect(privacy).toHaveCount(0)
+  await expect(
+    guide.getByRole("button", { name: "Next", exact: true }),
+  ).toBeEnabled()
+  await guide.getByRole("button", { name: "Close tutorial" }).click()
+  await expect(privacy).toBeVisible()
+  await expect(
+    privacy.getByRole("checkbox", { name: "I consent", exact: false }),
+  ).not.toBeChecked()
+  await privacy.getByRole("button", { name: "Continue without AI" }).click()
+  expect(
+    state.writes.filter((row) => row.path.startsWith("/api/platform/ai/")),
+  ).toEqual([])
+})
 
 test("training enrollment offers withdrawal without a duplicate delete action", async ({
   context,

@@ -49,6 +49,7 @@ export function Modal({
         </h2>
         <button
           type="button"
+          data-dismiss-dialog
           autoFocus
           disabled={busy}
           onClick={onClose}
