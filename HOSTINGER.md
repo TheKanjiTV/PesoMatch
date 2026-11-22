@@ -49,3 +49,11 @@ An already-reviewed documentation-only commit can be synchronized with `git pull
 Authentication expiry tracking uses `php artisan peso:expire-auth-sessions`. After deploying the archive/authentication migration, run `bash scripts/hostinger-auth-history-cron.sh --plan` and `--apply` from the domain app. This installs a dedicated once-per-minute expiry job, preserves existing cron entries, and saves a private crontab backup. It does not enable the unrelated hourly AI jobs. Errors go to private `storage/logs/auth-expiry-cron.log`. Verify `crontab -l` and run the command once. Request handling also detects expired sessions; browser closure is not reported as logout.
 
 The canonical API is `/api/v1`, with unversioned compatibility routes. The admin workspace's `/archive` restores recoverable accounts and soft-deleted catalog/enrollment records; Account Settings personal-data erasure stays permanent. Catalog restoration returns a draft; account restoration never revives revoked sessions. See `docs/API.md` for the contract and authentication event coverage.
+
+This hosting account does not expose the `crontab` executable over SSH. For background expiry tracking, use hPanel: Websites, Manage site, Cron Jobs, Custom. Set all five schedule fields to `*` (every minute) and use this command:
+
+```sh
+bash /home/u636932635/domains/pesomatch.site/app/scripts/hostinger-auth-expiry-run.sh
+```
+
+The private runner has been prepared for this exact deployment layout. Until the hPanel entry is saved, application requests still record detected inactivity expiry; no background schedule is assumed to exist. Verify the entry and private cron error log after saving. Hostinger documents [creating a cron job](https://www.hostinger.com/support/1583465-how-to-set-up-a-cron-job-at-hostinger/) and [using a shell runner for redirection](https://www.hostinger.com/support/5646919-how-to-set-up-a-cron-job-with-special-characters-at-hostinger/).

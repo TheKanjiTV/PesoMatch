@@ -8,7 +8,12 @@ BACKEND="$HOME/domains/pesomatch.site/app/backend"
 LOG="$HOME/apps/pesomatch/shared/storage/logs/auth-expiry-cron.log"
 [[ -f "$BACKEND/artisan" && -d "$(dirname "$LOG")" ]]
 JOB="* * * * * /opt/alt/php84/usr/bin/php $BACKEND/artisan peso:expire-auth-sessions --quiet >>$LOG 2>&1 # pesomatch-auth-expiry"
-command -v crontab >/dev/null
+if ! command -v crontab >/dev/null; then
+  printf 'SSH crontab is unavailable. In hPanel Cron Jobs, select Custom and schedule every minute (* * * * *):\nbash %s/scripts/hostinger-auth-expiry-run.sh\n' "$HOME/domains/pesomatch.site/app"
+  [[ "$MODE" = --plan ]] && exit 0
+  echo 'No cron job was installed. The hPanel entry must be created separately.' >&2
+  exit 3
+fi
 EXISTING=$(crontab -l 2>/dev/null || true)
 if [[ "$EXISTING" = *"$JOB"* ]]; then echo 'Authentication expiry cron is already configured.'; exit 0; fi
 if [[ "$EXISTING" = *'# pesomatch-auth-expiry'* ]]; then echo 'A different authentication expiry job already exists; inspect before changing it.' >&2; exit 1; fi
