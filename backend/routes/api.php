@@ -69,6 +69,8 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
     Route::get('/jobseekers', [Employment::class, 'registry']);
     Route::get('/users', [Employment::class, 'users']);
     Route::patch('/users/{user}/role', [Employment::class, 'role']);
+    Route::get('/table-settings', [Employment::class, 'tableSettings']);
+    Route::patch('/table-settings', [Employment::class, 'updateTableSettings']);
     Route::get('/login-policy', [Employment::class, 'loginPolicy']);
     Route::patch('/login-policy', [Employment::class, 'updateLoginPolicy']);
     Route::get('/audit', [Employment::class, 'auditLog']);

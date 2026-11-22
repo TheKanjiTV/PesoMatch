@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\TableSetting;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
@@ -60,8 +61,10 @@ class EmploymentMatcher
         return ['score' => (int) round(100 * (.75 * $coverage + .25 * $similarity)), 'matched_skills' => $matched, 'missing_skills' => $missing, 'profile_incomplete' => ! $profile?->profile_completed_at, 'method' => 'content-based-tfidf-v1', 'explanation' => '75% declared skill coverage + 25% TF-IDF profile/occupation similarity. Advisory only; PESO reviews referrals and employers decide hiring.'];
     }
 
-    public function recommendations(User $user, int $page = 1, int $perPage = 100, ?array $semanticScores = null, $candidateSet = null): array
+    public function recommendations(User $user, int $page = 1, ?int $perPage = null, ?array $semanticScores = null, $candidateSet = null): array
     {
+        $configured = TableSetting::perPage();
+        $perPage = max(1, min($perPage ?? $configured, $configured));
         $vacancies = $candidateSet ?? Vacancy::available()->where('is_sample', false)->orderBy('id')->get();
         $corpus = $vacancies->map(fn ($v) => $v->title.' '.$v->industry.' '.$v->description.' '.implode(' ', $v->skills))->all();
         // Compute corpus frequencies once, rather than rescanning every listing

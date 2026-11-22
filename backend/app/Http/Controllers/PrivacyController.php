@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PrivacyRequest;
+use App\Models\TableSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,7 +22,7 @@ class PrivacyController extends Controller
             $q->where('user_id', $r->user()->id);
         }
 
-        return $q->latest()->paginate(30);
+        return $q->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function store(Request $r)

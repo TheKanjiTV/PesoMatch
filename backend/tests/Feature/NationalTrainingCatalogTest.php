@@ -96,7 +96,7 @@ class NationalTrainingCatalogTest extends TestCase
         $this->assertCount(1, $data['matches'][0]['training']);
         $this->assertSame(['Communication'], $data['matches'][0]['training'][0]['addresses']);
         $this->actingAs($user)->getJson('/api/platform/training?page=2')->assertOk()
-            ->assertJsonPath('total', 501)->assertJsonPath('current_page', 2)->assertJsonCount(100, 'data');
+            ->assertJsonPath('total', 501)->assertJsonPath('current_page', 2)->assertJsonCount(20, 'data');
     }
 
     public function test_training_destinations_reject_credentials_duplicate_keys_and_false_hosts(): void

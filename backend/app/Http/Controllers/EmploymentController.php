@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EmploymentOutcome;
 use App\Models\Enrollment;
 use App\Models\LoginPolicy;
+use App\Models\TableSetting;
 use App\Models\Placement;
 use App\Models\PublicResource;
 use App\Models\Referral;
@@ -41,7 +42,7 @@ class EmploymentController extends Controller
     {
         // Preserve accountability without duplicating free-text personal data in logs.
         $summary = ['changed_fields' => array_values(array_diff(array_keys($changes), ['current_password']))];
-        $summary += array_intersect_key($changes, array_flip(['status', 'role', 'consent', 'slots', 'capacity']));
+        $summary += array_intersect_key($changes, array_flip(['status', 'role', 'consent', 'slots', 'capacity', 'rows_per_page']));
         DB::table('audit_events')->insert(['actor_id' => $r->user()->id, 'action' => $action, 'entity' => $row->getTable(), 'entity_id' => $row->id, 'changes' => json_encode($summary), 'created_at' => now()]);
     }
 
@@ -132,7 +133,7 @@ class EmploymentController extends Controller
             default => $q->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest(),
         };
 
-        return $q->orderByDesc('id')->paginate(100);
+        return $q->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function employers(Request $r)
@@ -143,7 +144,7 @@ class EmploymentController extends Controller
 
         return $q->select('organization')->selectRaw('COUNT(*) as vacancy_count')
             ->groupBy('organization')->orderBy('organization', $r->query('sort') === '-title' ? 'desc' : 'asc')
-            ->toBase()->paginate(100);
+            ->toBase()->paginate(TableSetting::perPage());
     }
 
     public function saveVacancy(Request $r, ?Vacancy $vacancy = null)
@@ -199,7 +200,7 @@ class EmploymentController extends Controller
             $q->where('status', $r->query('status'));
         }
 
-        return $q->orderBy('starts_on')->orderBy('title')->orderBy('id')->paginate(100);
+        return $q->orderBy('starts_on')->orderBy('title')->orderBy('id')->paginate(TableSetting::perPage());
     }
 
     public function saveProgram(Request $r, ?TrainingProgram $program = null)
@@ -281,7 +282,7 @@ class EmploymentController extends Controller
             $this->participants($q, $r);
         }
 
-        return $q->latest()->paginate(100);
+        return $q->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function updateReferral(Request $r, Referral $referral)
@@ -365,7 +366,7 @@ class EmploymentController extends Controller
             $this->participants($q, $r);
         }
 
-        return $q->latest()->paginate(100);
+        return $q->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function updateEnrollment(Request $r, Enrollment $enrollment)
@@ -420,7 +421,7 @@ class EmploymentController extends Controller
             $this->participants($q, $r);
         }
 
-        return $q->latest()->paginate(100);
+        return $q->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function place(Request $r, Referral $referral)
@@ -450,7 +451,7 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin']);
 
-        return $this->participants(EmploymentOutcome::with(['user:id,name', 'placement.referral.vacancy']), $r)->orderByDesc('reported_on')->latest()->paginate(100);
+        return $this->participants(EmploymentOutcome::with(['user:id,name', 'placement.referral.vacancy']), $r)->orderByDesc('reported_on')->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function reportOutcome(Request $r)
@@ -490,7 +491,7 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['jobseeker', 'peso_staff', 'admin']);
 
-        return $this->participants(ServiceRequest::with(['user:id,name', 'assignee:id,name']), $r)->latest()->paginate(100);
+        return $this->participants(ServiceRequest::with(['user:id,name', 'assignee:id,name']), $r)->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function requestService(Request $r)
@@ -545,7 +546,7 @@ class EmploymentController extends Controller
             $q->where(fn ($query) => $query->where('status', 'published')->orWhere(fn ($source) => $source->whereNotNull('source_url')->where('status', 'completed')));
         }
 
-        return $q->orderByRaw('CASE WHEN COALESCE(event_date, DATE(starts_at)) >= ? THEN 0 ELSE 1 END', [today()->toDateString()])->orderBy('event_date')->orderBy('starts_at')->paginate(100);
+        return $q->orderByRaw('CASE WHEN COALESCE(event_date, DATE(starts_at)) >= ? THEN 0 ELSE 1 END', [today()->toDateString()])->orderBy('event_date')->orderBy('starts_at')->orderBy('id')->paginate(TableSetting::perPage());
     }
 
     public function saveEvent(Request $r, ?ServiceEvent $event = null)
@@ -585,7 +586,7 @@ class EmploymentController extends Controller
             'jobseekerProfile.education:id,jobseeker_profile_id,highest_attainment',
             'jobseekerProfile.preferences:id,jobseeker_profile_id,preferred_location',
             'jobseekerProfile.preferences.occupations:id,jobseeker_preference_id,value',
-        ])->select('id', 'name', 'email', 'created_at')->latest()->paginate(100);
+        ])->select('id', 'name', 'email', 'created_at')->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
     }
 
     public function createAccount(Request $r)
@@ -606,7 +607,7 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['admin']);
 
-        return User::select('id', 'name', 'email', 'role')->orderBy('name')->paginate(100);
+        return User::select('id', 'name', 'email', 'role')->orderBy('name')->orderBy('id')->paginate(TableSetting::perPage());
     }
 
     public function role(Request $r, User $user)
@@ -623,6 +624,24 @@ class EmploymentController extends Controller
             $this->audit($r, 'user.role_changed', $user, $data);
 
             return response()->json(['message' => 'Access updated.']);
+        });
+    }
+
+    public function tableSettings()
+    {
+        return response()->json(['rows_per_page' => TableSetting::perPage()]);
+    }
+
+    public function updateTableSettings(Request $r)
+    {
+        $this->roles($r, ['admin']);
+        $data = $r->validate(['rows_per_page' => ['required', 'integer', 'between:1,20']]);
+
+        return DB::transaction(function () use ($r, $data) {
+            $settings = TableSetting::updateOrCreate(['id' => TableSetting::ID], ['rows_per_page' => (int) $data['rows_per_page']]);
+            $this->audit($r, 'table_settings.updated', $settings, $data);
+
+            return response()->json(['rows_per_page' => $settings->rows_per_page]);
         });
     }
 
@@ -659,7 +678,7 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['admin']);
 
-        return DB::table('audit_events')->leftJoin('users', 'users.id', '=', 'actor_id')->select('audit_events.*', 'users.name as actor')->orderByDesc('audit_events.id')->paginate(100);
+        return DB::table('audit_events')->leftJoin('users', 'users.id', '=', 'actor_id')->select('audit_events.*', 'users.name as actor')->orderByDesc('audit_events.id')->paginate(TableSetting::perPage());
     }
 
     public function summary(Request $r)

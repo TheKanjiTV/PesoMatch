@@ -84,7 +84,7 @@ class SemanticMatcher
         unset($cache);
         // Reuse the baseline corpus and training workflow; hydrate training only
         // for this result page, not every candidate in the entire catalog.
-        $result = app(EmploymentMatcher::class)->recommendations($user, $page, 100, $scores, $vacancies);
+        $result = app(EmploymentMatcher::class)->recommendations($user, $page, null, $scores, $vacancies);
 
         return array_replace($result, ['method' => 'cohere-semantic-v1', 'model' => config('ai.embedding_model'), 'notice' => 'Cosine relevance (-1 to 1), not hiring probability. Explicit qualifications are separate and unverified.']);
     }

@@ -1,6 +1,11 @@
 import { DeleteDialog } from "./DeleteDialog.jsx"
 
 import { PrivacyRequests } from "./PrivacyRequests.jsx"
+
+import { RecordPages } from "./RecordPages.jsx"
+
+import { TableSettings } from "./TableSettings.jsx"
+
 import { LoginAttemptSettings } from "./LoginAttemptSettings.jsx"
 
 import { useState } from "react"
@@ -499,35 +504,42 @@ export function LaborMarketPage() {
                     Verification is displayed separately. Training completions:{" "}
                     {r.data.training_completions}.
                   </p>
-                  <div className="mt-5 overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                      <thead>
-                        <tr className="border-b border-border text-xs text-muted-foreground">
-                          <th className="py-3 pr-5">Employment status</th>
-                          <th className="py-3 pr-5">Reported jobseekers</th>
-                          <th className="py-3">PESO verified</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {r.data.outcomes.map((o) => (
-                          <tr key={o.status} className="border-b border-border">
-                            <td className="py-4 pr-5">{human(o.status)}</td>
-                            <td className="py-4 pr-5 tabular-nums">
-                              {o.total}
-                            </td>
-                            <td className="py-4 tabular-nums">
-                              {o.verified || 0}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    {!r.data.outcomes.length && (
-                      <p className="py-7 text-sm text-muted-foreground">
-                        No employment outcomes reported yet.
-                      </p>
+                  <RecordPages rows={r.data.outcomes}>
+                    {(rows) => (
+                      <div className="mt-5 overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                          <thead>
+                            <tr className="border-b border-border text-xs text-muted-foreground">
+                              <th className="py-3 pr-5">Employment status</th>
+                              <th className="py-3 pr-5">Reported jobseekers</th>
+                              <th className="py-3">PESO verified</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((o) => (
+                              <tr
+                                key={o.status}
+                                className="border-b border-border"
+                              >
+                                <td className="py-4 pr-5">{human(o.status)}</td>
+                                <td className="py-4 pr-5 tabular-nums">
+                                  {o.total}
+                                </td>
+                                <td className="py-4 tabular-nums">
+                                  {o.verified || 0}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        {!r.data.outcomes.length && (
+                          <p className="py-7 text-sm text-muted-foreground">
+                            No employment outcomes reported yet.
+                          </p>
+                        )}
+                      </div>
                     )}
-                  </div>
+                  </RecordPages>
                 </section>
                 <section className="mt-8">
                   <h2 className="mb-5 font-display text-2xl text-primary">
@@ -722,6 +734,7 @@ export function AccessPage() {
   const r = useResource("/users")
 
   const [adding, setAdding] = useState(false)
+
   const [removing, setRemoving] = useState(null)
 
   const { user } = useAuth()
@@ -758,43 +771,63 @@ export function AccessPage() {
           help="Give the account holder their temporary password through your approved private channel. No email is sent automatically."
           fields={[
             { name: "first_name", label: "First name", maxLength: 80 },
+
             { name: "last_name", label: "Last name", maxLength: 80 },
+
             { name: "email", label: "Email", type: "email", maxLength: 255 },
+
             {
               name: "role",
+
               label: "Account role",
+
               options: Object.entries(roles).map(([value, label]) => ({
                 value,
+
                 label,
               })),
             },
+
             {
               name: "password",
+
               label:
                 "New account password (12+ characters, upper/lower case, number and symbol)",
+
               type: "password",
+
               minLength: 12,
             },
+
             {
               name: "password_confirmation",
+
               label: "Confirm new account password",
+
               type: "password",
+
               minLength: 12,
             },
+
             {
               name: "current_password",
+
               label: "Your administrator password",
+
               type: "password",
             },
           ]}
           onClose={() => setAdding(false)}
           onSave={async (v) => {
             await api("/users", "POST", v)
+
             setMessage("Account created with role-based workspace access.")
+
             await r.reload()
           }}
         />
       )}
+      <TableSettings />
       <LoginAttemptSettings />
       <div className="mb-7 grid gap-3 sm:grid-cols-2">
         {Object.entries(roles).map(([role, label]) => (

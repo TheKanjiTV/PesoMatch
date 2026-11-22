@@ -61,7 +61,7 @@ class VerifiedVacanciesTest extends TestCase
         $response = $this->actingAs($u)->getJson('/api/platform/vacancies')->assertOk();
         $response->assertJsonPath('total', Vacancy::count() - 3);
         $browse = $response->json('data');
-        $this->assertCount(min(100, Vacancy::count() - 3), $browse);
+        $this->assertCount(min(20, Vacancy::count() - 3), $browse);
         $excluded = $rows->take(3)->modelKeys();
         $this->assertSame([], array_values(array_intersect($excluded, array_column($browse, 'id'))));
         $matches = $this->getJson('/api/platform/matches')->assertOk()->json('matches');

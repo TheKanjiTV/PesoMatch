@@ -1,7 +1,13 @@
+import { RecordPages } from "./RecordPages.jsx"
+
 import { AiConsent } from "./AiWorkspace.jsx"
+
 import { Modal } from "./Modal.jsx"
+
 import { TrainingParticipants } from "./TrainingParticipation.jsx"
+
 import { RecordLink as Link } from "./RecordLink.jsx"
+
 import { useEffect, useRef, useState } from "react"
 
 import {
@@ -44,6 +50,7 @@ import {
   MatchesSkeleton,
   TableSkeleton,
 } from "./LoadingStates.jsx"
+
 import {
   EmployerVacancyTable,
   VacancyStatus,
@@ -89,6 +96,7 @@ const F = (name, label, type = "text", extra = {}) => ({
 const statusField = F("status", "Publication status", "text", {
   options: ["draft", "pending_review", "published", "closed"],
 })
+
 const vacancyStatusOptions = Object.entries(vacancyStatuses).map(
   ([value, [label]]) => ({ value, label }),
 )
@@ -198,27 +206,36 @@ const trainingFields = [
 export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
   const { user } = useAuth(),
     paramsId = useParams().id
+
   const id = previewId || paramsId
 
   const navigate = useNavigate()
+
   const [params] = useSearchParams()
 
   const [statusOnly, setStatusOnly] = useState(false)
+
   const [removing, setRemoving] = useState(null)
 
   const [intake, setIntake] = useState(null)
 
   const training = kind === "training"
+
   const employer = !training && user.role === "employer"
+
   const view = ["all", "employers"].includes(params.get("view"))
     ? params.get("view")
     : "mine"
+
   const directory = employer && !id && view === "employers"
+
   const organization =
     employer && view === "all" ? params.get("organization") || "" : ""
+
   const returnQuery = employer
     ? `?${new URLSearchParams({ view, ...(organization && { organization }) })}`
     : ""
+
   const catalogReturn = training ? "/training" : `/jobs${returnQuery}`
 
   const showSourceStatus = training
@@ -239,61 +256,83 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
     [sort, setSort] = useState("newest")
 
   const query = useSearchQuery(search)
+
   const locationQuery = useSearchQuery(location)
 
   const resourcePath = training ? "/training" : "/vacancies"
+
   const request = new URLSearchParams(
     id
       ? { id }
       : {
           search: query,
+
           status: employer && view !== "mine" ? "all" : filter,
+
           ...(training
             ? { catalog: catalogFilter }
             : {
                 availability:
                   employer && view === "mine" ? "all" : availabilityFilter,
               }),
+
           ...(savedOnly && !training && { saved: "1" }),
         },
   )
+
   if (employer) {
     request.set("scope", id || view === "all" ? "all" : "mine")
+
     if (!id && !directory) {
       if (organization) request.set("organization", organization)
+
       if (locationQuery) request.set("location", locationQuery)
+
       if (employment) request.set("employment_type", employment)
+
       request.set("sort", sort)
     }
   }
+
   const r = useResource(
     directory
       ? `/employers?${new URLSearchParams({ search: query, sort: sort === "-title" ? "-title" : "title" })}`
       : `${resourcePath}?${request}`,
   )
+
   const feedback = useRef(null)
+
   useEffect(() => {
     if (error) {
       feedback.current?.focus({ preventScroll: true })
+
       feedback.current?.scrollIntoView({
         block: "start",
+
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
           ? "auto"
           : "smooth",
       })
     }
   }, [error])
+
   const summary = useResource("/summary")
+
   useEffect(() => {
     if (id) return
+
     const refresh = () => r.reload()
+
     window.addEventListener("peso:catalog-changed", refresh)
+
     return () => window.removeEventListener("peso:catalog-changed", refresh)
   }, [id, r.reload])
 
   const staff = staffRole(user.role)
+
   const canManage =
     staff || user.role === (training ? "training_provider" : "employer")
+
   const canManageRecord = (record) =>
     staff || (canManage && record.owner_id === user.id)
 
@@ -306,16 +345,24 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
   useEffect(() => {
     if (!(training && staff && params.get("create") === "training"))
       setEditor(null)
+
     setRemoving(null)
+
     setSearch("")
+
     setFilter("all")
+
     setLocation("")
+
     setEmployment("")
+
     setAvailabilityFilter("all")
+
     setSort("newest")
   }, [view, organization])
 
   const openedDraft = useRef(false)
+
   useEffect(() => {
     if (
       training &&
@@ -324,8 +371,10 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
       !openedDraft.current
     ) {
       openedDraft.current = true
+
       edit({
         title: (params.get("topic") || "").slice(0, 160),
+
         status: "draft",
       })
     }
@@ -338,6 +387,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
 
   function edit(row = {}, statusOnly = false) {
     setStatusOnly(statusOnly)
+
     setEditor({
       ...row,
 
@@ -400,7 +450,9 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
       await api(
         training && row.external_enrollment && !save
           ? "/training-demands"
-          : `${resourcePath}/${row.id}/${save ? "save" : training ? "enroll" : "referrals"}`,
+          : `${resourcePath}/${row.id}/${
+              save ? "save" : training ? "enroll" : "referrals"
+            }`,
 
         save && summary.data?.saved?.includes(row.id) ? "DELETE" : "POST",
 
@@ -434,6 +486,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
 
       if (!save) {
         onPreviewClose?.()
+
         navigate(
           training
             ? row.external_enrollment
@@ -493,7 +546,9 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
         >
           {[
             ["mine", "My vacancies"],
+
             ["all", "All vacancies"],
+
             ["employers", "Employers"],
           ].map(([value, label]) => (
             <Link
@@ -517,6 +572,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
 
             if (id) {
               onPreviewClose?.()
+
               navigate(catalogReturn)
             } else await r.reload()
           }}
@@ -591,26 +647,30 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
       {editor && (
         <Editor
           key={editor.id || "new"}
-          title={`${statusOnly ? "Update status:" : editor.id ? "Edit" : "Add"} ${
-            training ? "training program" : "vacancy"
-          }`}
+          title={`${
+            statusOnly ? "Update status:" : editor.id ? "Edit" : "Add"
+          } ${training ? "training program" : "vacancy"}`}
           initial={editor}
           fields={(statusOnly
             ? [vacancyFields.find((f) => f.name === "status")]
             : training
               ? trainingFields
               : vacancyFields
-          ).map((f) => {
-            if (f.name !== "status" || staff) return f
-            return {
-              ...f,
-              options: training
-                ? ["pending_review", "closed"]
-                : vacancyStatusOptions.filter(
-                    ({ value }) => value !== "published",
-                  ),
-            }
-          })}
+          )
+
+            .map((f) => {
+              if (f.name !== "status" || staff) return f
+
+              return {
+                ...f,
+
+                options: training
+                  ? ["pending_review", "closed"]
+                  : vacancyStatusOptions.filter(
+                      ({ value }) => value !== "published",
+                    ),
+              }
+            })}
           help={
             !staffRole(user.role)
               ? "PESO reviews partner submissions before they appear in the public catalog."
@@ -720,14 +780,17 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
               {(training
                 ? statusField.options.map((value) => ({
                     value,
+
                     label: value.replaceAll("_", " "),
                   }))
                 : vacancyStatusOptions
-              ).map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
+              )
+
+                .map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
             </select>
           )}
           {employer && !directory && (
@@ -748,7 +811,9 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
               >
                 <option value="">All types</option>
                 {vacancyFields
+
                   .find(({ name }) => name === "employment_type")
+
                   .options.map((type) => (
                     <option key={type}>{type}</option>
                   ))}
@@ -1079,10 +1144,12 @@ export function Detail({
                 ],
 
                 ["Schedule", v.schedule],
+
                 ...(!v.external_enrollment
                   ? [
                       [
                         "Enrollment availability",
+
                         `${Math.max(0, v.capacity - Number(v.occupied_places || 0))} available / ${v.capacity} places · ${v.occupied_places || 0} confirmed · ${v.pending_requests || 0} pending review`,
                       ],
                     ]
@@ -1137,12 +1204,14 @@ export function Detail({
                       : "Contact employer",
                 ],
               ]
-          ).map(([k, value]) => (
-            <div key={k}>
-              <dt className="text-xs text-muted-foreground">{k}</dt>
-              <dd className="mt-1 font-medium">{value}</dd>
-            </div>
-          ))}
+          )
+
+            .map(([k, value]) => (
+              <div key={k}>
+                <dt className="text-xs text-muted-foreground">{k}</dt>
+                <dd className="mt-1 font-medium">{value}</dd>
+              </div>
+            ))}
         </dl>
         <div className="mt-7 space-y-3">
           {role === "jobseeker" && (
@@ -1271,35 +1340,65 @@ export function Detail({
 
 export function MatchesPage() {
   const baseline = useResource("/matches")
+
   const aiStatus = useResource("/ai/status")
+
+  const settingsVersion = useRef(baseline.settingsVersion)
+
+  settingsVersion.current = baseline.settingsVersion
+
   const [semantic, setSemantic] = useState(null)
+
   const [semanticBusy, setSemanticBusy] = useState(false)
+
   const [semanticError, setSemanticError] = useState("")
+
   const [aiConsent, setAiConsent] = useState(false)
+
   const [language, setLanguage] = useState("en")
-  async function semanticPage(page = 1) {
-    setSemanticBusy(true)
+
+  useEffect(() => {
+    setSemantic(null)
+
     setSemanticError("")
+  }, [baseline.settingsVersion])
+
+  async function semanticPage(page = 1) {
+    const requestSettingsVersion = settingsVersion.current
+
+    setSemanticBusy(true)
+
+    setSemanticError("")
+
     try {
       const data = await api("/ai/semantic-matches", "POST", {
         consent: aiConsent,
+
         notice_version: aiStatus.data?.notice_version,
+
         language,
+
         page,
       })
-      setSemantic(data)
+
+      if (requestSettingsVersion === settingsVersion.current) setSemantic(data)
     } catch (e) {
       setSemanticError(e.message)
     } finally {
       setSemanticBusy(false)
     }
   }
+
   const r = semantic
     ? {
         data: semantic,
+
         loading: semanticBusy,
+
         error: "",
+
         setPage: semanticPage,
+
         reload: () => semanticPage(semantic.current_page),
       }
     : baseline
@@ -1322,6 +1421,7 @@ export function MatchesPage() {
         consent={aiConsent}
         onConsent={(v) => {
           setAiConsent(v)
+
           if (!v) setSemantic(null)
         }}
         language={language}
@@ -1357,6 +1457,7 @@ export function MatchesPage() {
             disabled={semanticBusy}
             onClick={() => {
               setSemantic(null)
+
               setSemanticError("")
             }}
           >
@@ -1385,7 +1486,11 @@ export function MatchesPage() {
             key={id}
             onClick={() => setTab(id)}
             aria-pressed={tab === id}
-            className={`min-h-12 border-b-2 px-1 py-3 text-sm font-semibold transition-colors ${tab === id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"}`}
+            className={`min-h-12 border-b-2 px-1 py-3 text-sm font-semibold transition-colors ${
+              tab === id
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+            }`}
           >
             {label}
           </button>
@@ -1533,33 +1638,37 @@ export function MatchesPage() {
             {!r.data?.training.length && (
               <Empty title="No published training programs yet" />
             )}
-            {r.data?.training.map(({ program: p, addresses, reason }) => (
-              <article
-                key={p.id}
-                className="rounded-lg border border-border bg-card p-6"
-              >
-                <div className="flex flex-wrap justify-between gap-3">
-                  <h2 className="text-lg font-semibold text-primary">
-                    {p.title}
-                  </h2>
-                  <Sample record={p} />
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {p.provider}
-                </p>
-                <p className="mt-5 text-sm leading-6">{reason}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {addresses.length
-                    ? `Addresses: ${addresses.join(", ")}`
-                    : "General upskilling opportunity"}
-                </p>
-                <div className="mt-5">
-                  <ActionLink to={`/training/${p.id}`} secondary>
-                    Review program & availability
-                  </ActionLink>
-                </div>
-              </article>
-            ))}
+            <RecordPages rows={r.data?.training || []}>
+              {(rows) =>
+                rows.map(({ program: p, addresses, reason }) => (
+                  <article
+                    key={p.id}
+                    className="rounded-lg border border-border bg-card p-6"
+                  >
+                    <div className="flex flex-wrap justify-between gap-3">
+                      <h2 className="text-lg font-semibold text-primary">
+                        {p.title}
+                      </h2>
+                      <Sample record={p} />
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {p.provider}
+                    </p>
+                    <p className="mt-5 text-sm leading-6">{reason}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {addresses.length
+                        ? `Addresses: ${addresses.join(", ")}`
+                        : "General upskilling opportunity"}
+                    </p>
+                    <div className="mt-5">
+                      <ActionLink to={`/training/${p.id}`} secondary>
+                        Review program & availability
+                      </ActionLink>
+                    </div>
+                  </article>
+                ))
+              }
+            </RecordPages>
           </div>
         )}
       </ResourceState>

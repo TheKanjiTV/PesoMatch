@@ -234,10 +234,10 @@ class EmploymentPlatformTest extends TestCase
         $this->vacancy(['is_sample' => true]);
         $this->program();
         $pages = [];
-        for ($page = 1; $page <= 3; $page++) {
+        for ($page = 1; $page <= 11; $page++) {
             $pages[] = $this->actingAs($user)->getJson('/api/platform/matches?page='.$page)
-                ->assertOk()->assertJsonPath('total', 205)->assertJsonPath('last_page', 3)
-                ->assertJsonPath('current_page', $page)->assertJsonCount($page === 3 ? 5 : 100, 'matches')->json();
+                ->assertOk()->assertJsonPath('total', 205)->assertJsonPath('last_page', 11)
+                ->assertJsonPath('current_page', $page)->assertJsonCount($page === 11 ? 5 : 20, 'matches')->json();
         }
         $matches = array_merge(...array_column($pages, 'matches'));
         $ids = array_column(array_column($matches, 'vacancy'), 'id');

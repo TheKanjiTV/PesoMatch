@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
+use App\Models\TableSetting;
 use App\Models\TrainingProgram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class TrainingParticipationController extends Controller
     {
         $this->staff($r);
 
-        return Enrollment::with('user:id,name')->where('training_program_id', $program->id)->orderBy('id')->paginate(100);
+        return Enrollment::with('user:id,name')->where('training_program_id', $program->id)->orderBy('id')->paginate(TableSetting::perPage());
     }
 
     public function store(Request $r, TrainingProgram $program)
@@ -60,10 +61,10 @@ class TrainingParticipationController extends Controller
     {
         abort_unless(in_array($r->user()->role, ['jobseeker', 'peso_staff', 'admin'], true), 403);
         if ($r->user()->role === 'jobseeker') {
-            return response()->json(['data' => DB::table('training_demands')->where('user_id', $r->user()->id)->orderBy('topic')->get()]);
+            return DB::table('training_demands')->where('user_id', $r->user()->id)->orderBy('topic')->orderBy('id')->paginate(TableSetting::perPage());
         }
 
-        return response()->json(['data' => DB::table('training_demands')->select('topic_key')->selectRaw('MIN(topic) as topic, COUNT(DISTINCT user_id) as interested_jobseekers')->groupBy('topic_key')->orderByDesc('interested_jobseekers')->limit(100)->get(), 'note' => 'Planning demand only. Counts do not create or approve a training intake.']);
+        return response()->json(DB::table('training_demands')->select('topic_key')->selectRaw('MIN(topic) as topic, COUNT(DISTINCT user_id) as interested_jobseekers')->groupBy('topic_key')->orderByDesc('interested_jobseekers')->orderBy('topic_key')->paginate(TableSetting::perPage())->toArray() + ['note' => 'Planning demand only. Counts do not create or approve a training intake.']);
     }
 
     public function demand(Request $r)
