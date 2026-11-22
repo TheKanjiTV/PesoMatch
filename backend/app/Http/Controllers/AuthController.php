@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Listeners\AuthenticationActivity;
 use App\Models\User;
 use App\Services\LoginAttempts;
 use App\Services\OnboardingService;
@@ -40,6 +41,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request, LoginAttempts $attempts): JsonResponse
     {
         $guard = Auth::guard('web');
+        $previousUser = $guard->user();
         $guard->setRememberDuration(config('security.remember_minutes'));
 
         try {
@@ -64,6 +66,10 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+
+        if ($previousUser && $previousUser->id !== $guard->user()->id) {
+            app(AuthenticationActivity::class)->record($previousUser, 'auth.logout', ['reason' => 'account_switched']);
+        }
 
         return $this->response($guard->user());
     }

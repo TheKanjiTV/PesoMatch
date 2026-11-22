@@ -17,6 +17,7 @@ import { PrivacyRequests } from "./PrivacyRequests.jsx"
 import { ResumePanel } from "./Resume.jsx"
 
 import { AppearanceSettings } from "./Appearance.jsx"
+import { AccountHistory } from "./AccountHistory.jsx"
 
 import {
   deleteAccount,
@@ -473,6 +474,7 @@ export function AccountPage() {
           </button>
         </div>
       </section>
+      <AccountHistory />
       <PrivacyRequests />
     </>
   )

@@ -35,6 +35,8 @@ import {
   Badge,
   Contact,
   date,
+  dateTime,
+  authenticationAction,
   Editor,
   Empty,
   Heading,
@@ -960,7 +962,7 @@ export function AuditPage() {
     <>
       <Heading
         title="Audit Records"
-        description="Trace who changed catalog records, referrals, enrollment, services, placement, outcomes, and access."
+        description="Review logins, logouts, failed sign-in attempts, and changes to service records and access."
       />
       <ResourceState
         resource={r}
@@ -973,8 +975,14 @@ export function AuditPage() {
             <table className="w-full min-w-[650px] text-left text-sm">
               <thead className="bg-secondary text-xs text-primary">
                 <tr>
-                  {["Date", "Actor", "Action", "Record", "Changes"].map((l) => (
-                    <th key={l} className="p-4">
+                  {[
+                    "Date & time (PHT)",
+                    "Actor / account",
+                    "Action",
+                    "Record",
+                    "Details",
+                  ].map((l) => (
+                    <th key={l} scope="col" className="p-4">
                       {l}
                     </th>
                   ))}
@@ -983,19 +991,26 @@ export function AuditPage() {
               <tbody>
                 {r.data?.data.map((e) => (
                   <tr key={e.id} className="border-t border-border">
-                    <td className="p-4 text-xs">{date(e.created_at)}</td>
+                    <td className="p-4 text-xs tabular-nums">
+                      {dateTime(e.created_at)}
+                    </td>
                     <td className="p-4">
                       {e.actor || "Local operator / removed account"}
                     </td>
-                    <td className="p-4">{e.action}</td>
+                    <td className="p-4">
+                      {authenticationAction(e.action)}
+                      {e.action.startsWith("auth.") && (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {e.action}
+                        </span>
+                      )}
+                    </td>
                     <td className="p-4 text-xs">
                       {e.entity} #{e.entity_id}
                     </td>
                     <td className="max-w-xs p-4 text-xs">
                       <details>
-                        <summary className="min-h-8">
-                          View change details
-                        </summary>
+                        <summary className="min-h-8">View details</summary>
                         <pre className="mt-2 max-w-xs overflow-auto whitespace-pre-wrap break-words">
                           {JSON.stringify(
                             typeof e.changes === "string"

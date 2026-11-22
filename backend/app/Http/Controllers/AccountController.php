@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateAccountRequest;
 use App\Http\Resources\UserResource;
+use App\Listeners\AuthenticationActivity;
 use App\Models\ResumeDocument;
+use App\Models\TableSetting;
 use App\Models\User;
 use App\Rules\PasswordBytes;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +19,31 @@ use Illuminate\Validation\Rules\Password;
 
 class AccountController extends Controller
 {
+    public function history(Request $request): JsonResponse
+    {
+        $events = DB::table('audit_events')
+            ->where('actor_id', $request->user()->id)
+            ->where('entity', 'users')
+            ->whereIn('action', AuthenticationActivity::ACTIONS)
+            ->orderByDesc('id')
+            ->paginate(TableSetting::perPage(), ['id', 'action', 'changes', 'created_at']);
+
+        $events->through(function ($event) {
+            $details = json_decode($event->changes, true);
+
+            return [
+                'id' => $event->id,
+                'action' => $event->action,
+                'created_at' => Carbon::parse($event->created_at)->toIso8601String(),
+                'ip_address' => $details['ip_address'] ?? null,
+                'user_agent' => $details['user_agent'] ?? null,
+                'reason' => $details['reason'] ?? null,
+            ];
+        });
+
+        return response()->json($events);
+    }
+
     public function update(UpdateAccountRequest $request): JsonResponse
     {
         $user = $request->user();

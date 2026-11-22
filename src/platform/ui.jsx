@@ -42,6 +42,30 @@ export const date = (value) =>
       )
     : "Not scheduled"
 
+export const authenticationAction = (action) =>
+  ({
+    "auth.login": "Login",
+    "auth.logout": "Logout",
+    "auth.login_failed": "Failed login",
+  })[action] || action
+
+export const dateTime = (value) => {
+  if (!value) return "Unavailable"
+  // Query-builder audit timestamps use the application's Philippine timezone.
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
+    ? value.replace(" ", "T") + "+08:00"
+    : value
+  return new Date(normalized).toLocaleString("en-PH", {
+    timeZone: "Asia/Manila",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+  })
+}
+
 export const money = (value) =>
   new Intl.NumberFormat("en-PH", {
     style: "currency",

@@ -85,6 +85,7 @@ Route::middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platf
     Route::patch('/auth/password', [AccountController::class, 'password'])->middleware('throttle:6,1');
     Route::delete('/auth/account', [AccountController::class, 'destroy'])->middleware('throttle:6,1');
     Route::get('/auth/user', [AuthController::class, 'user']);
+    Route::get('/auth/history', [AccountController::class, 'history'])->middleware(ValidatePlatformQuery::class);
     Route::patch('/auth/preferences', [AuthController::class, 'preferences']);
     Route::get('/skills', fn () => response()->json(['data' => Skill::orderBy('id')->get(['id', 'name'])]));
     Route::prefix('jobseeker')->middleware('jobseeker')->group(function () {

@@ -14,6 +14,16 @@ Training additionally accepts `catalog=all|registered_program|online_course|over
 
 `GET /api/public/source-coverage` returns the committed review date, source counts, priority-location counts and office coverage limitations. It is throttled to 60 requests/minute and does not probe sources, expose accounts or claim live availability. See [national catalog review](NATIONAL-CATALOG-2026-11-06.md).
 
+### Account activity history
+
+`GET /api/auth/history?page=1` returns only the authenticated account's recorded login, logout, and failed sign-in events, newest first. All account roles can read their own history; client-supplied user IDs cannot select another account. Pagination follows the administrator's global table setting, capped at 20 rows. Records include `id`, `action`, ISO 8601 `created_at` with a timezone offset, `ip_address`, `user_agent`, and optional `reason`.
+
+Laravel web-guard authentication events append `auth.login`, `auth.logout`, and `auth.login_failed` to the existing `audit_events` table. Remember-cookie authentication also records a login. A successful switch to another account records the previous account's logout with `reason=account_switched`; a rejected switch does not log out the current account. Failed credential checks are attached to an existing target account; unknown emails and requests rejected before authentication (validation, throttling, or an existing lockout) do not create account events. Passwords, cookies, session IDs, and authentication tokens are never copied into activity details.
+
+The Account Settings history table displays Philippine time, IP address, and the browser's reported user agent. The administrator's existing `/api/platform/audit` feed includes the same persisted events, with full date and time in the Audit Records table. Failed-login attribution identifies the target account, not a verified actor. IP addresses follow the application's configured trusted-proxy handling; user agents are client-reported.
+
+Recording begins with this release. Earlier unrecorded authentication cannot be reconstructed. Browser closure and passive session expiry do not generate logout events. Explicit logout, account switching, and web-guard logout during self-deletion do; deleting an account leaves its audit entry with a nullable actor link. This change reuses the existing audit table and needs no schema migration.
+
 ## Employment endpoints
 
 Paths below have the `/api/platform` prefix.
