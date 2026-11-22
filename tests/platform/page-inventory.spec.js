@@ -147,7 +147,7 @@ test("training demand records a real topic, keeps it separate from enrollment, a
     .click()
   const dialog = page.getByRole("dialog")
   await dialog
-    .getByRole("textbox", { name: "Training / skill topic", exact: true })
+    .getByRole("textbox", { name: /^Training \/ skill topic/ })
     .fill(topic)
   await dialog.getByRole("button", { name: "Save record", exact: true }).click()
   await expect(dialog).toHaveCount(0)
