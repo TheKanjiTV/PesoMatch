@@ -58,7 +58,7 @@ publicTest(
         await accessible(page)
       }
     }
-    const auth = await request.get("/api/auth/user")
+    const auth = await request.get("/api/v1/auth/user")
     expect(auth.status()).toBe(401)
     expect(auth.headers()["cache-control"]).toContain("no-store")
     expect(auth.headers()["x-frame-options"]).toBe("DENY")
@@ -93,14 +93,14 @@ test("privacy requests stay scoped, render hostile text safely and support keybo
   await accessible(page)
   expect(
     (
-      await apiCall(account.request, "/api/privacy/requests?scope=all")
+      await apiCall(account.request, "/api/v1/privacy/requests?scope=all")
     ).status(),
   ).toBe(403)
   provision(account.email, "admin")
   // Role provisioning revokes sessions, requiring a fresh login.
   expect(
     (
-      await apiCall(account.request, "/api/auth/login", "POST", {
+      await apiCall(account.request, "/api/v1/auth/login", "POST", {
         email: account.email,
         password: account.password,
       })
@@ -133,7 +133,7 @@ publicTest(
   "registration sends explicit terms acknowledgement and an empty bot field",
   async ({ page }) => {
     let payload
-    await page.route("**/api/auth/register", async (route) => {
+    await page.route("**/api/v1/auth/register", async (route) => {
       payload = route.request().postDataJSON()
       await route.fulfill({
         status: 422,

@@ -378,7 +378,7 @@ publicTest(
 
     await page.waitForFunction(() => !!navigator.serviceWorker.controller)
 
-    await page.request.get("/api/public/catalog")
+    await page.request.get("/api/v1/public/catalog")
 
     const cached = await page.evaluate(async () => {
       const names = await caches.keys()
@@ -397,7 +397,7 @@ publicTest(
     })
 
     expect(
-      cached.some((p) => p.startsWith("/api/") || p.startsWith("/sanctum/")),
+      cached.some((p) => p.startsWith("/api/v1/") || p.startsWith("/sanctum/")),
     ).toBe(false)
 
     await context.setOffline(true)

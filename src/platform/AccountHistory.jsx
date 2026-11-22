@@ -17,12 +17,14 @@ export function AccountHistory() {
             Account history
           </h2>
           <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-            Your recorded logins, logouts, and failed sign-in attempts, newest
-            first. Times shown in Philippine time (UTC+8).
+            Registration, sign-ins, lockouts, password changes, session expiry,
+            and access changes for your account, newest first. Times shown in
+            Philippine time (UTC+8).
           </p>
           <p className="mt-2 max-w-prose text-xs text-muted-foreground">
-            Recording starts with this update. Closing a browser or an expired
-            session does not record a logout.
+            Events are recorded from feature activation. Browser closure is not
+            a logout; inactivity expiry is recorded separately when the server
+            detects it.
           </p>
         </div>
         <button
@@ -50,7 +52,7 @@ export function AccountHistory() {
           >
             <table className="w-full min-w-[680px] text-left text-sm">
               <caption className="sr-only">
-                Your login and logout activity
+                Your authentication activity
               </caption>
               <thead className="bg-secondary text-xs text-primary">
                 <tr>
@@ -79,6 +81,16 @@ export function AccountHistory() {
                       {event.reason === "account_switched" && (
                         <span className="mt-1 block text-xs text-muted-foreground">
                           Switched account
+                        </span>
+                      )}
+                      {event.reason && event.reason !== "account_switched" && (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {event.reason.replaceAll("_", " ")}
+                        </span>
+                      )}
+                      {event.method === "remember_cookie" && (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          Remembered sign-in
                         </span>
                       )}
                     </td>

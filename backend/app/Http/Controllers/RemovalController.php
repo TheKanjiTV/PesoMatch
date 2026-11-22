@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Listeners\AuthenticationActivity;
 use App\Models\Enrollment;
-use App\Models\ResumeDocument;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
+use App\Services\AuthenticationSessions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class RemovalController extends Controller
@@ -80,18 +80,17 @@ class RemovalController extends Controller
                 $row->update(['status' => 'withdrawn', 'updated_by' => $r->user()->id]);
             }
             if ($type === 'account') {
-                $resume = ResumeDocument::where('user_id', $id)->first();
-                if ($resume) {
-                    abort_unless(Storage::disk('local')->delete($resume->path), 503, 'The private document could not be removed. Account deletion was stopped.');
-                }
-                DB::table('sessions')->where('user_id', $id)->delete();
+                app(AuthenticationSessions::class)->revoke($row, 'account_archived');
+                $row->forceFill(['archived_at' => now()])->save();
+                app(AuthenticationActivity::class)->record($row, 'auth.account_archived', ['performed_by' => $r->user()->id]);
             }
-            DB::table('audit_events')->insert(['actor_id' => $r->user()->id, 'entity' => $row->getTable(), 'entity_id' => $id, 'action' => $type.'.deleted', 'changes' => json_encode(['removal' => $type === 'account' ? 'account_erasure' : 'soft_delete']), 'created_at' => now()]);
-            if ($type === 'account') DB::table('ai_embeddings')->where('source_type', 'profile')->where('source_id', $id)->delete();
-            $row->delete();
+            DB::table('audit_events')->insert(['actor_id' => $r->user()->id, 'entity' => $row->getTable(), 'entity_id' => $id, 'action' => $type.'.archived', 'changes' => json_encode(['removal' => 'archive']), 'created_at' => now()]);
+            if ($type !== 'account') {
+                $row->delete();
+            }
             $r->session()->forget('removal_intent');
 
-            return response()->json(['message' => $type === 'account' ? 'Account deleted and sessions revoked.' : 'Removed from active records. Linked history is preserved.']);
+            return response()->json(['message' => $type === 'account' ? 'Account archived and sessions revoked. An administrator can restore it from Archive.' : 'Archived. Linked history is preserved; an administrator can restore it from Archive.']);
         });
     }
 }

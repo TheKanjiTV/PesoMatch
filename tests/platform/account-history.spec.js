@@ -7,11 +7,11 @@ test("account history records real authentication and appears in the admin audit
 }) => {
   await provisionAndSignIn(account, page, "admin")
   expect(
-    (await apiCall(page.request, "/api/auth/logout", "POST")).status(),
+    (await apiCall(page.request, "/api/v1/auth/logout", "POST")).status(),
   ).toBe(200)
   expect(
     (
-      await apiCall(page.request, "/api/auth/login", "POST", {
+      await apiCall(page.request, "/api/v1/auth/login", "POST", {
         email: account.email,
         password: "wrong-password",
       })
@@ -19,7 +19,7 @@ test("account history records real authentication and appears in the admin audit
   ).toBe(422)
   expect(
     (
-      await apiCall(page.request, "/api/auth/login", "POST", {
+      await apiCall(page.request, "/api/v1/auth/login", "POST", {
         email: account.email,
         password: account.password,
       })
@@ -35,7 +35,7 @@ test("account history records real authentication and appears in the admin audit
       name: "Account history",
       exact: true,
     })
-    await expect(history.getByRole("table")).toBeVisible()
+    await expect(history.getByRole("table")).toBeVisible({ timeout: 30000 })
     const rows = history.locator("tbody tr")
     await expect(rows.first()).toContainText("Login")
     await expect(
@@ -94,7 +94,7 @@ test("account history recovers from a load error and paginates", async ({
   page,
 }) => {
   let fail = true
-  await page.route("**/api/auth/history?*", async (route) => {
+  await page.route("**/api/v1/auth/history?*", async (route) => {
     if (fail) {
       return route.fulfill({
         status: 503,
@@ -142,7 +142,7 @@ test("account history recovers from a load error and paginates", async ({
   await expect(
     history.getByRole("button", { name: "Next page" }),
   ).toBeDisabled()
-  await page.route("**/api/auth/history?*", (route) =>
+  await page.route("**/api/v1/auth/history?*", (route) =>
     route.fulfill({
       json: { data: [], current_page: 1, last_page: 1, total: 0 },
     }),

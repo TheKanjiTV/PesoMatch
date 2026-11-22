@@ -37,6 +37,9 @@ class SecurityHeaders
             $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
             $response->headers->set('Pragma', 'no-cache');
         }
+        if ($request->is('api/v1/*')) {
+            $response->headers->set('X-API-Version', '1');
+        }
         if (app()->environment('production') && $request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000');
         }

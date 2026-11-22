@@ -1,16 +1,22 @@
 <?php
 
+use App\Models\AiPractice;
 use App\Models\PublicResource;
 use App\Models\ServiceEvent;
 use App\Models\Skill;
 use App\Models\User;
 use App\Models\Vacancy;
+use App\Services\AiProvider;
+use App\Services\AuthenticationSessions;
 use App\Services\ReviewedTrainingImporter;
+use App\Services\SemanticMatcher;
 use App\Services\VacancySources;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schedule;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 Artisan::command('inspire', function () {
 
@@ -53,7 +59,7 @@ Artisan::command('peso:access {email} {role}', function () {
         $previous = $user->role;
 
         $user->forceFill(['role' => $this->argument('role'), 'remember_token' => null])->save();
-        DB::table('sessions')->where('user_id', $user->id)->delete();
+        app(AuthenticationSessions::class)->revoke($user, 'role_provisioned_locally');
 
         DB::table('audit_events')->insert(['actor_id' => null, 'action' => 'user.role_provisioned_locally', 'entity' => 'users', 'entity_id' => $user->id, 'changes' => json_encode(['previous_role' => $previous, 'role' => $user->role]), 'created_at' => now()]);
 
@@ -120,15 +126,26 @@ Artisan::command('peso:import-verified-public-resources', function () {
 
 Artisan::command('peso:ai-index', function () {
     $this->info('Embedding public, published vacancies with '.config('ai.embedding_model').'.');
-    try { $this->info('Updated '.app(\App\Services\SemanticMatcher::class)->index(fn ($count) => $this->info('Indexed '.$count.' changed vacancies.')).' vacancy vectors.'); }
-    catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) { $this->error($e->getMessage()); return 1; }
+    try {
+        $this->info('Updated '.app(SemanticMatcher::class)->index(fn ($count) => $this->info('Indexed '.$count.' changed vacancies.')).' vacancy vectors.');
+    } catch (HttpExceptionInterface $e) {
+        $this->error($e->getMessage());
+
+        return 1;
+    }
 })->purpose('Refresh content-hashed semantic vacancy embeddings (external Cohere inference)');
 
 Artisan::command('peso:ai-prune', function () {
-    $this->info('Expired practices deleted: '.\App\Models\AiPractice::where('expires_at', '<=', now())->delete());
+    $this->info('Expired practices deleted: '.AiPractice::where('expires_at', '<=', now())->delete());
     DB::table('ai_embeddings')->where('source_type', 'profile')->whereNotIn('source_id', User::select('id'))->delete();
 })->purpose('Erase expired encrypted practice transcripts and orphan profile vectors');
 
-\Illuminate\Support\Facades\Schedule::command('peso:ai-prune')->hourly();
+Schedule::command('peso:ai-prune')->hourly();
 
-\Illuminate\Support\Facades\Schedule::command('peso:ai-index')->hourly()->withoutOverlapping()->when(fn () => app(\App\Services\AiProvider::class)->configured());
+Artisan::command('peso:expire-auth-sessions', function (AuthenticationSessions $sessions) {
+    $this->info('Expired authentication sessions recorded: '.$sessions->expire());
+})->purpose('Record inactive tracked sessions once without treating browser closure as logout');
+
+Schedule::command('peso:expire-auth-sessions')->everyMinute()->withoutOverlapping();
+
+Schedule::command('peso:ai-index')->hourly()->withoutOverlapping()->when(fn () => app(AiProvider::class)->configured());

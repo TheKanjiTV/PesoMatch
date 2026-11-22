@@ -23,10 +23,10 @@ export function provision(email, role) {
 export async function provisionAndSignIn(account, page, role) {
   provision(account.email, role)
   // Provisioning intentionally invalidates old sessions; test the new boundary.
-  expect((await apiCall(account.request, "/api/auth/user")).status()).toBe(401)
+  expect((await apiCall(account.request, "/api/v1/auth/user")).status()).toBe(401)
   expect(
     (
-      await apiCall(account.request, "/api/auth/login", "POST", {
+      await apiCall(account.request, "/api/v1/auth/login", "POST", {
         email: account.email,
         password: account.password,
       })
@@ -66,7 +66,7 @@ export const test = base.extend({
 
     expect(
       (
-        await apiCall(request, "/api/auth/register", "POST", {
+        await apiCall(request, "/api/v1/auth/register", "POST", {
           first_name: "Platform",
 
           last_name: "Tester",
@@ -83,7 +83,7 @@ export const test = base.extend({
 
     expect(
       (
-        await apiCall(request, "/api/auth/login", "POST", { email, password })
+        await apiCall(request, "/api/v1/auth/login", "POST", { email, password })
       ).status(),
     ).toBe(200)
 
@@ -113,7 +113,7 @@ export const test = base.extend({
             await apiCall(
               request,
 
-              `/api/jobseeker/onboarding/${section}`,
+              `/api/v1/jobseeker/onboarding/${section}`,
 
               "PATCH",
 
@@ -124,7 +124,7 @@ export const test = base.extend({
 
       expect(
         (
-          await apiCall(request, "/api/jobseeker/onboarding/complete", "POST")
+          await apiCall(request, "/api/v1/jobseeker/onboarding/complete", "POST")
         ).status(),
       ).toBe(200)
     }
@@ -132,13 +132,13 @@ export const test = base.extend({
     if (tourComplete && completeProfile)
       expect(
         (
-          await apiCall(request, "/api/auth/preferences", "PATCH", {
+          await apiCall(request, "/api/v1/auth/preferences", "PATCH", {
             dashboard_tour_completed: true,
           })
         ).status(),
       ).toBe(200)
 
-    const user = (await (await apiCall(request, "/api/auth/user")).json()).user
+    const user = (await (await apiCall(request, "/api/v1/auth/user")).json()).user
 
     await use({
       request,
@@ -181,7 +181,7 @@ export const test = base.extend({
       const description = "Disposable local browser workflow fixture."
       const vacancyResponse = await apiCall(
         account.request,
-        "/api/platform/vacancies",
+        "/api/v1/platform/vacancies",
         "POST",
         {
           title: `Browser workflow vacancy ${account.user.id}`,
@@ -200,7 +200,7 @@ export const test = base.extend({
       vacancy = (await vacancyResponse.json()).data
       const programResponse = await apiCall(
         account.request,
-        "/api/platform/training",
+        "/api/v1/platform/training",
         "POST",
         {
           title: `Browser workflow training ${account.user.id}`,

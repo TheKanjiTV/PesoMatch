@@ -752,7 +752,9 @@ export function AccessPage() {
           record={removing}
           onClose={() => setRemoving(null)}
           onDeleted={async () => {
-            setMessage("Account deleted and sessions revoked.")
+            setMessage(
+              "Account archived and sessions revoked. Restore it from Archive & Restore.",
+            )
 
             await r.reload()
           }}
@@ -760,9 +762,14 @@ export function AccessPage() {
       )}
       <Heading
         action={
-          <button className={addStyle} onClick={() => setAdding(true)}>
-            Add new account
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <Link className={secondaryStyle} to="/archive">
+              Open Archive
+            </Link>
+            <button className={addStyle} onClick={() => setAdding(true)}>
+              Add new account
+            </button>
+          </div>
         }
         title="Account Access & Responsibilities"
         description="Public accounts begin as jobseekers. Only administrators can provision staff and partner access."
@@ -940,7 +947,7 @@ export function AccessPage() {
                         className={`${dangerStyle} ml-2`}
                         onClick={() => setRemoving(u)}
                       >
-                        Delete account
+                        Archive account
                       </button>
                     )}
                   </td>
@@ -956,14 +963,28 @@ export function AccessPage() {
 }
 
 export function AuditPage() {
-  const r = useResource("/audit")
+  const [category, setCategory] = useState("all")
+  const r = useResource(`/audit?category=${category}`)
 
   return (
     <>
       <Heading
         title="Audit Records"
-        description="Review logins, logouts, failed sign-in attempts, and changes to service records and access."
+        description="Review business changes and authentication events, including registration, login, lockout, password changes, session expiry, and access revocation."
       />
+      <label className="mb-6 block max-w-sm text-sm font-semibold">
+        Activity category
+        <select
+          className={`${inputStyle} mt-2`}
+          aria-label="Activity category"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+        >
+          <option value="all">All activities</option>
+          <option value="authentication">Authentication events</option>
+          <option value="business">Business activities</option>
+        </select>
+      </label>
       <ResourceState
         resource={r}
         skeleton={<TableSkeleton kind="audit" columns={5} />}
@@ -995,7 +1016,7 @@ export function AuditPage() {
                       {dateTime(e.created_at)}
                     </td>
                     <td className="p-4">
-                      {e.actor || "Local operator / removed account"}
+                      {e.actor || "System / unknown identity / removed account"}
                     </td>
                     <td className="p-4">
                       {authenticationAction(e.action)}

@@ -77,17 +77,17 @@ test("sign-in keeps the form visible until authentication, then the dashboard us
     route.fulfill({ status: 204 }),
   )
 
-  await page.route("**/api/**", async (route) => {
+  await page.route("**/api/v1/**", async (route) => {
     const path = new URL(route.request().url()).pathname
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill({
         status: 401,
 
         json: { message: "Unauthenticated." },
       })
 
-    if (path === "/api/auth/login") {
+    if (path === "/api/v1/auth/login") {
       await new Promise((resolve) => {
         finishLogin = resolve
       })
@@ -164,11 +164,11 @@ test("staff sign-in shows remaining attempts and unlocks after the countdown", a
   await page.route("**/sanctum/csrf-cookie", (route) =>
     route.fulfill({ status: 204 }),
   )
-  await page.route("**/api/auth/user", (route) =>
+  await page.route("**/api/v1/auth/user", (route) =>
     route.fulfill({ status: 401, json: {} }),
   )
   let requests = 0
-  await page.route("**/api/auth/login", (route) => {
+  await page.route("**/api/v1/auth/login", (route) => {
     requests++
     return requests === 1
       ? route.fulfill({
@@ -221,7 +221,7 @@ test("admin can edit and reload login attempt settings in Account Access", async
   await page.route("**/sanctum/csrf-cookie", (route) =>
     route.fulfill({ status: 204 }),
   )
-  await page.route("**/api/auth/user*", (route) =>
+  await page.route("**/api/v1/auth/user*", (route) =>
     route.fulfill({
       json: {
         user: user("admin"),
@@ -229,10 +229,10 @@ test("admin can edit and reload login attempt settings in Account Access", async
       },
     }),
   )
-  await page.route("**/api/privacy/requests*", (route) =>
+  await page.route("**/api/v1/privacy/requests*", (route) =>
     route.fulfill({ json: { data: [] } }),
   )
-  await page.route("**/api/platform/users?*", (route) =>
+  await page.route("**/api/v1/platform/users?*", (route) =>
     route.fulfill({ json: { data: [user("admin")] } }),
   )
   let stages = [
@@ -240,7 +240,7 @@ test("admin can edit and reload login attempt settings in Account Access", async
     { attempts: 3, lockout_minutes: 10 },
     { attempts: 5, lockout_minutes: 60 },
   ]
-  await page.route("**/api/platform/login-policy*", (route) => {
+  await page.route("**/api/v1/platform/login-policy*", (route) => {
     if (route.request().method() === "PATCH")
       stages = route.request().postDataJSON().stages
     return route.fulfill({ json: { stages } })
@@ -281,7 +281,7 @@ test("admin can edit and reload login attempt settings in Account Access", async
 test("home, login and registration use the PESO logo and never generic card skeletons", async ({
   page,
 }) => {
-  await page.route("**/api/auth/user", (route) =>
+  await page.route("**/api/v1/auth/user", (route) =>
     route.fulfill({ status: 401, json: { message: "Unauthenticated." } }),
   )
 
@@ -317,10 +317,10 @@ test("every workspace resource uses its own layout through a slow request and er
 
   let pending = []
 
-  await page.route("**/api/**", async (route) => {
+  await page.route("**/api/v1/**", async (route) => {
     const path = new URL(route.request().url()).pathname
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill({
         json: {
           user: user(role),
@@ -465,10 +465,10 @@ test("Overview mirrors its banner, pathway, four counters and two content column
 
   let hold = true
 
-  await page.route("**/api/**", async (route) => {
+  await page.route("**/api/v1/**", async (route) => {
     const path = new URL(route.request().url()).pathname
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill({
         json: {
           user: user("admin"),

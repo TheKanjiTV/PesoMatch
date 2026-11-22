@@ -9,7 +9,7 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
 }) => {
   const vacancies = (
     await (
-      await apiCall(account.request, "/api/platform/vacancies?location=Pasay")
+      await apiCall(account.request, "/api/v1/platform/vacancies?location=Pasay")
     ).json()
   ).data
 
@@ -108,7 +108,7 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
   })
 
   const result = await (
-    await apiCall(account.request, "/api/platform/matches")
+    await apiCall(account.request, "/api/v1/platform/matches")
   ).json()
 
   const matches = result.matches
@@ -131,7 +131,7 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
     ).toBeEnabled()
 
     const response = page.waitForResponse((r) =>
-      r.url().includes("/api/platform/matches?page=2"),
+      r.url().includes("/api/v1/platform/matches?page=2"),
     )
 
     await page.getByRole("button", { name: "Next page", exact: true }).click()
@@ -158,7 +158,7 @@ test("official PESO vacancies show provenance, honest metadata and a working sav
   }
 
   const courses = (
-    await (await apiCall(account.request, "/api/platform/training")).json()
+    await (await apiCall(account.request, "/api/v1/platform/training")).json()
   ).data
 
   const unmappedCourse = courses.find(

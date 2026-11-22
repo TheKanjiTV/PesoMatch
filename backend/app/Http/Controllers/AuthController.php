@@ -7,6 +7,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Listeners\AuthenticationActivity;
 use App\Models\User;
+use App\Services\AuthenticationSessions;
 use App\Services\LoginAttempts;
 use App\Services\OnboardingService;
 use Illuminate\Contracts\Cache\LockTimeoutException;
@@ -31,6 +32,7 @@ class AuthController extends Controller
             $user = User::create(['first_name' => $data['first_name'], 'middle_name' => $data['middle_name'] ?? null, 'last_name' => $data['last_name'], 'name' => trim($data['first_name'].' '.$data['last_name']), 'email' => $data['email'], 'password' => $data['password']]);
             $user->forceFill(['terms_accepted_at' => now(), 'terms_version' => config('security.notice_version'), 'privacy_notice_version' => config('security.notice_version')])->save();
             $user->jobseekerProfile()->create(['mobile_number' => $data['mobile_number'] ?? null]);
+            app(AuthenticationActivity::class)->record($user, 'auth.registered');
 
             return $user;
         });
@@ -42,6 +44,7 @@ class AuthController extends Controller
     {
         $guard = Auth::guard('web');
         $previousUser = $guard->user();
+        $previousHash = app(AuthenticationSessions::class)->hash($request->session()->getId());
         $guard->setRememberDuration(config('security.remember_minutes'));
 
         try {
@@ -50,6 +53,8 @@ class AuthController extends Controller
                 fn () => $guard->attempt($request->only('email', 'password'), $request->boolean('remember')),
             );
         } catch (LockTimeoutException) {
+            app(AuthenticationActivity::class)->attempt('auth.login_busy', $request->input('email'));
+
             return response()->json(['message' => 'Sign-in is busy. Please try again shortly.'], 429)
                 ->header('Retry-After', '3');
         }
@@ -68,6 +73,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         if ($previousUser && $previousUser->id !== $guard->user()->id) {
+            app(AuthenticationSessions::class)->endHash($previousHash, 'account_switched');
             app(AuthenticationActivity::class)->record($previousUser, 'auth.logout', ['reason' => 'account_switched']);
         }
 

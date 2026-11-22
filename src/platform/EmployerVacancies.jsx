@@ -123,10 +123,10 @@ export function EmployerVacancyTable({
                         </button>
                         <button
                           className={`${rowAction} action-delete`}
-                          aria-label="Delete vacancy"
+                          aria-label="Archive vacancy"
                           onClick={() => remove(row)}
                         >
-                          Delete
+                          Archive
                         </button>
                       </>
                     )}

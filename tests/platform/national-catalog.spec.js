@@ -75,10 +75,10 @@ const overseas = {
 async function mock(page) {
   await page.emulateMedia({ reducedMotion: "reduce" })
 
-  await page.route("**/api/**", async (route) => {
+  await page.route("**/api/v1/**", async (route) => {
     const url = new URL(route.request().url())
 
-    if (url.pathname === "/api/auth/user")
+    if (url.pathname === "/api/v1/auth/user")
       return route.fulfill({
         json: {
           user: {
@@ -97,10 +97,10 @@ async function mock(page) {
         },
       })
 
-    if (url.pathname === "/api/platform/summary")
+    if (url.pathname === "/api/v1/platform/summary")
       return route.fulfill({ json: { saved: [] } })
 
-    if (url.pathname === "/api/public/source-coverage")
+    if (url.pathname === "/api/v1/public/source-coverage")
       return route.fulfill({
         json: {
           review_date: "2026-11-06",

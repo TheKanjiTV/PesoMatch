@@ -568,7 +568,9 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
           record={removing}
           onClose={() => setRemoving(null)}
           onDeleted={async () => {
-            setMessage("Catalog item deleted. Linked history is preserved.")
+            setMessage(
+              "Catalog item archived. Linked history is preserved; administrators can restore it from Archive & Restore.",
+            )
 
             if (id) {
               onPreviewClose?.()
@@ -894,7 +896,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
                     className={dangerStyle}
                     onClick={() => setRemoving(detail)}
                   >
-                    Delete {training ? "training" : "vacancy"}
+                    Archive {training ? "training" : "vacancy"}
                   </button>
                 </div>
               )}
@@ -1040,7 +1042,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
                             className={dangerStyle}
                             onClick={() => setRemoving(v)}
                           >
-                            Delete {training ? "training" : "vacancy"}
+                            Archive {training ? "training" : "vacancy"}
                           </button>
                         )}
                       </div>

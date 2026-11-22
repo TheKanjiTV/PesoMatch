@@ -58,10 +58,10 @@ test("official PESO details keep application links, provenance and mobile access
 
   await page.emulateMedia({ reducedMotion: "reduce" })
 
-  await page.route("**/api/**", async (route) => {
+  await page.route("**/api/v1/**", async (route) => {
     const path = new URL(route.request().url()).pathname
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill({
         json: {
           user: {
@@ -80,7 +80,7 @@ test("official PESO details keep application links, provenance and mobile access
         },
       })
 
-    if (path === "/api/platform/summary")
+    if (path === "/api/v1/platform/summary")
       return route.fulfill({ json: { saved: [] } })
 
     return route.fulfill({

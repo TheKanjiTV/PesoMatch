@@ -17,9 +17,14 @@ class User extends Authenticatable
 
     protected $hidden = ['password', 'remember_token'];
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('active', fn ($query) => $query->whereNull('users.archived_at'));
+    }
+
     protected function casts(): array
     {
-        return ['email_verified_at' => 'datetime', 'dashboard_tour_completed_at' => 'datetime', 'password' => 'hashed'];
+        return ['email_verified_at' => 'datetime', 'dashboard_tour_completed_at' => 'datetime', 'archived_at' => 'datetime', 'password' => 'hashed'];
     }
 
     public function jobseekerProfile(): HasOne

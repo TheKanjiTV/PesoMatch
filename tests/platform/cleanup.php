@@ -6,7 +6,7 @@ $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 $id = filter_var($argv[1] ?? '', FILTER_VALIDATE_INT);
 $email = $argv[2] ?? '';
 if (! $id || ! preg_match('/^platform\.[0-9]+\.[a-z0-9]+@example\.test$/', $email)) exit(1);
-$user = \App\Models\User::whereKey($id)->where('email', $email)->first();
+$user = \App\Models\User::withoutGlobalScope('active')->whereKey($id)->where('email', $email)->first();
 if ($user) \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
     \Illuminate\Support\Facades\DB::table('sessions')->where('user_id', $user->id)->delete();
     \Illuminate\Support\Facades\DB::table('privacy_requests')->where('user_id', $user->id)->delete();

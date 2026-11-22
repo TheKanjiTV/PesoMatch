@@ -7,14 +7,14 @@ test("dashboard loads only its feature and keeps one authoritative initial auth 
   const requests = []
   page.on("request", (r) => requests.push(new URL(r.url()).pathname))
   await Promise.all([
-    page.waitForResponse((r) => r.url().includes("/api/platform/events")),
+    page.waitForResponse((r) => r.url().includes("/api/v1/platform/events")),
     page.goto("/dashboard"),
   ])
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Welcome")
   for (const path of [
-    "/api/auth/user",
-    "/api/platform/summary",
-    "/api/platform/events",
+    "/api/v1/auth/user",
+    "/api/v1/platform/summary",
+    "/api/v1/platform/events",
   ])
     expect(requests.filter((p) => p === path)).toHaveLength(1)
   expect(
@@ -49,13 +49,13 @@ test("profile review requests the skills lookup only on the skills step", async 
 }) => {
   const reads = []
   page.on("request", (r) => {
-    if (new URL(r.url()).pathname === "/api/skills") reads.push(r.url())
+    if (new URL(r.url()).pathname === "/api/v1/skills") reads.push(r.url())
   })
   await page.goto("/jobseeker/onboarding/1?review=1")
   await expect(page.getByRole("textbox", { name: "First Name", exact: true })).toBeVisible()
   expect(reads).toHaveLength(0)
   const [response] = await Promise.all([
-    page.waitForResponse(r => new URL(r.url()).pathname === "/api/skills"),
+    page.waitForResponse(r => new URL(r.url()).pathname === "/api/v1/skills"),
     page.goto("/jobseeker/onboarding/3?review=1"),
   ])
   expect(response.ok()).toBe(true)

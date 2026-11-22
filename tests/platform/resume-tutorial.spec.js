@@ -130,7 +130,7 @@ test("PDF review persists skills and official courses expose local requests with
   })
 
   const resume = await (
-    await apiCall(account.request, "/api/jobseeker/resume")
+    await apiCall(account.request, "/api/v1/jobseeker/resume")
   ).json()
 
   expect(resume.data.path).toBeUndefined()
@@ -141,7 +141,7 @@ test("PDF review persists skills and official courses expose local requests with
     await (
       await apiCall(
         account.request,
-        "/api/platform/training?catalog=online_course",
+        "/api/v1/platform/training?catalog=online_course",
       )
     ).json()
   ).data
@@ -259,7 +259,7 @@ test("reviewed PDF work and completion certificates save to their separate profi
     .click()
   await expect(dialog).toHaveCount(0)
   await page.reload()
-  const response = await apiCall(account.request, "/api/jobseeker/profile")
+  const response = await apiCall(account.request, "/api/v1/jobseeker/profile")
   const profile = (await response.json()).data
   expect(profile.work_experience.experiences).toEqual(
     expect.arrayContaining([
@@ -368,7 +368,7 @@ test.describe("New user guidance", () => {
     await expect(page.getByRole("dialog")).not.toBeVisible()
 
     expect(
-      (await (await apiCall(account.request, "/api/auth/user")).json()).user
+      (await (await apiCall(account.request, "/api/v1/auth/user")).json()).user
         .dashboard_tour_completed_at,
     ).toBeTruthy()
 

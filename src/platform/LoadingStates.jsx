@@ -167,7 +167,7 @@ export function WorkspaceShellSkeleton({ pathname, role = "jobseeker" }) {
     )
 
   const counts = {
-    admin: 13,
+    admin: 14,
     peso_staff: 11,
     jobseeker: 11,
     employer: 7,
@@ -361,6 +361,8 @@ export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
     content = <TableSkeleton kind="access" columns={4} />
   else if (page === "audit")
     content = <TableSkeleton kind="audit" columns={5} />
+  else if (page === "archive")
+    content = <TableSkeleton kind="archive" columns={5} />
   else if (page === "profile")
     content = (
       <>

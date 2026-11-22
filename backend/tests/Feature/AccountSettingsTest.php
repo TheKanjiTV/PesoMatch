@@ -35,6 +35,7 @@ class AccountSettingsTest extends TestCase
         $this->patchJson('/api/auth/account', [...$data, 'current_password' => 'wrong'])->assertUnprocessable();
         $this->patchJson('/api/auth/account', $data)->assertOk()->assertJsonPath('user.email', 'new@example.test')->assertJsonPath('user.email_verified_at', null)->assertJsonMissingPath('user.password');
         $this->assertDatabaseHas('users', ['id' => $owner->id, 'name' => 'Ana Cruz']);
+        $this->assertDatabaseHas('audit_events', ['actor_id' => $owner->id, 'action' => 'auth.email_changed']);
         $this->assertDatabaseHas('users', ['id' => $other->id, 'email' => $other->email]);
         $this->assertDatabaseHas('jobseeker_profiles', ['user_id' => $owner->id, 'mobile_number' => '+639171234567']);
     }

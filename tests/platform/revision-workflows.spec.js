@@ -59,13 +59,13 @@ async function mock(context, role = "peso_staff", configured = false) {
   await context.route("**/sanctum/csrf-cookie", (r) =>
     r.fulfill({ status: 204 }),
   )
-  await context.route("**/api/**", async (r) => {
+  await context.route("**/api/v1/**", async (r) => {
     const req = r.request(),
       path = new URL(req.url()).pathname
     let json = {}
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       json = { user, onboarding: { completed: true } }
-    else if (path === "/api/platform/summary")
+    else if (path === "/api/v1/platform/summary")
       json = {
         saved: [],
         counts: {},
@@ -75,7 +75,7 @@ async function mock(context, role = "peso_staff", configured = false) {
         services: 0,
       }
     else if (
-      ["/api/platform/matches", "/api/platform/ai/semantic-matches"].includes(
+      ["/api/v1/platform/matches", "/api/v1/platform/ai/semantic-matches"].includes(
         path,
       )
     )
@@ -99,10 +99,10 @@ async function mock(context, role = "peso_staff", configured = false) {
         total: 1,
         model: "embed-multilingual-v3.0",
       }
-    else if (path === "/api/platform/training")
+    else if (path === "/api/v1/platform/training")
       json = list([{ ...program, occupied_places: 1 + participants.length }])
-    else if (path === "/api/platform/vacancies") json = list([vacancy])
-    else if (path === `/api/platform/training/${program.id}/participants`) {
+    else if (path === "/api/v1/platform/vacancies") json = list([vacancy])
+    else if (path === `/api/v1/platform/training/${program.id}/participants`) {
       if (req.method() === "POST")
         participants.push({
           id: 1,
@@ -110,14 +110,14 @@ async function mock(context, role = "peso_staff", configured = false) {
           status: "confirmed",
         })
       json = list(participants)
-    } else if (path === "/api/platform/ai/status")
+    } else if (path === "/api/v1/platform/ai/status")
       json = {
         configured,
         notice_version: "cohere-employment-v1",
         notice:
           "With consent, minimized profile facts and selected vacancy are sent to Cohere.",
       }
-    else if (path === "/api/platform/ai/adviser")
+    else if (path === "/api/v1/platform/ai/adviser")
       json = {
         model: "command-a-03-2025",
         generated: true,
@@ -136,7 +136,7 @@ async function mock(context, role = "peso_staff", configured = false) {
           training: [{ ...program, url: `/training/${program.id}` }],
         },
       }
-    else if (path === "/api/platform/ai/resume-review")
+    else if (path === "/api/v1/platform/ai/resume-review")
       json = {
         model: "command-a-03-2025",
         scope: "Extracted excerpt only.",
@@ -154,7 +154,7 @@ async function mock(context, role = "peso_staff", configured = false) {
           ],
         },
       }
-    else if (path === "/api/platform/ai/interviews") {
+    else if (path === "/api/v1/platform/ai/interviews") {
       practice = {
         id: 99,
         version: 1,
@@ -174,7 +174,7 @@ async function mock(context, role = "peso_staff", configured = false) {
         },
       }
       json = { data: practice }
-    } else if (path === "/api/platform/ai/interviews/99/answer") {
+    } else if (path === "/api/v1/platform/ai/interviews/99/answer") {
       const input = req.postDataJSON()
       practice.transcript.turns.at(-1).answer = input.answer
       const last = practice.version === 5
@@ -201,8 +201,8 @@ async function mock(context, role = "peso_staff", configured = false) {
       practice.version++
       if (last) practice.completed_at = "2026-11-19T00:00:00Z"
       json = { data: practice }
-    } else if (path === "/api/platform/users") json = list([user])
-    else if (path === "/api/platform/login-policy")
+    } else if (path === "/api/v1/platform/users") json = list([user])
+    else if (path === "/api/v1/platform/login-policy")
       json = {
         stages: [
           { attempts: 5, lockout_minutes: 15 },
@@ -210,18 +210,18 @@ async function mock(context, role = "peso_staff", configured = false) {
           { attempts: 2, lockout_minutes: 60 },
         ],
       }
-    else if (path === "/api/platform/referrals")
+    else if (path === "/api/v1/platform/referrals")
       json = list([
         { id: 1, user, vacancy, status: "requested", created_at: "2026-11-19" },
       ])
-    else if (path === "/api/platform/enrollments")
+    else if (path === "/api/v1/platform/enrollments")
       json = list([
         { id: 1, user, program, status: "requested", created_at: "2026-11-19" },
       ])
-    else if (path === "/api/platform/events") json = list([])
-    else if (path === "/api/platform/outcomes") json = list([])
-    else if (path === "/api/platform/placements") json = list([])
-    else if (path === "/api/platform/jobseekers") json = list([])
+    else if (path === "/api/v1/platform/events") json = list([])
+    else if (path === "/api/v1/platform/outcomes") json = list([])
+    else if (path === "/api/v1/platform/placements") json = list([])
+    else if (path === "/api/v1/platform/jobseekers") json = list([])
     return r.fulfill({ json })
   })
   return participants
@@ -356,7 +356,7 @@ test("AI has explicit unavailable state and consent-gated model suggestions on m
     path: "artifacts/revision-2026-11-19/ai-unavailable-mobile.png",
     fullPage: true,
   })
-  await context.unroute("**/api/**")
+  await context.unroute("**/api/v1/**")
   await mock(context, "jobseeker", true)
   await page.reload()
   await page.getByLabel("Selected vacancy").selectOption(String(vacancy.id))
@@ -544,7 +544,7 @@ test("withdrawing a referral hides interview scheduling and omits its date", asy
 }) => {
   await mock(context, "jobseeker")
   let submitted
-  await context.route("**/api/platform/referrals/1", async (route) => {
+  await context.route("**/api/v1/platform/referrals/1", async (route) => {
     submitted = route.request().postDataJSON()
     await route.fulfill({ json: { message: "Referral withdrawn." } })
   })
@@ -571,7 +571,7 @@ test("duplicate referral feedback is focused inside the vacancy modal", async ({
 }) => {
   await mock(context, "jobseeker")
   await context.route(
-    `**/api/platform/vacancies/${vacancy.id}/referrals`,
+    `**/api/v1/platform/vacancies/${vacancy.id}/referrals`,
     (route) =>
       route.fulfill({
         status: 409,

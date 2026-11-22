@@ -26,6 +26,7 @@ import { usesLogoLoading } from "./loading.js"
 
 import {
   ArrowUpRight,
+  ArchiveRestore,
   BookOpen,
   BriefcaseBusiness,
   CalendarDays,
@@ -130,6 +131,7 @@ const nav = [
   ["Account Access", "/users", UsersRound, ["admin"]],
 
   ["Audit Records", "/audit", ShieldCheck, ["admin"]],
+  ["Archive & Restore", "/archive", ArchiveRestore, ["admin"]],
 ]
 
 // CSS visibility transitions may still be hidden in the first animation frame.

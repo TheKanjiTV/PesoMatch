@@ -196,7 +196,7 @@ test("normal catalogs contain real sources and national statistics remain distin
 }) => {
   for (const resource of ["vacancies", "training", "events"]) {
     const rows = (
-      await (await apiCall(account.request, `/api/platform/${resource}`)).json()
+      await (await apiCall(account.request, `/api/v1/platform/${resource}`)).json()
     ).data
     expect(rows.length).toBeGreaterThan(0)
     expect(rows.every((row) => !row.is_sample && row.source_url)).toBe(true)

@@ -68,7 +68,7 @@ test("autocomplete keeps focus, supports keyboard selection and validates withou
 
   await page.emulateMedia({ reducedMotion: "reduce" })
 
-  await page.route("**/api/platform/vacancies?**", async (route) => {
+  await page.route("**/api/v1/platform/vacancies?**", async (route) => {
     searches.push(new URL(route.request().url()).searchParams.get("search"))
 
     await route.fulfill({
@@ -240,7 +240,7 @@ test("slow responses retain skeletons, stale searches cannot replace newer resul
 
   let fail = false
 
-  await page.route("**/api/platform/vacancies?**", async (route) => {
+  await page.route("**/api/v1/platform/vacancies?**", async (route) => {
     const query = new URL(route.request().url()).searchParams.get("search")
 
     if (query === "slow")
@@ -369,7 +369,7 @@ test("record forms expose field errors, keyboard submit, and Escape restores foc
     "true",
   )
 
-  await page.route("**/api/platform/vacancies", (route) =>
+  await page.route("**/api/v1/platform/vacancies", (route) =>
     route.fulfill({
       status: 422,
       json: {

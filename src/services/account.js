@@ -26,6 +26,8 @@ const xsrfCookie = () =>
 const pendingReads = new Map()
 
 export function accountRequest(path, options = {}) {
+  // Keep logical error/session handling identical for canonical and legacy callers.
+  path = path.replace(/^\/api\/v1(?=\/)/, "/api")
   const method = (options.method || "GET").toUpperCase()
 
   if (!["GET", "HEAD"].includes(method)) {
@@ -107,7 +109,8 @@ async function performAccountRequest(
 
     const token = xsrfCookie()?.slice(11)
 
-    const response = await fetch(`${ACCOUNT_ORIGIN}${path}`, {
+    const versionedPath = path.replace(/^\/api\/(?!v1(?:\/|$))/, "/api/v1/")
+    const response = await fetch(`${ACCOUNT_ORIGIN}${versionedPath}`, {
       ...options,
 
       method,

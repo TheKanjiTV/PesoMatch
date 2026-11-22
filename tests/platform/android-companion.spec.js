@@ -24,7 +24,7 @@ test("Android companion browser session works on the local mobile platform", asy
       .first()
       .fill(account.password)
     const [response] = await Promise.all([
-      page.waitForResponse((r) => r.url().endsWith("/api/auth/login")),
+      page.waitForResponse((r) => r.url().endsWith("/api/v1/auth/login")),
       page.getByRole("button", { name: "Log In", exact: true }).click(),
     ])
     expect(response.status()).toBe(200)

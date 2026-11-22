@@ -99,6 +99,8 @@ ln -s "$APP" "$SITE_ROOT/current.next"; mv -Tf "$SITE_ROOT/current.next" "$SITE_
 (cd "$APP/backend"; php artisan optimize:clear; php artisan config:cache; php artisan route:cache; php artisan view:cache; php "$APP/deploy/hostinger-verify.php"; php artisan up)
 cp "$APP/deploy/hostinger-runtime.sh" "$SITE_ROOT/runtime.sh"
 [[ "$(curl --fail --silent --show-error --max-time 25 https://pesomatch.site/api/public/health)" = *'"application":"pesomatch"'* ]]
+[[ "$(curl --fail --silent --show-error --max-time 25 https://pesomatch.site/api/v1/public/health)" = *'"application":"pesomatch"'* ]]
+[[ "$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 25 -H 'Accept: application/json' https://pesomatch.site/api/v1/auth/user)" = 401 ]]
 [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 25 -H 'Accept: application/json' https://pesomatch.site/api/auth/user)" = 401 ]]
 curl --fail --silent --show-error --max-time 25 https://pesomatch.site/ai-workspace >/dev/null
 [[ "$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 25 https://pesomatch.site/.git/config)" = 403 ]]

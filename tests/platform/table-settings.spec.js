@@ -26,15 +26,15 @@ async function fixture(context) {
     route.fulfill({ status: 204 }),
   )
 
-  await context.route("**/api/**", async (route) => {
+  await context.route("**/api/v1/**", async (route) => {
     const request = route.request(),
       url = new URL(request.url()),
       path = url.pathname
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill({ json: { user, onboarding: { completed: true } } })
 
-    if (path === "/api/platform/table-settings") {
+    if (path === "/api/v1/platform/table-settings") {
       if (request.method() === "PATCH") {
         if (state.fail)
           return route.fulfill({
@@ -48,7 +48,7 @@ async function fixture(context) {
       return route.fulfill({ json: { rows_per_page: state.size } })
     }
 
-    if (path === "/api/platform/login-policy")
+    if (path === "/api/v1/platform/login-policy")
       return route.fulfill({
         json: {
           stages: [
@@ -59,7 +59,7 @@ async function fixture(context) {
         },
       })
 
-    if (path === "/api/platform/users") {
+    if (path === "/api/v1/platform/users") {
       const page = Number(url.searchParams.get("page") || 1)
 
       return route.fulfill({
@@ -230,7 +230,7 @@ test("summary tables respect one row per page and keep every status reachable", 
 
   state.size = 1
 
-  await context.route("**/api/platform/labor-market?*", (route) =>
+  await context.route("**/api/v1/platform/labor-market?*", (route) =>
     route.fulfill({
       json: {
         industries: [],

@@ -162,10 +162,10 @@ test("jobseeker screens, details and onboarding fit all required widths", async 
     errors = []
   page.on("pageerror", (error) => errors.push(error.message))
   const jobs = (
-    await (await apiCall(account.request, "/api/platform/vacancies")).json()
+    await (await apiCall(account.request, "/api/v1/platform/vacancies")).json()
   ).data
   const training = (
-    await (await apiCall(account.request, "/api/platform/training")).json()
+    await (await apiCall(account.request, "/api/v1/platform/training")).json()
   ).data
   for (const route of [
     "/dashboard",
@@ -325,7 +325,7 @@ test.describe("Controlled network failures", () => {
     page,
     account,
   }) => {
-    await page.route("**/api/platform/summary*", (route) =>
+    await page.route("**/api/v1/platform/summary*", (route) =>
       route.fulfill({
         status: 503,
         contentType: "application/json",
@@ -340,7 +340,7 @@ test.describe("Controlled network failures", () => {
       "temporarily unavailable",
     )
     await expect(page.getByText(/SQLSTATE/)).toHaveCount(0)
-    await page.unroute("**/api/platform/summary*")
+    await page.unroute("**/api/v1/platform/summary*")
     await page.getByRole("button", { name: "Retry loading" }).click()
     await expect(page.getByRole("alert")).toHaveCount(0)
     await provisionAndSignIn(account, page, "peso_staff")
@@ -350,7 +350,7 @@ test.describe("Controlled network failures", () => {
       .click()
     const form = page.locator("#record-editor form")
     // Exercise the server-validation rendering without submitting an incomplete record.
-    await page.route("**/api/platform/events", (route) =>
+    await page.route("**/api/v1/platform/events", (route) =>
       route.request().method() === "POST"
         ? route.fulfill({
             status: 422,
@@ -407,7 +407,7 @@ test.describe("Controlled network failures", () => {
       page.getByRole("heading", { name: "Vacancy Management", exact: true }),
     ).toBeVisible()
     const reservedEmail = "platform.audit?body=example@example.test"
-    await page.route("**/api/auth/user", async (route) => {
+    await page.route("**/api/v1/auth/user", async (route) => {
       const response = await route.fetch()
       const json = await response.json()
       json.user.email = reservedEmail

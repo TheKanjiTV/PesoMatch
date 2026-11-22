@@ -1,5 +1,6 @@
 import { RecordLink as Link } from "./RecordLink.jsx"
 import { useState } from "react"
+import { DeleteDialog } from "./DeleteDialog.jsx"
 
 import { CollectionNotice } from "./CollectionNotice.jsx"
 
@@ -153,6 +154,7 @@ export function RecordsPage({ kind }) {
   const r = useResource(`/${kind}`)
 
   const [intakeSource, setIntakeSource] = useState(null)
+  const [archiving, setArchiving] = useState(null)
 
   const intakePrograms = useResource(
     staff && intakeSource
@@ -493,6 +495,19 @@ export function RecordsPage({ kind }) {
 
   return (
     <>
+      {archiving && (
+        <DeleteDialog
+          type="enrollment"
+          record={archiving}
+          onClose={() => setArchiving(null)}
+          onDeleted={async () => {
+            setMessage(
+              "Enrollment history archived. An administrator can restore it from Archive & Restore.",
+            )
+            await r.reload()
+          }}
+        />
+      )}
       <Heading
         {...config}
         description={
@@ -793,6 +808,21 @@ export function RecordsPage({ kind }) {
                     )}
                   </div>
                   <div className="mt-5 flex flex-wrap gap-3">
+                    {kind === "enrollments" &&
+                      !jobseeker &&
+                      ["withdrawn", "rejected"].includes(row.status) && (
+                        <button
+                          className={secondaryStyle}
+                          onClick={() =>
+                            setArchiving({
+                              id: row.id,
+                              title: row.program?.title || "this enrollment",
+                            })
+                          }
+                        >
+                          Archive enrollment
+                        </button>
+                      )}
                     {related && (
                       <Link
                         className={`${secondaryStyle} action-view`}

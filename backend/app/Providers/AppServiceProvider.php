@@ -22,7 +22,11 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Logout::class, [AuthenticationActivity::class, 'logout']);
         Event::listen(Failed::class, [AuthenticationActivity::class, 'failed']);
 
-        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
+        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(30)->by($request->ip())->response(function (Request $request, array $headers) {
+            app(AuthenticationActivity::class)->attempt('auth.login_throttled', $request->input('email'));
+
+            return response()->json(['message' => 'Too many sign-in requests. Try again shortly.'], 429, $headers);
+        }));
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('platform', fn (Request $request) => in_array($request->method(), ['GET', 'HEAD'], true)
             ? Limit::perMinute(180)->by('read:'.$request->user()->id)

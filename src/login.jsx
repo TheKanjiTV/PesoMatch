@@ -315,6 +315,15 @@ const router = createBrowserRouter([
 
                 lazy: feature(operations, "AuditPage", {}, ["admin"]),
               },
+              {
+                path: "/archive",
+                lazy: feature(
+                  () => import("./platform/Archive.jsx"),
+                  "ArchivePage",
+                  {},
+                  ["admin"],
+                ),
+              },
 
               {
                 path: "/profile",

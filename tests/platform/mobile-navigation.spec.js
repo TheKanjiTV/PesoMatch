@@ -3,10 +3,10 @@ import { expect, test } from "@playwright/test"
 for (const role of ["jobseeker", "admin"]) {
   test(`mobile navigation for ${role}`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 360, height: 780 })
-    await page.route("**/api/**", (route) => {
+    await page.route("**/api/v1/**", (route) => {
       const path = new URL(route.request().url()).pathname
       return route.fulfill({
-        json: path === "/api/auth/user"
+        json: path === "/api/v1/auth/user"
           ? {
               user: { id: 900001, name: "Mobile Review", role, dashboard_tour_completed_at: "2026-11-06T00:00:00Z" },
               onboarding: { completed: true, current_step: 5 },

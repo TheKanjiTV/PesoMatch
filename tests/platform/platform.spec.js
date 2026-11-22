@@ -241,7 +241,7 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   await expect(page).toHaveURL(/\/referrals$/)
 
   const referralId = (
-    await (await apiCall(account.request, "/api/platform/referrals")).json()
+    await (await apiCall(account.request, "/api/v1/platform/referrals")).json()
   ).data.find((r) => r.vacancy_id === vacancy.id).id
 
   await page.goto("/referrals")
@@ -272,7 +272,7 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   await expect(page).toHaveURL(/\/enrollments$/)
 
   const enrollmentId = (
-    await (await apiCall(account.request, "/api/platform/enrollments")).json()
+    await (await apiCall(account.request, "/api/v1/platform/enrollments")).json()
   ).data.find((r) => r.training_program_id === program.id)?.id
 
   await page.goto("/services")
@@ -466,7 +466,7 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
   ).toBeVisible()
 
   const outcomeId = (
-    await (await apiCall(account.request, "/api/platform/outcomes")).json()
+    await (await apiCall(account.request, "/api/v1/platform/outcomes")).json()
   ).data[0].id
 
   await provisionAndSignIn(account, page, "peso_staff")
@@ -502,7 +502,7 @@ test("staff, employer, provider and administrator workspaces enforce role bounda
 
   await expect(page.getByRole("alert")).toContainText("does not have access")
 
-  expect((await apiCall(account.request, "/api/platform/users")).status()).toBe(
+  expect((await apiCall(account.request, "/api/v1/platform/users")).status()).toBe(
     403,
   )
 
@@ -586,7 +586,7 @@ for (const role of ["jobseeker", "employer", "admin"]) {
 
       const [loginResponse] = await Promise.all([
         page.waitForResponse((response) =>
-          response.url().endsWith("/api/auth/login"),
+          response.url().endsWith("/api/v1/auth/login"),
         ),
 
         page.getByRole("button", { name: "Log In", exact: true }).click(),
@@ -614,7 +614,7 @@ for (const role of ["jobseeker", "employer", "admin"]) {
       const token = (await page.context().cookies(origin)).find(
         (cookie) => cookie.name === "XSRF-TOKEN",
       )?.value
-      const repeatLogin = await page.request.post(`${origin}/api/auth/login`, {
+      const repeatLogin = await page.request.post(`${origin}/api/v1/auth/login`, {
         data: { email: account.email, password: account.password },
         headers: {
           Accept: "application/json",

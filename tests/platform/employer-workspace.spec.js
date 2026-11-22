@@ -56,13 +56,13 @@ test("employer can browse published listings, manage their own postings, and res
   await page.route("**/sanctum/csrf-cookie", (route) =>
     route.fulfill({ status: 204 }),
   )
-  await page.route("**/api/**", async (route) => {
+  await page.route("**/api/v1/**", async (route) => {
     const request = route.request()
     const { pathname, searchParams } = new URL(request.url())
     const method = request.method()
-    if (pathname === "/api/auth/user")
+    if (pathname === "/api/v1/auth/user")
       return route.fulfill({ json: { user: employer } })
-    if (pathname === "/api/platform/summary")
+    if (pathname === "/api/v1/platform/summary")
       return route.fulfill({
         json: {
           saved: [],
@@ -71,11 +71,11 @@ test("employer can browse published listings, manage their own postings, and res
           placements: 0,
         },
       })
-    if (pathname === "/api/platform/employers")
+    if (pathname === "/api/v1/platform/employers")
       return route.fulfill({
         json: list([{ organization: shared.organization, vacancy_count: 1 }]),
       })
-    if (pathname === "/api/platform/vacancies" && method === "POST") {
+    if (pathname === "/api/v1/platform/vacancies" && method === "POST") {
       own = {
         ...request.postDataJSON(),
         id: 93,
@@ -84,11 +84,11 @@ test("employer can browse published listings, manage their own postings, and res
       }
       return route.fulfill({ json: { data: own } })
     }
-    if (pathname === "/api/platform/vacancies/93" && method === "PATCH") {
+    if (pathname === "/api/v1/platform/vacancies/93" && method === "PATCH") {
       own = { ...own, ...request.postDataJSON() }
       return route.fulfill({ json: { data: own } })
     }
-    if (pathname === "/api/platform/vacancies") {
+    if (pathname === "/api/v1/platform/vacancies") {
       if (searchParams.has("id"))
         return route.fulfill({
           json: list(
@@ -103,21 +103,21 @@ test("employer can browse published listings, manage their own postings, and res
         ),
       })
     }
-    if (pathname === "/api/platform/delete-intents") {
+    if (pathname === "/api/v1/platform/delete-intents") {
       expect(request.postDataJSON()).toEqual({ type: "vacancy", id: 93 })
       return route.fulfill({
         json: { token: "fixture-confirmation", wait_seconds: 5 },
       })
     }
-    if (pathname === "/api/platform/remove/vacancy/93" && method === "DELETE") {
+    if (pathname === "/api/v1/platform/remove/vacancy/93" && method === "DELETE") {
       own = null
       return route.fulfill({ json: { message: "Removed" } })
     }
-    if (pathname === "/api/platform/referrals/94" && method === "PATCH") {
+    if (pathname === "/api/v1/platform/referrals/94" && method === "PATCH") {
       Object.assign(referral, request.postDataJSON())
       return route.fulfill({ json: { data: referral } })
     }
-    if (pathname === "/api/platform/referrals")
+    if (pathname === "/api/v1/platform/referrals")
       return route.fulfill({ json: list([referral]) })
     return route.fulfill({ json: list([]) })
   })
@@ -186,12 +186,12 @@ test("employer can browse published listings, manage their own postings, and res
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(390)
-  await row.getByRole("button", { name: "Delete vacancy" }).click()
+  await row.getByRole("button", { name: "Archive vacancy" }).click()
   const confirmation = page.getByRole("dialog")
   await expect(
-    confirmation.getByRole("button", { name: /Delete \(\d+\)/ }),
+    confirmation.getByRole("button", { name: /Archive \(\d+\)/ }),
   ).toBeDisabled()
-  await confirmation.getByRole("button", { name: "Delete item" }).click()
+  await confirmation.getByRole("button", { name: "Archive item" }).click()
   await expect(
     page.getByRole("heading", { name: "No vacancies yet" }),
   ).toBeVisible()
@@ -212,7 +212,7 @@ test("employer can browse published listings, manage their own postings, and res
 test("dark login and registration keep visible primary actions and legible fields", async ({
   page,
 }) => {
-  await page.route("**/api/auth/user", (route) =>
+  await page.route("**/api/v1/auth/user", (route) =>
     route.fulfill({ status: 401, json: {} }),
   )
   await page.setViewportSize({ width: 1440, height: 900 })

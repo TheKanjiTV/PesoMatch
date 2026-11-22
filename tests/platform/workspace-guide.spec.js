@@ -16,7 +16,7 @@ async function workspace(
 
     hold,
 
-    holdPaths: ["/api/platform/vacancies"],
+    holdPaths: ["/api/v1/platform/vacancies"],
 
     pending: [],
 
@@ -55,7 +55,7 @@ async function workspace(
     route.fulfill({ status: 204 }),
   )
 
-  await context.route("**/api/**", async (route) => {
+  await context.route("**/api/v1/**", async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
       path = url.pathname
@@ -69,9 +69,9 @@ async function workspace(
         body: req.postDataJSON(),
       })
 
-      if (path === "/api/auth/preferences") state.complete = true
+      if (path === "/api/v1/auth/preferences") state.complete = true
 
-      if (path === "/api/platform/enrollments/960002")
+      if (path === "/api/v1/platform/enrollments/960002")
         state.enrollmentStatus = req.postDataJSON().status
 
       return route.fulfill({
@@ -79,7 +79,7 @@ async function workspace(
       })
     }
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill({
         json: {
           user: user(),
@@ -91,14 +91,14 @@ async function workspace(
     if (state.holdPaths.includes(path) && state.hold)
       await new Promise((resolve) => state.pending.push(resolve))
 
-    if (path === "/api/platform/vacancies" && state.failed)
+    if (path === "/api/v1/platform/vacancies" && state.failed)
       return route.fulfill({
         status: 503,
 
         json: { message: "Isolated source failure" },
       })
 
-    if (path === "/api/platform/summary")
+    if (path === "/api/v1/platform/summary")
       return route.fulfill({
         json: {
           saved: [],
@@ -113,7 +113,7 @@ async function workspace(
         },
       })
 
-    if (path === "/api/platform/login-policy")
+    if (path === "/api/v1/platform/login-policy")
       return route.fulfill({
         json: {
           stages: [
@@ -124,7 +124,7 @@ async function workspace(
         },
       })
 
-    if (path === "/api/platform/ai/status")
+    if (path === "/api/v1/platform/ai/status")
       return route.fulfill({
         json: {
           configured: false,
@@ -134,10 +134,10 @@ async function workspace(
         },
       })
 
-    if (path === "/api/public/source-coverage")
+    if (path === "/api/v1/public/source-coverage")
       return route.fulfill({ json: { review_date: "2026-11-07", sources: [] } })
 
-    if (path === "/api/jobseeker/profile")
+    if (path === "/api/v1/jobseeker/profile")
       return route.fulfill({
         json: {
           data: {
@@ -160,10 +160,10 @@ async function workspace(
         },
       })
 
-    if (path === "/api/jobseeker/resume")
+    if (path === "/api/v1/jobseeker/resume")
       return route.fulfill({ json: { data: null } })
 
-    if (path === "/api/platform/matches")
+    if (path === "/api/v1/platform/matches")
       return route.fulfill({
         json: {
           matches: [],
@@ -180,7 +180,7 @@ async function workspace(
         },
       })
 
-    if (path === "/api/platform/labor-market")
+    if (path === "/api/v1/platform/labor-market")
       return route.fulfill({
         json: {
           industries: [],
@@ -207,7 +207,7 @@ async function workspace(
         },
       })
 
-    if (path === "/api/platform/enrollments")
+    if (path === "/api/v1/platform/enrollments")
       return route.fulfill({
         json: list([
           {
@@ -414,7 +414,7 @@ test("loaded shell stays stable across module navigation, searches and cancelled
     })
   })
 
-  state.holdPaths = ["/api/platform/training", "/api/platform/vacancies"]
+  state.holdPaths = ["/api/v1/platform/training", "/api/v1/platform/vacancies"]
   state.hold = true
   await page
     .getByRole("navigation", { name: "Employment services", exact: true })
@@ -751,7 +751,7 @@ for (const [role, paths] of [
     await expect.poll(() => state.writes.length).toBe(1)
 
     expect(state.writes[0]).toMatchObject({
-      path: "/api/auth/preferences",
+      path: "/api/v1/auth/preferences",
 
       method: "PATCH",
 
@@ -816,7 +816,7 @@ test("AI privacy waits for the active guide and opens without consent after it c
   ).not.toBeChecked()
   await privacy.getByRole("button", { name: "Continue without AI" }).click()
   expect(
-    state.writes.filter((row) => row.path.startsWith("/api/platform/ai/")),
+    state.writes.filter((row) => row.path.startsWith("/api/v1/platform/ai/")),
   ).toEqual([])
 })
 
@@ -863,7 +863,7 @@ test("training enrollment offers withdrawal without a duplicate delete action", 
 
   expect(state.writes).toEqual([
     {
-      path: "/api/platform/enrollments/960002",
+      path: "/api/v1/platform/enrollments/960002",
 
       method: "PATCH",
 

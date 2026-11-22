@@ -151,12 +151,12 @@ async function mock(context, initial = seeker) {
     last_page: 1,
   })
 
-  await context.route("**/api/**", async (route) => {
+  await context.route("**/api/v1/**", async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
       path = url.pathname
 
-    if (path === "/api/auth/user")
+    if (path === "/api/v1/auth/user")
       return route.fulfill(
         state.user
           ? {
@@ -169,13 +169,13 @@ async function mock(context, initial = seeker) {
           : { status: 401, json: { message: "Unauthenticated" } },
       )
 
-    if (path === "/api/auth/logout") {
+    if (path === "/api/v1/auth/logout") {
       state.user = null
 
       return route.fulfill({ json: {} })
     }
 
-    if (path === "/api/auth/login") {
+    if (path === "/api/v1/auth/login") {
       state.user = req.postDataJSON().email.includes("admin") ? admin : seeker
 
       return route.fulfill({
@@ -183,10 +183,10 @@ async function mock(context, initial = seeker) {
       })
     }
 
-    if (path === "/api/auth/preferences")
+    if (path === "/api/v1/auth/preferences")
       return route.fulfill({ json: { user: state.user } })
 
-    if (path === "/api/platform/summary")
+    if (path === "/api/v1/platform/summary")
       return route.fulfill({
         json: {
           saved: [],
@@ -201,7 +201,7 @@ async function mock(context, initial = seeker) {
         },
       })
 
-    if (path === "/api/public/source-coverage")
+    if (path === "/api/v1/public/source-coverage")
       return route.fulfill({
         json: { review_date: "2026-11-07", sources: [] },
       })
@@ -219,7 +219,7 @@ async function mock(context, initial = seeker) {
       return route.fulfill({ json: { message: "Removed" } })
     }
 
-    if (path === `/api/platform/vacancies/${vacancy.id}/referrals`) {
+    if (path === `/api/v1/platform/vacancies/${vacancy.id}/referrals`) {
       state.referrals.push({
         id: 970010,
 
@@ -237,7 +237,7 @@ async function mock(context, initial = seeker) {
       return route.fulfill({ status: 201, json: { data: state.referrals[0] } })
     }
 
-    if (path === "/api/platform/training-demands") {
+    if (path === "/api/v1/platform/training-demands") {
       if (req.method() === "POST")
         state.demands.push({
           ...req.postDataJSON(),
@@ -246,7 +246,7 @@ async function mock(context, initial = seeker) {
       return route.fulfill({ json: list(state.demands) })
     }
 
-    if (path === `/api/platform/training/${program.id}/enroll`) {
+    if (path === `/api/v1/platform/training/${program.id}/enroll`) {
       state.enrollments.push({
         id: 970011,
 
@@ -266,21 +266,21 @@ async function mock(context, initial = seeker) {
       })
     }
 
-    if (path === "/api/platform/referrals")
+    if (path === "/api/v1/platform/referrals")
       return route.fulfill({ json: list(state.referrals) })
 
-    if (path === "/api/platform/enrollments")
+    if (path === "/api/v1/platform/enrollments")
       return route.fulfill({ json: list(state.enrollments) })
 
-    if (path === "/api/platform/vacancies")
+    if (path === "/api/v1/platform/vacancies")
       return route.fulfill({ json: list(state.deleted ? [] : [vacancy]) })
 
-    if (path === "/api/platform/training")
+    if (path === "/api/v1/platform/training")
       return route.fulfill({
         json: list([program, ...(state.intake ? [state.intake] : [])]),
       })
 
-    if (path === `/api/platform/training/${program.id}/intakes`) {
+    if (path === `/api/v1/platform/training/${program.id}/intakes`) {
       state.intake = {
         ...program,
 
@@ -301,7 +301,7 @@ async function mock(context, initial = seeker) {
     }
 
     if (
-      path === "/api/platform/enrollments/970011" &&
+      path === "/api/v1/platform/enrollments/970011" &&
       req.method() === "PATCH"
     ) {
       const body = req.postDataJSON()
@@ -319,10 +319,10 @@ async function mock(context, initial = seeker) {
       return route.fulfill({ json: { data: state.enrollments[0] } })
     }
 
-    if (path === "/api/platform/users")
+    if (path === "/api/v1/platform/users")
       return route.fulfill({ json: list([seeker, admin]) })
 
-    if (path === "/api/platform/events") {
+    if (path === "/api/v1/platform/events") {
       if (req.method() === "POST") {
         state.events.push({ id: 970020, ...req.postDataJSON() })
 
@@ -495,13 +495,13 @@ test("charcoal theme persists, disabled dropdown prompts cannot be selected, and
 
   await page
 
-    .getByRole("button", { name: "Delete vacancy", exact: true })
+    .getByRole("button", { name: "Archive vacancy", exact: true })
 
     .click()
 
   const dialog = page.getByRole("dialog")
 
-  await expect(dialog.getByRole("button", { name: /Delete/ })).toBeDisabled()
+  await expect(dialog.getByRole("button", { name: /Archive/ })).toBeDisabled()
 
   expect(state.deletes).toBe(0)
 
@@ -514,10 +514,10 @@ test("charcoal theme persists, disabled dropdown prompts cannot be selected, and
   })
 
   await expect(
-    dialog.getByRole("button", { name: "Delete item", exact: true }),
+    dialog.getByRole("button", { name: "Archive item", exact: true }),
   ).toBeEnabled({ timeout: 8000 })
 
-  await dialog.getByRole("button", { name: "Delete item", exact: true }).click()
+  await dialog.getByRole("button", { name: "Archive item", exact: true }).click()
 
   await expect(dialog).toHaveCount(0)
 
@@ -801,7 +801,7 @@ test("quiet action buttons have readable labels in both themes and dark headings
   await page.goto("/jobs")
   const add = page.getByRole("button", { name: "Add vacancy", exact: true })
   const remove = page.getByRole("button", {
-    name: "Delete vacancy",
+    name: "Archive vacancy",
     exact: true,
   })
   const view = page.getByRole("link", { name: "View vacancy", exact: true })

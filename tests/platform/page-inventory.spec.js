@@ -34,7 +34,7 @@ const roleRoutes = {
     "/profile",
   ],
   peso_staff: [...shared, ...staffServices],
-  admin: [...shared, ...staffServices, "/users", "/audit"],
+  admin: [...shared, ...staffServices, "/users", "/audit", "/archive"],
   employer: [...shared, "/referrals", "/placements"],
   training_provider: [...shared, "/enrollments"],
 }
@@ -76,7 +76,7 @@ for (const [role, routes] of Object.entries(roleRoutes)) {
     page.on("pageerror", (error) => errors.push(error.message))
     page.on("response", (response) => {
       const url = new URL(response.url())
-      if (url.pathname.startsWith("/api/") && response.status() >= 400)
+      if (url.pathname.startsWith("/api/v1/") && response.status() >= 400)
         responses.push({ path: url.pathname, status: response.status() })
     })
     for (const width of [1440, 390]) {
@@ -139,7 +139,7 @@ test("training demand records a real topic, keeps it separate from enrollment, a
 }) => {
   const topic = `Synthetic browser training demand ${Date.now()}`
   const before = await (
-    await apiCall(account.request, "/api/platform/enrollments")
+    await apiCall(account.request, "/api/v1/platform/enrollments")
   ).json()
   await page.goto("/training-demand")
   await page
@@ -163,7 +163,7 @@ test("training demand records a real topic, keeps it separate from enrollment, a
     path: "artifacts/page-inventory/training-demand-desktop.png",
   })
   const after = await (
-    await apiCall(account.request, "/api/platform/enrollments")
+    await apiCall(account.request, "/api/v1/platform/enrollments")
   ).json()
   expect(after.total).toBe(before.total)
   await provisionAndSignIn(account, page, "peso_staff")

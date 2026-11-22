@@ -47,6 +47,18 @@ export const authenticationAction = (action) =>
     "auth.login": "Login",
     "auth.logout": "Logout",
     "auth.login_failed": "Failed login",
+    "auth.registered": "Account registered",
+    "auth.lockout": "Account locked",
+    "auth.login_blocked": "Login blocked",
+    "auth.login_throttled": "Sign-in rate limited",
+    "auth.login_busy": "Sign-in busy",
+    "auth.password_changed": "Password changed",
+    "auth.email_changed": "Sign-in email changed",
+    "auth.sessions_revoked": "Sessions revoked",
+    "auth.session_expired": "Session expired",
+    "auth.account_archived": "Account archived",
+    "auth.account_restored": "Account restored",
+    "auth.account_deleted": "Account permanently deleted",
   })[action] || action
 
 export const dateTime = (value) => {

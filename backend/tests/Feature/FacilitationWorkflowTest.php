@@ -10,6 +10,7 @@ use App\Models\Vacancy;
 use App\Services\ReviewedTrainingImporter;
 use App\Services\TrainingSources;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class FacilitationWorkflowTest extends TestCase
@@ -148,7 +149,8 @@ class FacilitationWorkflowTest extends TestCase
         $this->deleteJson('/api/platform/remove/vacancy/'.$v->id, ['confirmation_token' => $token])->assertUnprocessable();
         $this->deleteJson('/api/platform/remove/account/'.$u->id, ['confirmation_token' => $token, 'current_password' => 'wrong'])->assertUnprocessable();
         $this->deleteJson('/api/platform/remove/account/'.$u->id, ['confirmation_token' => $token, 'current_password' => 'SecureTest123!'])->assertOk();
-        $this->assertDatabaseMissing('users', ['id' => $u->id]);
+        $this->assertNotNull(DB::table('users')->where('id', $u->id)->value('archived_at'));
+        $this->assertNull(User::find($u->id));
         $this->postJson('/api/platform/delete-intents', ['type' => 'account', 'id' => $admin->id])->assertForbidden();
     }
 

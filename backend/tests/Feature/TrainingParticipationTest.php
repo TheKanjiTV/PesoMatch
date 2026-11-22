@@ -70,5 +70,6 @@ class TrainingParticipationTest extends TestCase
         $this->postJson('/api/platform/users', array_replace($body, ['current_password' => 'wrong']))->assertUnprocessable();
         $this->postJson('/api/platform/users', $body)->assertCreated()->assertJsonPath('data.role', 'peso_staff')->assertJsonMissingPath('data.password');
         $this->assertDatabaseHas('audit_events', ['action' => 'user.created']);
+        $this->assertDatabaseHas('audit_events', ['action' => 'auth.registered']);
     }
 }

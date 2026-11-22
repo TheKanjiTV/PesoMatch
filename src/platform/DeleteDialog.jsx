@@ -105,15 +105,15 @@ export function DeleteDialog({ type, record, onClose, onDeleted }) {
     >
       <form onSubmit={remove} className="space-y-5">
         <h2 id={heading} className="font-display text-2xl text-primary">
-          Are you sure you want to delete{" "}
+          Are you sure you want to archive{" "}
           {record.title || record.name || "this enrollment"}?
         </h2>
         <p id={help} className="text-sm leading-6 text-muted-foreground">
           {type === "account"
-            ? "This permanently removes the account, private résumé and linked personal service records, and revokes its sessions. This cannot be undone."
+            ? "This disables sign-in and revokes sessions while preserving personal records. An administrator can restore the account from Archive & Restore. Permanent personal-data deletion remains separate in Account Settings."
             : type === "enrollment"
               ? "An active request will be withdrawn and removed from your list. Completed training remains as history."
-              : "This removes the item from the active catalog. Existing referrals and enrollment history are kept. A later source import will not restore this deleted item."}
+              : "This removes the item from the active catalog and preserves linked history. An administrator can restore it as a draft from Archive & Restore. A later source import does not restore it automatically."}
         </p>
         {type === "account" && (
           <label className="block text-sm font-semibold">
@@ -132,8 +132,8 @@ export function DeleteDialog({ type, record, onClose, onDeleted }) {
           {!token
             ? "Preparing confirmation…"
             : remaining
-              ? `Please review this action. Delete unlocks in ${remaining} seconds.`
-              : "You can now confirm deletion."}
+              ? `Please review this action. Archive unlocks in ${remaining} seconds.`
+              : "You can now confirm archiving."}
         </p>
         {error && <Notice error>{error}</Notice>}
         <div className="flex flex-wrap gap-3">
@@ -151,12 +151,10 @@ export function DeleteDialog({ type, record, onClose, onDeleted }) {
             disabled={!token || remaining > 0 || busy}
           >
             {busy
-              ? "Deleting…"
+              ? "Archiving…"
               : remaining
-                ? `Delete (${remaining})`
-                : type === "account"
-                  ? "Delete permanently"
-                  : "Delete item"}
+                ? `Archive (${remaining})`
+                : "Archive item"}
           </button>
         </div>
       </form>

@@ -49,12 +49,18 @@ class AuthenticationHistoryTest extends TestCase
             ->assertJsonPath('data.0.created_at', '2026-11-23T14:15:16+08:00');
     }
 
-    public function test_unknown_credentials_and_unauthenticated_logout_do_not_create_a_fake_account_event(): void
+    public function test_unknown_credentials_are_audited_without_creating_or_exposing_an_account(): void
     {
         $this->getJson('/api/auth/history')->assertUnauthorized();
         $this->postJson('/api/auth/logout')->assertUnauthorized();
         $this->postJson('/api/auth/login', ['email' => 'unknown@example.test', 'password' => 'password'])->assertUnprocessable();
-        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertDatabaseCount('audit_events', 1);
+        $event = DB::table('audit_events')->first();
+        $this->assertNull($event->actor_id);
+        $this->assertSame('authentication', $event->entity);
+        $this->assertSame('auth.login_failed', $event->action);
+        $this->assertStringNotContainsString('unknown@example.test', $event->changes);
+        $this->assertStringNotContainsString('password', $event->changes);
     }
 
     public function test_every_role_can_only_read_its_own_history_with_global_pagination(): void

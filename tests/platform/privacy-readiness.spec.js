@@ -193,7 +193,7 @@ test.describe("Privacy before profile completion", () => {
     ).toBeVisible()
     await expect(opener).toBeFocused()
     await focusedControlVisible(page)
-    expect((await apiCall(account.request, "/api/auth/user")).status()).toBe(
+    expect((await apiCall(account.request, "/api/v1/auth/user")).status()).toBe(
       200,
     )
     const deletion = page.getByRole("button", {

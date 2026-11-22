@@ -9,6 +9,7 @@ use App\Models\ResumeDocument;
 use App\Models\TableSetting;
 use App\Models\User;
 use App\Rules\PasswordBytes;
+use App\Services\AuthenticationSessions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -25,7 +26,7 @@ class AccountController extends Controller
             ->where('actor_id', $request->user()->id)
             ->where('entity', 'users')
             ->whereIn('action', AuthenticationActivity::ACTIONS)
-            ->orderByDesc('id')
+            ->orderByDesc('created_at')->orderByDesc('id')
             ->paginate(TableSetting::perPage(), ['id', 'action', 'changes', 'created_at']);
 
         $events->through(function ($event) {
@@ -38,6 +39,8 @@ class AccountController extends Controller
                 'ip_address' => $details['ip_address'] ?? null,
                 'user_agent' => $details['user_agent'] ?? null,
                 'reason' => $details['reason'] ?? null,
+                'method' => $details['method'] ?? null,
+                'session_count' => $details['session_count'] ?? null,
             ];
         });
 
@@ -49,12 +52,16 @@ class AccountController extends Controller
         $user = $request->user();
         $data = $request->validated();
         DB::transaction(function () use ($user, $data) {
-            if ($user->email !== $data['email']) {
+            $emailChanged = $user->email !== $data['email'];
+            if ($emailChanged) {
                 $user->email_verified_at = null;
             }
             $user->fill(array_intersect_key($data, array_flip(['first_name', 'middle_name', 'last_name', 'email'])));
             $user->name = trim($user->first_name.' '.$user->last_name);
             $user->save();
+            if ($emailChanged) {
+                app(AuthenticationActivity::class)->record($user, 'auth.email_changed');
+            }
             $user->jobseekerProfile()->update(['mobile_number' => $data['mobile_number']]);
         });
 
@@ -65,7 +72,8 @@ class AccountController extends Controller
     {
         $data = $request->validate(['current_password' => ['bail', 'required', 'string', 'current_password:web'], 'password' => ['required', 'string', 'confirmed', Password::min(8), new PasswordBytes]]);
         $request->user()->update(['password' => $data['password'], 'remember_token' => null]);
-        DB::table('sessions')->where('user_id', $request->user()->id)->where('id', '!=', $request->session()->getId())->delete();
+        app(AuthenticationActivity::class)->record($request->user(), 'auth.password_changed');
+        app(AuthenticationSessions::class)->revoke($request->user(), 'password_changed', $request->session()->getId());
         $request->session()->regenerate(true);
 
         return response()->json(['message' => 'Password updated. Other sessions have been signed out.']);
@@ -80,12 +88,13 @@ class AccountController extends Controller
         abort_if($user->role === 'admin' && User::where('role', 'admin')->count() <= 1, 422, 'Assign another administrator before deleting your account.');
         Auth::guard('web')->logout();
         DB::transaction(function () use ($user) {
-            DB::table('sessions')->where('user_id', $user->id)->delete();
+            app(AuthenticationSessions::class)->revoke($user, 'account_deleted');
             $resume = ResumeDocument::where('user_id', $user->id)->first();
             if ($resume) {
                 abort_unless(Storage::disk('local')->delete($resume->path), 503, 'Your document could not be removed. Please try again or contact the operator.');
             }
             DB::table('ai_embeddings')->where('source_type', 'profile')->where('source_id', $user->id)->delete();
+            app(AuthenticationActivity::class)->record($user, 'auth.account_deleted');
             $user->delete();
         });
         $request->session()->invalidate();

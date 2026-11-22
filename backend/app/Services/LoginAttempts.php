@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Listeners\AuthenticationActivity;
 use App\Models\LoginPolicy;
 use App\Models\User;
 use Closure;
@@ -15,11 +16,13 @@ class LoginAttempts
         $email = User::where('email', $email)->value('email') ?? $email;
         $key = 'login-attempts:'.hash_hmac('sha256', strtolower($email), config('app.key'));
 
-        return Cache::lock($key.':lock', 30)->block(3, function () use ($key, $authenticate) {
+        return Cache::lock($key.':lock', 30)->block(3, function () use ($key, $authenticate, $email) {
             $state = Cache::get($key, ['stage' => 0, 'failures' => 0, 'locked_until' => 0]);
             $retryAfter = $state['locked_until'] - now()->timestamp;
 
             if ($retryAfter > 0) {
+                app(AuthenticationActivity::class)->attempt('auth.login_blocked', $email, ['retry_after' => $retryAfter]);
+
                 return ['retry_after' => $retryAfter];
             }
 
@@ -41,6 +44,7 @@ class LoginAttempts
                     'failures' => 0,
                     'locked_until' => now()->timestamp + $retryAfter,
                 ];
+                app(AuthenticationActivity::class)->attempt('auth.lockout', $email, ['retry_after' => $retryAfter]);
             }
 
             Cache::put($key, $state, now()->addSeconds($retryAfter)->addDay());

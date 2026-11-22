@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Listeners\AuthenticationActivity;
 use App\Models\EmploymentOutcome;
 use App\Models\Enrollment;
 use App\Models\LoginPolicy;
-use App\Models\TableSetting;
 use App\Models\Placement;
 use App\Models\PublicResource;
 use App\Models\Referral;
 use App\Models\ServiceEvent;
 use App\Models\ServiceRequest;
+use App\Models\TableSetting;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
 use App\Rules\PasswordBytes;
+use App\Services\AuthenticationSessions;
 use App\Services\EmploymentMatcher;
 use App\Services\TrainingSources;
 use App\Services\VacancySources;
@@ -598,6 +600,7 @@ class EmploymentController extends Controller
             $row = User::create(['name' => $data['first_name'].' '.$data['last_name'], 'first_name' => $data['first_name'], 'last_name' => $data['last_name'], 'email' => strtolower($data['email']), 'password' => $data['password']]);
             $row->forceFill(['role' => $data['role']])->save();
             $this->audit($r, 'user.created', $row, ['role' => $row->role]);
+            app(AuthenticationActivity::class)->record($row, 'auth.registered', ['method' => 'administrator', 'performed_by' => $r->user()->id]);
 
             return response()->json(['data' => $row], 201);
         });
@@ -619,8 +622,7 @@ class EmploymentController extends Controller
 
         return DB::transaction(function () use ($r, $user, $data) {
             $user->forceFill($data)->save();
-            $user->forceFill(['remember_token' => null])->save();
-            DB::table('sessions')->where('user_id', $user->id)->delete();
+            app(AuthenticationSessions::class)->revoke($user, 'role_changed');
             $this->audit($r, 'user.role_changed', $user, $data);
 
             return response()->json(['message' => 'Access updated.']);
@@ -678,7 +680,16 @@ class EmploymentController extends Controller
     {
         $this->roles($r, ['admin']);
 
-        return DB::table('audit_events')->leftJoin('users', 'users.id', '=', 'actor_id')->select('audit_events.*', 'users.name as actor')->orderByDesc('audit_events.id')->paginate(TableSetting::perPage());
+        $r->validate(['category' => ['sometimes', Rule::in(['all', 'authentication', 'business'])]]);
+        $query = DB::table('audit_events')->leftJoin('users', 'users.id', '=', 'actor_id')->select('audit_events.*', 'users.name as actor');
+        if ($r->query('category') === 'authentication') {
+            $query->where('action', 'like', 'auth.%');
+        }
+        if ($r->query('category') === 'business') {
+            $query->where('action', 'not like', 'auth.%');
+        }
+
+        return $query->orderByDesc('audit_events.created_at')->orderByDesc('audit_events.id')->paginate(TableSetting::perPage());
     }
 
     public function summary(Request $r)
