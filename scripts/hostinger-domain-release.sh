@@ -5,6 +5,9 @@ umask 077
 MODE=${1:---plan}; REVISION=${2:-}
 [[ "$MODE" = --plan || "$MODE" = --apply ]] && [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]] || exit 2
 export PATH="/opt/alt/php84/usr/bin:/opt/alt/alt-nodejs24/root/usr/bin:$PATH"
+# Shared hosting counts native worker threads against the account process cap.
+# Bound the independent Rust/Node pools as well as oxlint's CLI thread option.
+export TOKIO_WORKER_THREADS=1 RAYON_NUM_THREADS=1 UV_THREADPOOL_SIZE=1
 pnpm() { corepack pnpm@10.29.3 "$@"; }; export -f pnpm
 export SITE_ROOT="$HOME/apps/pesomatch"
 DOMAIN="$HOME/domains/pesomatch.site"; APP="$DOMAIN/app"; PUBLIC="$DOMAIN/public_html"
