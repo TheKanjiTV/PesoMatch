@@ -153,14 +153,14 @@ test("Later dismisses the same release across reloads while a different release 
     )
   await announce("release-a")
   await expect(
-    page.getByText("A new version is ready. Save your work before reloading."),
+    page.getByText("Save your work, then reload to get the latest version."),
   ).toBeVisible()
   await page.getByRole("button", { name: "Later", exact: true }).click()
   await page.reload()
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
   await announce("release-a")
   await expect(
-    page.getByText("A new version is ready. Save your work before reloading."),
+    page.getByText("Save your work, then reload to get the latest version."),
   ).toHaveCount(0)
   await announce("release-b")
   await expect(

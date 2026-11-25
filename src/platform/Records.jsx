@@ -46,21 +46,21 @@ const configs = {
     title: "Referrals",
 
     description:
-      "PESO reviews requests, refers candidates, and follows employer interview and offer updates.",
+      "",
   },
 
   enrollments: {
     title: "Training Enrollment",
 
     description:
-      "Track applications, PESO-assisted enrollment, confirmed places and training progress.",
+      "",
   },
 
   placements: {
     title: "Employment Facilitation & Placement",
 
     description:
-      "Placements are recorded by PESO after an employer offer and evidence of the employment start.",
+      "",
   },
 
   outcomes: {
@@ -74,7 +74,7 @@ const configs = {
     title: "PESO Services",
 
     description:
-      "Request career counseling, assessments, orientation, livelihood referrals, reintegration, or employment program support.",
+      "",
   },
 }
 
@@ -194,7 +194,7 @@ export function RecordsPage({ kind }) {
       path = `/${kind}/${row?.id}`,
       method = "PATCH",
       heading = "Update record",
-      help = "Every update is saved to Laravel and recorded in the audit log."
+      help = ""
 
     if (kind === "referrals") {
       if (action === "placement") {

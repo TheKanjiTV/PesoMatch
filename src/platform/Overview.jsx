@@ -153,7 +153,7 @@ export function OverviewPage() {
               ? "A service desk for registration, referrals, upskilling, placement, and continued employment support."
               : partner
                 ? "Coordinate with PESO and keep your organization’s service records up to date."
-                : "Your employment journey continues here. Choose the next step that works for you."
+                : ""
           }
           action={
             <div className="flex flex-wrap gap-3">

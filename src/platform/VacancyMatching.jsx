@@ -2,7 +2,7 @@ import { useAiPreferences } from "./AiPreferences.jsx"
 import { useEffect, useState } from "react"
 import { AiConsent } from "./AiWorkspace.jsx"
 import { api, useResource } from "./api.js"
-import { Badge, Notice, secondaryStyle } from "./ui.jsx"
+import { Notice, secondaryStyle } from "./ui.jsx"
 
 export function VacancyMatchTools({ records, onChange }) {
   const status = useResource("/ai/status")
@@ -83,14 +83,22 @@ export function VacancyMatchScore({ record, state }) {
     ? state.scores[record.id]
     : record.assessment?.score
   return (
-    <Badge>
-      <span aria-label="Profile match">
-        {Number.isFinite(value)
-          ? `${value}% match`
-          : state?.loading
-            ? "Matching…"
-            : "Match unavailable"}
-      </span>
-    </Badge>
+    <div
+      aria-label="Profile match"
+      className="vacancy-match shrink-0 text-right text-primary"
+    >
+      {Number.isFinite(value) ? (
+        <>
+          <span className="block text-4xl font-semibold leading-none tabular-nums">
+            {value}%
+          </span>{" "}
+          <span className="mt-2 block text-sm font-semibold">Match</span>
+        </>
+      ) : (
+        <span className="block max-w-24 text-sm">
+          {state?.loading ? "Matching…" : "Match unavailable"}
+        </span>
+      )}
+    </div>
   )
 }

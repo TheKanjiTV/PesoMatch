@@ -337,7 +337,11 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
     staff || (canManage && record.owner_id === user.id)
 
   const records = r.data?.data || []
-  const [matching, setMatching] = useState({ active: false, scores: {}, loading: false })
+  const [matching, setMatching] = useState({
+    active: false,
+    scores: {},
+    loading: false,
+  })
 
   const filtered = records
 
@@ -445,7 +449,9 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
   async function action(row, save = false) {
     if (training && row.external_enrollment && !save) {
       onPreviewClose?.()
-      navigate(`/training-demand?${new URLSearchParams({ topic: row.title, source_program_id: row.id })}`)
+      navigate(
+        `/training-demand?${new URLSearchParams({ topic: row.title, source_program_id: row.id })}`,
+      )
       return
     }
 
@@ -527,14 +533,14 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
           training
             ? user.role === "employer"
               ? "Browse published training and skills development programs. Training providers manage learner enrollment."
-              : "Explore offered training, check places and apply for a scheduled intake. PESO can manage participants and partner programs."
+              : ""
             : detail?.external_application
               ? "Review the official source and plan your application with PESO guidance."
               : directory
                 ? "Browse organizations with published vacancies."
                 : employer
                   ? "Manage your own postings and browse published vacancies. PESO reviews submissions before publication."
-                  : "Discover work opportunities or manage reviewed vacancies for PESO referrals."
+                  : ""
         }
         action={
           !previewId &&
@@ -635,7 +641,9 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
           }}
         />
       )}
-      {!training && user.role === "jobseeker" && <VacancyMatchTools records={records} onChange={setMatching} />}
+      {!training && user.role === "jobseeker" && (
+        <VacancyMatchTools records={records} onChange={setMatching} />
+      )}
       {showSourceStatus && !id && (
         <PesoVacancySource training={training} onArea={setSearch} />
       )}
@@ -986,28 +994,34 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
                     key={v.id}
                     className="flex flex-col rounded-lg border border-border bg-card p-6"
                   >
-                    <div className="flex flex-wrap gap-2">
-                      <Badge>{training ? v.mode : v.employment_type}</Badge>
-                      {!training && <VacancyStatus record={v} />}
-                      {training && canManage && (
-                        <Badge>{v.status.replaceAll("_", " ")}</Badge>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap gap-2">
+                          <Badge>{training ? v.mode : v.employment_type}</Badge>
+                          {!training && <VacancyStatus record={v} />}
+                          {training && canManage && (
+                            <Badge>{v.status.replaceAll("_", " ")}</Badge>
+                          )}
+                          <Sample record={v} />
+                          <Source record={v} />
+                          <Verification record={v} />
+                        </div>
+                        <h2 className="mt-5 text-xl font-semibold text-primary">
+                          <Link
+                            to={`${training ? "/training" : "/jobs"}/${v.id}`}
+                            className="hover:underline underline-offset-4"
+                          >
+                            {v.title}
+                          </Link>
+                        </h2>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          {training ? v.provider : v.organization}
+                        </p>
+                      </div>
+                      {!training && user.role === "jobseeker" && (
+                        <VacancyMatchScore record={v} state={matching} />
                       )}
-                      {!training && user.role === "jobseeker" && <VacancyMatchScore record={v} state={matching} />}
-                      <Sample record={v} />
-                      <Source record={v} />
-                      <Verification record={v} />
                     </div>
-                    <h2 className="mt-5 text-xl font-semibold text-primary">
-                      <Link
-                        to={`${training ? "/training" : "/jobs"}/${v.id}`}
-                        className="hover:underline underline-offset-4"
-                      >
-                        {v.title}
-                      </Link>
-                    </h2>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {training ? v.provider : v.organization}
-                    </p>
                     <p className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
                       <MapPin size={15} />
                       {v.location}
@@ -1091,18 +1105,24 @@ export function Detail({
   return (
     <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
       <article className="rounded-lg border border-border bg-card p-6 sm:p-8">
-        <div className="flex flex-wrap gap-2">
-          <Badge>{training ? v.mode : v.employment_type}</Badge>
-          {!training && <VacancyStatus record={v} />}
-          {!training && role === "jobseeker" && <VacancyMatchScore record={v} state={matching} />}
-          <Sample record={v} />
-          <Source record={v} />
-          <Verification record={v} />
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap gap-2">
+              <Badge>{training ? v.mode : v.employment_type}</Badge>
+              {!training && <VacancyStatus record={v} />}
+              <Sample record={v} />
+              <Source record={v} />
+              <Verification record={v} />
+            </div>
+            <h2 className="mt-5 font-display text-3xl text-primary">
+              {training ? v.provider : v.organization}
+            </h2>
+            <p className="mt-3 text-sm text-muted-foreground">{v.location}</p>
+          </div>
+          {!training && role === "jobseeker" && (
+            <VacancyMatchScore record={v} state={matching} />
+          )}
         </div>
-        <h2 className="mt-5 font-display text-3xl text-primary">
-          {training ? v.provider : v.organization}
-        </h2>
-        <p className="mt-3 text-sm text-muted-foreground">{v.location}</p>
         <h3 className="mt-9 text-base font-semibold">
           {training ? "About this program" : "About this opportunity"}
         </h3>

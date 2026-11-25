@@ -1,3 +1,4 @@
+import { PrivacyLink } from "./PrivacyNotice.jsx"
 import { lazy, Suspense, useEffect, useState } from "react"
 
 import { Link, Navigate, useSearchParams } from "react-router"
@@ -542,7 +543,7 @@ export default function Landing() {
             </p>
           </div>
           <div className="flex flex-wrap gap-6 text-xs text-primary">
-            <Link to="/privacy">Privacy</Link>
+            <PrivacyLink to="/privacy">Privacy</PrivacyLink>
             <Link to="/terms">Terms</Link>
             <Link to="/cookies">Cookies</Link>
             <Link to="/help">Official help</Link>

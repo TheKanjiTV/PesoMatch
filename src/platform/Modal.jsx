@@ -34,9 +34,12 @@ export function Modal({
     <dialog
       ref={ref}
       aria-labelledby={heading}
-      className={`workspace-modal ${size === "compact" ? "workspace-modal-compact" : ""}`}
+      className={`workspace-modal ${
+        size !== "wide" ? `workspace-modal-${size}` : ""
+      }`}
       onCancel={(event) => {
         event.preventDefault()
+        event.stopPropagation()
         if (!busy) onClose()
       }}
     >

@@ -83,3 +83,14 @@
 .workspace-modal-compact .workspace-modal-header h2 { font-family: var(--font-sans); font-size: 1.25rem; line-height: 1.5; }
 
 .practice-actions > button { min-height: 50px; }
+
+.workspace-modal.workspace-modal-form { width: min(880px, calc(100vw - 2rem)); }
+.workspace-modal.workspace-modal-reading { width: min(900px, calc(100vw - 2rem)); }
+.training-step { flex: 1; min-width: 0; position: relative; text-align: center; padding-inline: .25rem; }
+.training-step::after { content: ""; position: absolute; top: 17px; height: 2px; left: calc(50% + 25px); right: calc(-50% + 25px); background: var(--color-border); }
+.training-step:last-child::after { display: none; }
+.training-step[data-state="complete"]::after { background: var(--color-primary); }
+.training-step-circle { position: relative; z-index: 1; margin-inline: auto; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--color-secondary); color: var(--color-muted-foreground); font-size: .875rem; font-weight: 600; }
+.training-step[data-state="complete"] .training-step-circle { background: var(--color-primary); color: var(--color-primary-foreground); }
+.training-step[data-state="current"] .training-step-circle { background: var(--color-primary); color: var(--color-primary-foreground); outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.training-step[data-state="current"] { color: var(--color-primary); }

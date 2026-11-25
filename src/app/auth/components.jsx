@@ -1,3 +1,4 @@
+import { PrivacyLink } from "../../platform/PrivacyNotice.jsx"
 import { useId, useState } from "react"
 
 import { Link } from "react-router"
@@ -399,9 +400,9 @@ export function AuthLayout({
           <div className="mx-auto flex max-w-[640px] flex-wrap items-center justify-between gap-3 border-t border-border pt-5 text-[11px] text-muted-foreground">
             <span>&copy; {new Date().getFullYear()} PesoMatch</span>
             <span className="flex flex-wrap gap-4">
-              <Link className="hover:text-primary" to="/privacy">
+              <PrivacyLink className="hover:text-primary" to="/privacy">
                 Privacy Policy
-              </Link>
+              </PrivacyLink>
               <Link className="hover:text-primary" to="/terms">
                 Terms of Use
               </Link>

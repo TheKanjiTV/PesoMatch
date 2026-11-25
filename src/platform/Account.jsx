@@ -75,7 +75,7 @@ export function ProfilePage() {
     <>
       <Heading
         title="My Jobseeker Profile"
-        description="Keep your skills, education, experience, and preferences current so PESO can support your next step."
+        description=""
       />
       <ResumePanel
         onLoaded={setResume}

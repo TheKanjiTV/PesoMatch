@@ -1,3 +1,4 @@
+import { PrivacyLink } from "./PrivacyNotice.jsx"
 import { AiPreferencesProvider } from "./AiPreferences.jsx"
 import { useEffect, useRef, useState } from "react"
 
@@ -160,7 +161,9 @@ export function PlatformLayout() {
       key={`${user.id}:${user.role}`}
       routePending={navigation.state !== "idle"}
     >
-      <AiPreferencesProvider><WorkspaceFrame /></AiPreferencesProvider>
+      <AiPreferencesProvider>
+        <WorkspaceFrame />
+      </AiPreferencesProvider>
     </WorkspaceLoadingProvider>
   )
 }
@@ -522,11 +525,18 @@ function WorkspaceFrame() {
               ["Cookies", "/cookies"],
 
               ["Official help", "/help"],
-            ].map(([label, to]) => (
-              <Link key={to} to={to} className="underline underline-offset-4">
-                {label}
-              </Link>
-            ))}
+            ].map(([label, to]) => {
+              const FooterLink = to === "/privacy" ? PrivacyLink : Link
+              return (
+                <FooterLink
+                  key={to}
+                  to={to}
+                  className="underline underline-offset-4"
+                >
+                  {label}
+                </FooterLink>
+              )
+            })}
           </div>
         </footer>
       </div>
@@ -541,30 +551,15 @@ function WorkspaceFrame() {
           <>
             {[
               ["Home", "/dashboard", LayoutDashboard],
-
-              [
-                user.role === "training_provider" ? "Programs" : "Jobs",
-
-                user.role === "training_provider" ? "/training" : "/jobs",
-
-                BriefcaseBusiness,
-              ],
-
-              ...(user.role === "jobseeker"
-                ? [["AI Career", "/ai-workspace", BookOpen]]
-                : []),
-
-              [
-                user.role === "employer" ? "Referrals" : "Training",
-
-                user.role === "employer" ? "/referrals" : "/training",
-
-                GraduationCap,
-              ],
-
-              ...(user.role === "jobseeker"
-                ? []
-                : [["Account", "/settings", UserRound]]),
+              user.role === "jobseeker"
+                ? ["AI Career", "/ai-workspace", BookOpen]
+                : user.role === "training_provider"
+                  ? ["Enrollments", "/enrollments", BookOpen]
+                  : ["Account", "/settings", UserRound],
+              ["Vacancy Management", "/jobs", BriefcaseBusiness],
+              user.role === "employer"
+                ? ["Referrals", "/referrals", FileCheck2]
+                : ["Training", "/training", GraduationCap],
             ].map(([label, to, Icon]) => (
               <NavLink
                 key={label}
@@ -573,13 +568,19 @@ function WorkspaceFrame() {
                   [
                     "app-tab",
                     isActive && "app-tab-active",
-
+                    to === "/jobs" && "app-tab-vacancies",
                   ]
                     .filter(Boolean)
                     .join(" ")
                 }
               >
-                <Icon size={21} aria-hidden="true" />
+                {to === "/jobs" ? (
+                  <span className="app-tab-vacancies-icon">
+                    <Icon size={25} aria-hidden="true" />
+                  </span>
+                ) : (
+                  <Icon size={21} aria-hidden="true" />
+                )}
                 <span>{label}</span>
               </NavLink>
             ))}

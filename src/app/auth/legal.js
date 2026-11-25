@@ -13,7 +13,7 @@ export const legalNotices = {
       ],
       [
         "Optional résumé and recommendations",
-        "Uploading a PDF is optional. The server extracts text locally and detects skills and a mobile number for your review; it stores the document, a limited excerpt and detected information. Nothing is automatically added to your profile: choose the detected skills and optionally the phone number to apply. You can remove the résumé separately. No external AI model receives your résumé in this implementation. Matching is an explainable content-based baseline. Scores describe profile-to-listing relevance, not a hiring probability, eligibility determination or employment guarantee. Ask PESO staff to review a suggestion or correct your profile.",
+        "Uploading a PDF is optional. The server extracts text locally and detects skills and a mobile number for your review; it stores the document, a limited excerpt and detected information. Nothing is automatically added to your profile: choose the detected skills and optionally the phone number to apply. You can remove the résumé separately. AI assistance is optional and requires your consent. When enabled, relevant profile details and the selected vacancy are sent to an external AI service; résumé review includes a redacted extracted excerpt, and interview practice includes your answers. Matching uses vector similarity. Scores describe profile-to-listing relevance, not a hiring probability, eligibility determination or employment guarantee. Ask PESO staff to review a suggestion or correct your profile.",
       ],
       [
         "Why information is used",
@@ -25,7 +25,7 @@ export const legalNotices = {
       ],
       [
         "External services",
-        "Source links take you to official PESO job boards, TESDA or another named provider. Visiting or applying there is governed by their notices. PesoMatch does not automatically send your profile to those sites or certify an external enrollment. Fonts and scripts are served locally; no analytics, advertising, marketing email or payment processor is enabled in the active application. The hosting location, processor agreements and any cross-border transfers still need operator assessment.",
+        "Source links take you to official PESO job boards, TESDA or another named provider. Visiting or applying there is governed by their notices. PesoMatch does not automatically send your profile to those sites or certify an external enrollment. Fonts and scripts are served locally; no analytics, advertising, marketing email or payment processor is enabled in the active application. Consented AI assistance shares the relevant profile or excerpt and selected vacancy with an external AI service. The hosting location, processor agreements and any cross-border transfers still need operator assessment.",
       ],
       [
         "Storage and retention",

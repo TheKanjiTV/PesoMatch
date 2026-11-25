@@ -142,7 +142,7 @@ export function TrainingDemandPage() {
       <h1 className="mb-4 font-display text-3xl text-primary">
         Training demand & planning
       </h1>
-      {user.role === "jobseeker" && !adding && (
+      {user.role === "jobseeker" && (
         <button
           className={`${primaryStyle} my-5`}
           onClick={() => setAdding(true)}

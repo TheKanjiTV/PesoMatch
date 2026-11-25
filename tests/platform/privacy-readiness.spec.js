@@ -102,7 +102,7 @@ test("collection notices precede profile resume and service inputs and enrollmen
   await expect(notice).toContainText("under 18")
   await expect(
     notice.getByRole("link", { name: /Read the privacy notice/ }),
-  ).toHaveAttribute("target", "_blank")
+  ).toHaveAttribute("aria-haspopup", "dialog")
   await accessible(page)
   await page.goto("/profile")
   await expect(

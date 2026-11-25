@@ -154,7 +154,7 @@ export function EventsPage() {
     <>
       <Heading
         title="Events & Employment Programs"
-        description="Coordinate job fairs, career orientation, livelihood, reintegration, and SPES / GIP / JobStart assistance."
+        description=""
         action={
           staff && (
             <button

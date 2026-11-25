@@ -25,7 +25,7 @@ for (const role of ["jobseeker", "admin"]) {
     const brandBounds = await brand.boundingBox()
     expect(Math.abs(brandBounds.x + brandBounds.width / 2 - 180)).toBeLessThan(1)
     if (role === "jobseeker") {
-      await expect(nav.getByRole("link")).toHaveText(["Home", "Jobs", "AI Career", "Training"])
+      await expect(nav.getByRole("link")).toHaveText(["Home", "AI Career", "Vacancy Management", "Training"])
       await page.screenshot({ path: testInfo.outputPath("mobile-navigation.png") })
       await matching.click()
       await expect(page).toHaveURL(/\/ai-workspace$/)

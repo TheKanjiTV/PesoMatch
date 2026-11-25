@@ -81,8 +81,10 @@ p { text-wrap: pretty; }
 .install-instructions ol { list-style: decimal; padding-left: 1.2rem; color: var(--muted-foreground); line-height: 1.8; }
 .install-instructions li { padding-left: .4rem; margin-block: .65rem; }
 .connection-notice { display: flex; align-items: center; justify-content: center; gap: .7rem; background: var(--pending-bg); color: var(--pending-text); padding: .8rem 1.2rem; font-weight: 750; font-size: .9rem; }
-.app-update { position: fixed; z-index: 80; bottom: 1rem; right: 1rem; max-width: 26rem; margin-left: 1rem; padding: 1.2rem; background: var(--card); color: var(--foreground); border: 2px solid var(--primary); border-radius: .8rem; box-shadow: 0 8px 30px #001d1b33; }
-.app-update button { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; margin-top: .5rem; margin-right: .75rem; font-weight: 750; text-decoration: underline; }
+.app-update { position: fixed; z-index: 80; bottom: 1.25rem; right: 1.25rem; width: min(26rem, calc(100vw - 2rem)); padding: 1.25rem; background: var(--card); color: var(--foreground); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 10px 32px #001d1b26; }
+.app-update-heading { display: flex; align-items: flex-start; gap: .9rem; }
+.app-update-icon { flex-shrink: 0; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--secondary); color: var(--primary); }
+.app-update button { text-decoration: none; }
 :root[data-contrast="hc2"] .legacy-light-surface { background: var(--muted); }
 :root[data-contrast="hc2"] .legacy-danger-ink { color: var(--error-text); }
 @keyframes account-enter-right { from { transform: translateX(90px); opacity: .4; } to { transform: translateX(0); opacity: 1; } }
@@ -101,11 +103,13 @@ html[data-page-transition="back"]::view-transition-new(root) { animation: accoun
  .workspace-actions > a { display: none; }
  .app-bottom-nav { position: fixed; z-index: 35; bottom: 0; left: 0; right: 0; display: flex; background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -5px 20px #123d3512; padding: .4rem .5rem calc(.4rem + env(safe-area-inset-bottom)); }
  .app-tab { min-height: 3.4rem; flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; font-size: .7rem; font-weight: 750; color: var(--muted-foreground); border-radius: .65rem; }
- .app-tab-matching { position: relative; justify-content: flex-end; padding-bottom: .2rem; color: var(--primary); text-align: center; line-height: 1.15; }
- .app-tab-matching-icon { position: absolute; bottom: calc(100% - 1.8rem); display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border: 3px solid var(--card); border-radius: 50%; background: var(--primary); color: var(--primary-foreground); box-shadow: 0 4px 10px #0003; }
- .app-tab-matching:focus-visible .app-tab-matching-icon { outline: 2px solid var(--ring); outline-offset: 2px; }
+ .app-tab-vacancies { position: relative; justify-content: flex-end; padding-bottom: 0; color: var(--primary); text-align: center; line-height: 1.15; }
+ .app-tab-vacancies > span:last-child { max-width: 100%; font-size: .65rem; overflow-wrap: anywhere; }
+ .app-tab-vacancies-icon { position: absolute; bottom: calc(100% - 1.8rem); display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border: 3px solid var(--card); border-radius: 50%; background: var(--primary); color: var(--primary-foreground); box-shadow: 0 4px 10px #0003; }
+ .app-tab-vacancies:focus-visible .app-tab-vacancies > span:last-child { max-width: 100%; font-size: .65rem; overflow-wrap: anywhere; }
+ .app-tab-vacancies-icon { outline: 2px solid var(--ring); outline-offset: 2px; }
  .app-tab-active { background: var(--secondary); color: var(--primary); }
- .app-update { bottom: 6rem; }
+ .app-update { bottom: calc(6.25rem + env(safe-area-inset-bottom)); right: 1rem; }
  .journey-strip { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
 @media (max-width: 639px) {

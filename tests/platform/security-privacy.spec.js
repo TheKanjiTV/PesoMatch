@@ -50,7 +50,8 @@ publicTest(
         expect(response.headers()["content-security-policy"]).not.toContain(
           "'unsafe-eval'",
         )
-        await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
+        if (route === "/privacy") await expect(page.getByRole("dialog", { name: "Privacy & Your Information" })).toBeVisible()
+        else await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
         await expect(page.locator("html")).toHaveAttribute(
           "data-contrast",
           theme,

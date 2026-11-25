@@ -59,3 +59,12 @@ Training topic requests use four actual form steps: Topic, Dates, Preferences, R
 Interview outcomes appear inside the associated referral only when staff enable the option after its interview time. Interview decisions do not create employment placements. Settings and Overview expose tutorial replay only to administrators; new users still receive the first-run guide.
 
 AI consent uses a compact 600px native dialog with readable sharing information, an explicit consent control, response language, privacy link and Done action. The profile shows saved work entries first and extracted résumé work evidence when no structured entries exist. Repeated explanatory source panels, privacy-request sections and the résumé experience/certificate add controls are retired.
+
+
+## November 25 presentation follow-up
+
+Vacancy cards and details place a large, borderless match percentage at the right of their heading. The mobile navigation places Vacancy Management in the raised center circle for every role, while keeping role-specific services on either side.
+
+Training topic requests open an 880px native modal with four connected progress markers. Completed steps show checks; the current step has an outlined marker; each step retains Topic, Dates, Details and Review content and validation. Back preserves entered values and closing restores focus to the opener. Privacy links open the full notice in a reading dialog without navigating away or changing registration consent. Direct privacy URLs also open the dialog. Nested Escape closes only the top dialog.
+
+Update notifications use a quiet card with a refresh icon, a short heading and distinct Later / Reload app controls above the mobile navigation. Requested module descriptions and account-history explanations are removed without changing their underlying workflows or records.

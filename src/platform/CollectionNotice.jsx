@@ -1,3 +1,4 @@
+import { PrivacyLink } from "./PrivacyNotice.jsx"
 import { Link } from "react-router"
 
 export const trainingNoticeVersion = "enrollment-review-2026-10-13-v1"
@@ -25,15 +26,15 @@ export function CollectionNotice({ kind = "profile" }) {
     >
       <p>
         {notices[kind]}{" "}
-        <Link
+        <PrivacyLink
           className="font-semibold text-primary underline underline-offset-4"
           to="/privacy"
           target="_blank"
           rel="noopener noreferrer"
         >
           Read the privacy notice
-          <span className="sr-only"> (opens in a new tab)</span>
-        </Link>
+          <span className="sr-only"> (opens a dialog)</span>
+        </PrivacyLink>
         .
       </p>
       {kind === "profile" && (

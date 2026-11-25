@@ -1,3 +1,4 @@
+import { PrivacyLink } from "./PrivacyNotice.jsx"
 import { useAiPreferences } from "./AiPreferences.jsx"
 import { useEffect, useRef, useState } from "react"
 import { Link, useSearchParams } from "react-router"
@@ -141,13 +142,13 @@ export function AiConsent({
               </Notice>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-              <Link
+              <PrivacyLink
                 to="/privacy"
                 target="_blank"
                 className="text-sm font-semibold underline"
               >
                 Privacy notice
-              </Link>
+              </PrivacyLink>
               <button
                 type="button"
                 className={primaryStyle}

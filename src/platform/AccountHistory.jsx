@@ -16,16 +16,6 @@ export function AccountHistory() {
           >
             Account history
           </h2>
-          <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-            Registration, sign-ins, lockouts, password changes, session expiry,
-            and access changes for your account, newest first. Times shown in
-            Philippine time (UTC+8).
-          </p>
-          <p className="mt-2 max-w-prose text-xs text-muted-foreground">
-            Events are recorded from feature activation. Browser closure is not
-            a logout; inactivity expiry is recorded separately when the server
-            detects it.
-          </p>
         </div>
         <button
           className={secondaryStyle}

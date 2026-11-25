@@ -1,3 +1,5 @@
+import { Modal } from "./Modal.jsx"
+import { Check } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { api } from "./api.js"
 import {
@@ -86,29 +88,39 @@ export function TrainingRequestWizard({ initial = {}, onClose, onSubmitted }) {
     }
   }
   return (
-    <section
-      aria-label="Request a training topic"
-      className="my-6 rounded-xl border border-border bg-card p-5 sm:p-7"
+    <Modal
+      title="Request a training topic"
+      size="form"
+      busy={busy}
+      onClose={onClose}
     >
-      <h2 className="font-display text-2xl text-primary">
-        Request a training topic
-      </h2>
       <ol
         aria-label="Training request progress"
-        className="my-6 grid grid-cols-4 gap-2 border-b border-border pb-5"
+        className="training-stepper mb-7 flex border-b border-border pb-6"
       >
         {stages.map((label, index) => (
           <li
             key={label}
             aria-current={step === index ? "step" : undefined}
-            className={`text-sm ${
-              step === index
-                ? "font-semibold text-primary"
-                : "text-muted-foreground"
-            }`}
+            data-state={
+              index < step ? "complete" : index === step ? "current" : "pending"
+            }
+            className="training-step"
           >
-            <span className="block">Step {index + 1}</span>
-            <span className="mt-1 block">{label}</span>
+            <span className="training-step-circle" aria-hidden="true">
+              {index < step ? <Check size={18} /> : index + 1}
+            </span>
+            <span className="mt-3 block text-xs text-muted-foreground">
+              Step {index + 1}
+            </span>
+            <span className="mt-1 block text-sm font-semibold">{label}</span>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              {index < step
+                ? "Completed"
+                : index === step
+                  ? "In progress"
+                  : "Pending"}
+            </span>
           </li>
         ))}
       </ol>
@@ -123,7 +135,10 @@ export function TrainingRequestWizard({ initial = {}, onClose, onSubmitted }) {
               <label
                 key={name}
                 className={`block text-sm font-semibold ${
-                  type === "textarea" ? "sm:col-span-2" : ""
+                  type === "textarea" ||
+                  ["topic", "preferred_schedule"].includes(name)
+                    ? "sm:col-span-2"
+                    : ""
                 }`}
               >
                 {label}
@@ -180,7 +195,12 @@ export function TrainingRequestWizard({ initial = {}, onClose, onSubmitted }) {
             {fields.flat().map(({ name, label, type }) => (
               <div
                 key={name}
-                className={type === "textarea" ? "sm:col-span-2" : ""}
+                className={
+                  type === "textarea" ||
+                  ["topic", "preferred_schedule"].includes(name)
+                    ? "sm:col-span-2"
+                    : ""
+                }
               >
                 <dt className="text-sm text-muted-foreground">{label}</dt>
                 <dd className="mt-1 whitespace-pre-wrap break-words text-sm font-semibold">
@@ -223,7 +243,7 @@ export function TrainingRequestWizard({ initial = {}, onClose, onSubmitted }) {
           </div>
         </div>
       </form>
-    </section>
+    </Modal>
   )
 }
 

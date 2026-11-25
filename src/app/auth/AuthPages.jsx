@@ -1,3 +1,4 @@
+import { PrivacyLink, PrivacyDialog } from "../../platform/PrivacyNotice.jsx"
 import { legalNotices } from "./legal.js"
 
 import { OfficialHelp } from "./OfficialHelp.jsx"
@@ -669,14 +670,14 @@ export function RegisterPage() {
               Terms of Use
             </Link>{" "}
             and acknowledge the{" "}
-            <Link
+            <PrivacyLink
               to="/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="font-bold text-primary underline underline-offset-4"
             >
               Privacy Policy
-            </Link>
+            </PrivacyLink>
             .
           </span>
         </label>
@@ -767,6 +768,19 @@ export function LegalPage() {
   const notice = legalNotices[pathname] || legalNotices["/privacy"]
 
   useTitle(notice.title)
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  if (pathname === "/privacy")
+    return (
+      <AuthLayout centered wide>
+        <h1 className="font-display text-3xl text-primary">{notice.title}</h1>
+        <PrivacyDialog
+          onClose={() =>
+            navigate(user ? "/dashboard" : "/login", { replace: true })
+          }
+        />
+      </AuthLayout>
+    )
 
   return (
     <AuthLayout centered wide>
@@ -779,9 +793,12 @@ export function LegalPage() {
         aria-label="Legal notices"
         className="mb-6 flex flex-wrap gap-4 text-sm font-semibold text-primary"
       >
-        <Link className="min-h-11 content-center underline" to="/privacy">
+        <PrivacyLink
+          className="min-h-11 content-center underline"
+          to="/privacy"
+        >
           Privacy Policy
-        </Link>
+        </PrivacyLink>
         <Link className="min-h-11 content-center underline" to="/terms">
           Terms of Use
         </Link>

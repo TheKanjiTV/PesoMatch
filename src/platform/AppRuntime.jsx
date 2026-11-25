@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router"
 import { Download, RefreshCw, WifiOff } from "lucide-react"
-import { secondaryStyle } from "./ui.jsx"
+import { primaryStyle, secondaryStyle } from "./ui.jsx"
 
 const standalone = () =>
   window.matchMedia("(display-mode: standalone)").matches ||
@@ -133,20 +133,40 @@ export function AppUpdate() {
   }
 
   return update ? (
-    <div className="app-update" role="status">
-      <p>A new version is ready. Save your work before reloading.</p>
-      <button
-        onClick={() => {
-          window.dispatchEvent(new Event("peso:reload-update"))
+    <section
+      className="app-update"
+      role="status"
+      aria-label="App update available"
+    >
+      <div className="app-update-heading">
+        <span className="app-update-icon">
+          <RefreshCw size={20} aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="font-semibold">Update ready</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            Save your work, then reload to get the latest version.
+          </p>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
+        <button type="button" className={secondaryStyle} onClick={dismiss}>
+          Later
+        </button>
+        <button
+          type="button"
+          className={primaryStyle}
+          onClick={() => {
+            window.dispatchEvent(new Event("peso:reload-update"))
 
-          update.worker.postMessage({ type: "SKIP_WAITING" })
-          dismiss()
-        }}
-      >
-        <RefreshCw size={16} />
-        Reload app
-      </button>
-      <button onClick={dismiss}>Later</button>
-    </div>
+            update.worker.postMessage({ type: "SKIP_WAITING" })
+            dismiss()
+          }}
+        >
+          <RefreshCw size={16} />
+          Reload app
+        </button>
+      </div>
+    </section>
   ) : null
 }

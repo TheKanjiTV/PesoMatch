@@ -105,7 +105,7 @@ test("vacancies show scores and compact generic AI consent across themes and wid
   })
   await page.goto("/jobs")
   await expect(page.getByLabel("Profile match").first()).toHaveText(
-    /\d+% match/,
+    /\d+% Match/,
   )
   expect(matchingCalls).toBe(0)
   await expect(
@@ -143,7 +143,7 @@ test("vacancies show scores and compact generic AI consent across themes and wid
   }
   await dialog.getByRole("checkbox").check()
   await dialog.getByRole("button", { name: "Done", exact: true }).click()
-  await expect(page.getByLabel("Profile match").first()).toHaveText("68% match")
+  await expect(page.getByLabel("Profile match").first()).toHaveText("68% Match")
   expect(matchingCalls).toBeGreaterThan(0)
   expect(errors).toEqual([])
 })
