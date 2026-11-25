@@ -370,13 +370,13 @@ test("every workspace resource uses its own layout through a slow request and er
 
     ["/placements", "placements"],
 
-    ["/outcomes", "outcomes"],
+
 
     ["/services", "services"],
 
     ["/events", "events"],
 
-    ["/labor-market", "labor-market"],
+
 
     ["/jobseekers", "registry"],
 
@@ -384,7 +384,7 @@ test("every workspace resource uses its own layout through a slow request and er
 
     ["/audit", "audit"],
 
-    ["/matches", "vacancy-matches", "jobseeker"],
+
 
     ["/profile", "profile", "jobseeker"],
 

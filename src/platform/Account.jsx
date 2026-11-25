@@ -12,7 +12,6 @@ import { Link, useNavigate } from "react-router"
 
 import { useAuth } from "../context/AuthContext.jsx"
 
-import { PrivacyRequests } from "./PrivacyRequests.jsx"
 
 import { ResumePanel } from "./Resume.jsx"
 
@@ -44,6 +43,7 @@ export function ProfilePage() {
   const { user, onboarding } = useAuth()
 
   const [profile, setProfile] = useState(null),
+    [resume, setResume] = useState(null),
     [error, setError] = useState(""),
     [skills, setSkills] = useState([])
 
@@ -78,6 +78,7 @@ export function ProfilePage() {
         description="Keep your skills, education, experience, and preferences current so PESO can support your next step."
       />
       <ResumePanel
+        onLoaded={setResume}
         onApplied={async () => {
           const r = await getProfile()
 
@@ -204,7 +205,9 @@ export function ProfilePage() {
 
                         e.company_name,
                       ])
-                    : [["Experience", "No work experience declared"]],
+                    : resume?.detected?.experience_excerpt
+                      ? [["From your résumé", resume.detected.experience_excerpt]]
+                      : [["Experience", profile.work_experience.has_experience ? "Work experience indicated — add your job details using Edit." : "No saved work experience yet."]],
                 ],
 
                 [
@@ -409,18 +412,18 @@ export function AccountPage() {
           onSave={save}
           help={
             editor === "delete"
-              ? "Deletion removes your live account, profile, résumé and linked service records. Audit entries and privacy requests may remain without the account link; backups require operator review. For a retention review, submit a privacy request instead. This action cannot be undone."
+              ? "Deletion removes your live account, profile, résumé and linked service records. Audit entries may remain without the account link; backups require operator review. This action cannot be undone."
               : undefined
           }
         />
       )}
       <AppearanceSettings />
-      <button
+      {user.role === "admin" && <button
         className={`${secondaryStyle} mb-6`}
         onClick={() => window.dispatchEvent(new Event("peso:open-tour"))}
       >
         Replay workspace tutorial
-      </button>
+      </button>}
       <section className="rounded-lg border border-border bg-card px-6">
         <div className="flex flex-wrap items-center justify-between gap-5 border-b border-border py-6">
           <div>
@@ -475,7 +478,6 @@ export function AccountPage() {
         </div>
       </section>
       <AccountHistory />
-      <PrivacyRequests />
     </>
   )
 }

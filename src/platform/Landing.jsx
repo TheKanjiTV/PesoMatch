@@ -51,7 +51,7 @@ const journey = [
 
   "Facilitate employment & placement",
 
-  "Monitor employment outcomes",
+  "Follow interview updates",
 ]
 
 export default function Landing() {

@@ -201,7 +201,7 @@ test("jobseeker routes load real service screens at desktop and mobile", async (
   expect(errors).toEqual([])
 })
 
-test("referral, enrollment, PESO review, placement and outcome persist end to end", async ({
+test("referral, enrollment, PESO review and placement persist end to end", async ({
   page,
 
   account,
@@ -431,64 +431,7 @@ test("referral, enrollment, PESO review, placement and outcome persist end to en
     record(enrollmentId).getByText("Completed", { exact: true }),
   ).toBeVisible()
 
-  await provisionAndSignIn(account, page, "jobseeker")
 
-  await page.goto("/outcomes")
-
-  await page
-
-    .getByRole("button", { name: "Report employment status", exact: true })
-
-    .click()
-
-  await page
-
-    .getByRole("combobox", { name: /Employment status/ })
-
-    .selectOption("employed")
-
-  await page
-
-    .getByLabel("Notes / reason")
-
-    .fill("Fictional employment status for local end-to-end test.")
-
-  await page.getByRole("button", { name: "Save record", exact: true }).click()
-
-  await expect(
-    page.getByText("Reported · not verified", { exact: true }),
-  ).toBeVisible()
-
-  await page.reload()
-
-  await expect(
-    page.getByText("Reported · not verified", { exact: true }),
-  ).toBeVisible()
-
-  const outcomeId = (
-    await (await apiCall(account.request, "/api/v1/platform/outcomes")).json()
-  ).data[0].id
-
-  await provisionAndSignIn(account, page, "peso_staff")
-
-  await page.reload()
-
-  await record(outcomeId)
-    .getByRole("button", { name: "Verify report", exact: true })
-
-    .click()
-
-  await page
-
-    .getByLabel("Evidence / verification source")
-
-    .fill("Verified fictional report during local workflow evaluation.")
-
-  await page.getByRole("button", { name: "Save record", exact: true }).click()
-
-  await expect(
-    record(outcomeId).getByText("PESO verified", { exact: true }),
-  ).toBeVisible()
 })
 
 test("staff, employer, provider and administrator workspaces enforce role boundaries", async ({

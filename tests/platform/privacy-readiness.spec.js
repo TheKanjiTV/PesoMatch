@@ -109,7 +109,7 @@ test("collection notices precede profile resume and service inputs and enrollmen
     page
       .locator(".resume-panel")
       .getByRole("complementary", { name: "Privacy before you submit" }),
-  ).toContainText("optional")
+  ).toHaveCount(0)
   await page.goto("/services")
   await page
     .getByRole("button", { name: "Request PESO assistance", exact: true })
@@ -173,29 +173,7 @@ test.describe("Privacy before profile completion", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0)
     await page.getByRole("button", { name: "Switch to dark mode" }).click()
     await page.getByRole("switch", { name: "Larger text" }).click()
-    const opener = page.getByRole("button", {
-      name: "Make a privacy request",
-      exact: true,
-    })
-    await opener.focus()
-    await page.keyboard.press("Enter")
-    await expect(page.getByLabel("Request type")).toBeFocused()
-    await page.getByLabel("Request type").selectOption("deletion")
-    await page
-      .getByLabel("Details (optional)")
-      .fill("Please review deletion of this disposable incomplete account.")
-    await page.getByRole("button", { name: "Save record", exact: true }).click()
-    await expect(
-      page.getByText(
-        "Privacy request recorded. You can follow its status here.",
-        { exact: true },
-      ),
-    ).toBeVisible()
-    await expect(opener).toBeFocused()
-    await focusedControlVisible(page)
-    expect((await apiCall(account.request, "/api/v1/auth/user")).status()).toBe(
-      200,
-    )
+    await expect(page.getByRole("button", { name: "Make a privacy request", exact: true })).toHaveCount(0)
     const deletion = page.getByRole("button", {
       name: "Delete account",
       exact: true,

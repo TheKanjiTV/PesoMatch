@@ -1,3 +1,4 @@
+import { AiPreferencesProvider } from "./AiPreferences.jsx"
 import { useEffect, useRef, useState } from "react"
 
 import {
@@ -62,8 +63,6 @@ const nav = [
   ["Jobseeker registry", "/jobseekers", UsersRound, ["peso_staff", "admin"]],
 
   ["Vacancy Management", "/jobs", BriefcaseBusiness],
-
-  ["Job Matching", "/matches", Route, ["jobseeker"]],
   ["AI Career Workspace", "/ai-workspace", BookOpen, ["jobseeker"]],
   [
     "Training Demand",
@@ -105,16 +104,6 @@ const nav = [
   ],
 
   [
-    "Employment Outcomes",
-
-    "/outcomes",
-
-    TrendingUp,
-
-    ["jobseeker", "peso_staff", "admin"],
-  ],
-
-  [
     "PESO Services",
 
     "/services",
@@ -125,8 +114,6 @@ const nav = [
   ],
 
   ["Events & Programs", "/events", CalendarDays],
-
-  ["Labor Market Information", "/labor-market", TrendingUp],
 
   ["Account Access", "/users", UsersRound, ["admin"]],
 
@@ -173,7 +160,7 @@ export function PlatformLayout() {
       key={`${user.id}:${user.role}`}
       routePending={navigation.state !== "idle"}
     >
-      <WorkspaceFrame />
+      <AiPreferencesProvider><WorkspaceFrame /></AiPreferencesProvider>
     </WorkspaceLoadingProvider>
   )
 }
@@ -564,7 +551,7 @@ function WorkspaceFrame() {
               ],
 
               ...(user.role === "jobseeker"
-                ? [["Job Matching", "/matches", Route]]
+                ? [["AI Career", "/ai-workspace", BookOpen]]
                 : []),
 
               [
@@ -586,19 +573,13 @@ function WorkspaceFrame() {
                   [
                     "app-tab",
                     isActive && "app-tab-active",
-                    to === "/matches" && "app-tab-matching",
+
                   ]
                     .filter(Boolean)
                     .join(" ")
                 }
               >
-                {to === "/matches" ? (
-                  <span className="app-tab-matching-icon">
-                    <Icon size={25} aria-hidden="true" />
-                  </span>
-                ) : (
-                  <Icon size={21} aria-hidden="true" />
-                )}
+                <Icon size={21} aria-hidden="true" />
                 <span>{label}</span>
               </NavLink>
             ))}

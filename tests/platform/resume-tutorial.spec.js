@@ -206,78 +206,15 @@ test("PDF review persists skills and official courses expose local requests with
   )
 })
 
-test("reviewed PDF work and completion certificates save to their separate profile sections", async ({
-  page,
-  account,
-}) => {
+test("résumé work evidence appears without retired add buttons", async ({ page }) => {
   await page.goto("/profile")
-  await page.getByLabel("Résumé PDF · up to 5 MB").setInputFiles({
-    name: "reviewed-work.pdf",
-    mimeType: "application/pdf",
-    buffer: resumePdf([
-      "Education",
-      "Bachelor of Science in Information Technology",
-      "Work Experience",
-      "Job title: Records Assistant",
-      "Employer: Synthetic Records Office",
-      "Start date: 2024-01-15",
-      "End date: 2025-03-20",
-      "Recorded customer requests using spreadsheets.",
-      "Certifications",
-      "AIClassASEAN.org AI for Oceans | 2025",
-      "Code.Org Certificate of Completion | 2026",
-    ]),
-  })
+  await page.getByLabel("Résumé PDF · up to 5 MB").setInputFiles({ name: "reviewed-work.pdf", mimeType: "application/pdf", buffer: resumePdf(["Work Experience", "Job title: Records Assistant", "Employer: Synthetic Records Office", "Start date: 2024-01-15", "End date: 2025-03-20", "Recorded customer requests using spreadsheets."]) })
   await page.getByRole("button", { name: "Analyze PDF", exact: true }).click()
-  await page
-    .getByRole("button", { name: "Review & add work experience", exact: true })
-    .click()
-  let dialog = page.getByRole("dialog")
-  await expect(
-    dialog.getByRole("textbox", { name: "Job title", exact: true }),
-  ).toHaveValue("Records Assistant")
-  await dialog.getByLabel("Do you currently work here?").selectOption("no")
-  await dialog.getByLabel("Confirm these profile facts").selectOption("yes")
-  await dialog
-    .getByRole("button", { name: "Add reviewed work experience", exact: true })
-    .click()
-  await expect(dialog).toHaveCount(0)
-  await expect(
-    page.getByText("Records Assistant", { exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole("button", { name: "Review & add certificate", exact: true })
-    .click()
-  dialog = page.getByRole("dialog")
-  await dialog.getByLabel("Certificate / course name").fill("AI for Oceans")
-  await dialog
-    .getByLabel("Issuing organization (optional)")
-    .fill("AIClassASEAN.org")
-  await dialog.getByLabel("Confirm these profile facts").selectOption("yes")
-  await dialog
-    .getByRole("button", { name: "Add reviewed certificate", exact: true })
-    .click()
-  await expect(dialog).toHaveCount(0)
-  await page.reload()
-  const response = await apiCall(account.request, "/api/v1/jobseeker/profile")
-  const profile = (await response.json()).data
-  expect(profile.work_experience.experiences).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({
-        job_title: "Records Assistant",
-        company_name: "Synthetic Records Office",
-      }),
-    ]),
-  )
-  expect(profile.skills.certifications).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({
-        certification_name: "AI for Oceans",
-        issued_at: "",
-      }),
-    ]),
-  )
-  expect(JSON.stringify(profile.education)).not.toContain("AI for Oceans")
+  await expect(page.getByText("reviewed-work.pdf", { exact: true })).toBeVisible()
+  const work = page.locator("section").filter({ has: page.getByRole("heading", { name: "Work experience", exact: true }) })
+  await expect(work).toContainText("Records Assistant")
+  await expect(work).not.toContainText("No work experience declared")
+  await expect(page.getByRole("button", { name: /Review & add (work experience|certificate)/i })).toHaveCount(0)
 })
 
 test.describe("New user guidance", () => {
@@ -314,54 +251,7 @@ test.describe("New user guidance", () => {
     await page.getByRole("button", { name: "Close tutorial" }).click()
 
     await page.goto("/settings")
-
-    await page
-
-      .getByRole("button", { name: "Replay workspace tutorial" })
-
-      .click()
-
-    await expect(page.getByRole("dialog")).toBeVisible()
-
-    await expect(
-      page.getByRole("heading", { name: "Welcome to your PESO workspace" }),
-    ).toBeVisible()
-
-    await accessible(page)
-
-    await page.screenshot({
-      path: "artifacts/revisions/tutorial-mobile.png",
-
-      fullPage: true,
-    })
-
-    await page.getByRole("button", { name: "Next", exact: true }).click()
-
-    await expect(
-      page.getByRole("heading", { name: "Your profile and résumé" }),
-    ).toBeVisible()
-
-    await page
-
-      .getByRole("button", { name: "Skip tutorial", exact: true })
-
-      .click()
-
-    await expect(page.getByRole("dialog")).not.toBeVisible()
-
-    await expect(
-      page.getByRole("heading", { name: "My Jobseeker Profile", exact: true }),
-    ).toBeFocused()
-
-    await page.goto("/settings")
-
-    await page
-
-      .getByRole("button", { name: "Replay workspace tutorial" })
-
-      .click()
-
-    await page.getByRole("button", { name: "Close tutorial" }).click()
+    await expect(page.getByRole("button", { name: "Replay workspace tutorial" })).toHaveCount(0)
 
     await page.reload()
 
@@ -388,11 +278,11 @@ test.describe("New user guidance", () => {
 
       .getByRole("navigation", { name: "Employment services" })
 
-      .getByRole("link", { name: "Job Matching", exact: true })
+      .getByRole("link", { name: "Vacancy Management", exact: true })
 
       .click()
 
-    await expect(page).toHaveURL(/\/matches$/)
+    await expect(page).toHaveURL(/\/jobs$/)
 
     await expect(page.locator(".workspace-sidebar")).toHaveClass(
       /drawer-closed/,

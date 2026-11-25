@@ -44,7 +44,7 @@ class EmploymentController extends Controller
     {
         // Preserve accountability without duplicating free-text personal data in logs.
         $summary = ['changed_fields' => array_values(array_diff(array_keys($changes), ['current_password']))];
-        $summary += array_intersect_key($changes, array_flip(['status', 'role', 'consent', 'slots', 'capacity', 'rows_per_page']));
+        $summary += array_intersect_key($changes, array_flip(['status', 'role', 'consent', 'slots', 'capacity', 'rows_per_page', 'enabled', 'result']));
         DB::table('audit_events')->insert(['actor_id' => $r->user()->id, 'action' => $action, 'entity' => $row->getTable(), 'entity_id' => $row->id, 'changes' => json_encode($summary), 'created_at' => now()]);
     }
 
@@ -135,7 +135,14 @@ class EmploymentController extends Controller
             default => $q->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest(),
         };
 
-        return $q->orderByDesc('id')->paginate(TableSetting::perPage());
+        $page = $q->orderByDesc('id')->paginate(TableSetting::perPage());
+        if ($r->user()->role === 'jobseeker') {
+            $r->user()->loadMissing(['jobseekerProfile.skills', 'jobseekerProfile.education', 'jobseekerProfile.workExperiences', 'jobseekerProfile.licenses', 'jobseekerProfile.certifications', 'jobseekerProfile.preferences.occupations']);
+            $matcher = app(EmploymentMatcher::class);
+            $page->getCollection()->each(fn ($v) => $v->setAttribute('assessment', $matcher->assess($r->user(), $v)));
+        }
+
+        return $page;
     }
 
     public function employers(Request $r)
@@ -284,7 +291,17 @@ class EmploymentController extends Controller
             $this->participants($q, $r);
         }
 
-        return $q->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
+        $page = $q->latest()->orderByDesc('id')->paginate(TableSetting::perPage());
+        if (! $this->staff($r)) {
+            $page->getCollection()->each(function ($row) {
+                $row->makeHidden(['interview_result_by']);
+                if (! $row->outcome_enabled) {
+                    $row->makeHidden(['interview_result', 'interview_result_notes', 'interview_result_at']);
+                }
+            });
+        }
+
+        return $page;
     }
 
     public function updateReferral(Request $r, Referral $referral)
@@ -319,6 +336,22 @@ class EmploymentController extends Controller
             }
             $row->update([...$data, 'updated_by' => $r->user()->id]);
             $this->audit($r, 'referral.'.$data['status'], $row, $data);
+
+            return response()->json(['data' => $row]);
+        });
+    }
+
+    public function interviewOutcome(Request $r, Referral $referral)
+    {
+        $this->roles($r, ['peso_staff', 'admin']);
+        $data = $r->validate(['enabled' => 'required|boolean', 'result' => 'nullable|in:pending,accepted,not_accepted', 'notes' => 'nullable|string|max:2000']);
+
+        return DB::transaction(function () use ($r, $referral, $data) {
+            $row = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
+            abort_unless($row->interview_at && $row->interview_at->isPast() && in_array($row->status, ['interviewing', 'offered', 'not_selected', 'placed'], true), 422, 'An interview must have taken place before enabling its outcome.');
+            $row->update(['outcome_enabled' => $data['enabled'], 'interview_result' => $data['enabled'] ? ($data['result'] ?? 'pending') : $row->interview_result,
+                'interview_result_notes' => $data['notes'] ?? $row->interview_result_notes, 'interview_result_at' => now(), 'interview_result_by' => $r->user()->id]);
+            $this->audit($r, 'referral.interview_outcome_updated', $row, ['enabled' => $data['enabled'], 'result' => $row->interview_result]);
 
             return response()->json(['data' => $row]);
         });

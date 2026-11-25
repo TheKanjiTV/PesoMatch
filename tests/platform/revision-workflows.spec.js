@@ -334,9 +334,7 @@ test("account creation, employment report and event forms are modal", async ({
   await page.getByRole("button", { name: "Add event / program" }).click()
   await expect(page.getByRole("dialog")).toBeVisible()
   await page.keyboard.press("Escape")
-  await page.goto("/outcomes")
-  await page.getByRole("button", { name: "Report employment status" }).click()
-  await expect(page.getByRole("dialog")).toBeVisible()
+
 })
 
 test("AI has explicit unavailable state and consent-gated model suggestions on mobile", async ({
@@ -347,8 +345,8 @@ test("AI has explicit unavailable state and consent-gated model suggestions on m
   await mock(context, "jobseeker", false)
   await page.goto("/ai-workspace")
   await expect(
-    page.getByText("AI model unavailable:", { exact: false }),
-  ).toBeVisible()
+    page.getByRole("switch", { name: "Enable AI assistance" }),
+  ).toBeDisabled()
   await expect(
     page.getByRole("button", { name: "Generate career advice" }),
   ).toBeDisabled()
@@ -366,8 +364,8 @@ test("AI has explicit unavailable state and consent-gated model suggestions on m
   await page
     .getByRole("button", { name: "Privacy & consent", exact: true })
     .click()
-  await page.getByRole("checkbox", { name: "I consent", exact: false }).check()
-  await page.getByRole("button", { name: "Continue with AI enabled" }).click()
+  await page.getByRole("checkbox", { name: "I agree", exact: false }).check()
+  await page.getByRole("button", { name: "Done" }).click()
   await page.getByRole("button", { name: "Generate career advice" }).click()
   await expect(page.getByText("License is not stated.")).toBeVisible()
   await expect(
@@ -414,8 +412,8 @@ test("text interview submits actual answers one at a time and reaches final prac
   await page
     .getByRole("button", { name: "Privacy & consent", exact: true })
     .click()
-  await page.getByRole("checkbox", { name: "I consent", exact: false }).check()
-  await page.getByRole("button", { name: "Continue with AI enabled" }).click()
+  await page.getByRole("checkbox", { name: "I agree", exact: false }).check()
+  await page.getByRole("button", { name: "Done" }).click()
   await page
     .getByRole("button", { name: "Start five-question practice" })
     .click()
@@ -445,50 +443,12 @@ test("text interview submits actual answers one at a time and reaches final prac
   ).toBeNull()
 })
 
-test("matching announces privacy without consent, groups ranking controls, and supports AI opt-out", async ({
-  page,
-  context,
-}) => {
+test("old matching bookmarks redirect into Vacancy Management", async ({ page, context }) => {
   await mock(context, "jobseeker", true)
-  let modelCalls = 0
-  page.on("request", (request) => {
-    if (request.url().includes("/ai/semantic-matches")) modelCalls++
-  })
   await page.goto("/matches")
-  const notice = page.getByRole("dialog", {
-    name: "AI privacy & response preferences",
-  })
-  await expect(notice).toBeVisible()
-  await page.screenshot({
-    path: "artifacts/revision-2026-11-19/privacy-notice-desktop.png",
-  })
-  await expect(
-    notice.getByRole("checkbox", { name: "I consent", exact: false }),
-  ).not.toBeChecked()
-  expect(modelCalls).toBe(0)
-  await notice.getByRole("button", { name: "Continue without AI" }).click()
-  await expect(
-    page.getByRole("button", { name: "Rank with semantic AI" }),
-  ).toBeDisabled()
-  await page.getByRole("switch", { name: "Allow Cohere AI" }).click()
-  await notice
-    .getByRole("checkbox", { name: "I consent", exact: false })
-    .check()
-  await notice
-    .getByLabel("Response language", { exact: true })
-    .selectOption("fil")
-  await notice.getByRole("button", { name: "Continue with AI enabled" }).click()
-  await page.getByRole("button", { name: "Rank with semantic AI" }).click()
-  await expect(page.getByText("0.830", { exact: true })).toBeVisible()
-  await page.getByRole("switch", { name: "Allow Cohere AI" }).uncheck()
-  await expect(page.getByText("0.830", { exact: true })).toHaveCount(0)
-  await expect(
-    page.getByRole("button", { name: "Show TF-IDF baseline" }),
-  ).toHaveAttribute("aria-pressed", "true")
-  await page.screenshot({
-    path: "artifacts/revision-2026-11-19/matching-controls-desktop.png",
-    fullPage: true,
-  })
+  await expect(page).toHaveURL(/\/jobs$/)
+  await expect(page.getByRole("heading", { name: "Vacancy Management", exact: true })).toBeVisible()
+  await expect(page.getByRole("button", { name: "Show TF-IDF baseline" })).toHaveCount(0)
 })
 
 test("AI action buttons have a real gap and practice opens in a large accessible modal", async ({
@@ -505,8 +465,8 @@ test("AI action buttons have a real gap and practice opens in a large accessible
   await page
     .getByRole("button", { name: "Privacy & consent", exact: true })
     .click()
-  await page.getByRole("checkbox", { name: "I consent", exact: false }).check()
-  await page.getByRole("button", { name: "Continue with AI enabled" }).click()
+  await page.getByRole("checkbox", { name: "I agree", exact: false }).check()
+  await page.getByRole("button", { name: "Done" }).click()
   const review = await page
     .getByRole("link", { name: "Review vacancy details" })
     .boundingBox()

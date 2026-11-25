@@ -220,7 +220,7 @@ class EmploymentPlatformTest extends TestCase
         $result = app(EmploymentMatcher::class)->assess($u->fresh(), $v);
         $this->assertEquals(['Communication'], $result['matched_skills']);
         $this->assertEquals(['Microsoft Excel'], $result['missing_skills']);
-        $this->actingAs($u)->getJson('/api/platform/matches')->assertOk()->assertJsonPath('training.0.addresses.0', 'Microsoft Excel')->assertJsonPath('method', 'content-based-tfidf-v1');
+        $this->actingAs($u)->getJson('/api/platform/matches')->assertOk()->assertJsonPath('training.0.addresses.0', 'Microsoft Excel')->assertJsonPath('method', 'count-vector-cosine-v1');
     }
 
     public function test_large_matching_catalog_is_paginated_without_losing_ranked_results_or_changing_scores(): void

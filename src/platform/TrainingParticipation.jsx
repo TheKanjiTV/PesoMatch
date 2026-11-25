@@ -1,5 +1,9 @@
+import {
+  TrainingRequestWizard,
+  TrainingRequestDetails,
+} from "./TrainingRequestWizard.jsx"
 import { useState } from "react"
-import { Link } from "react-router"
+import { Link, useSearchParams } from "react-router"
 import { api, useResource } from "./api.js"
 import { useAuth } from "../context/AuthContext.jsx"
 import { RecordLink } from "./RecordLink.jsx"
@@ -125,57 +129,20 @@ export function TrainingParticipants({ program, onChanged }) {
 }
 
 export function TrainingDemandPage() {
+  const [params] = useSearchParams()
+  const initialTopic = params.get("topic") || ""
+  const sourceId = params.get("source_program_id") || ""
   const { user } = useAuth()
   const r = useResource("/training-demands")
-  const [adding, setAdding] = useState(false)
+  const [adding, setAdding] = useState(user.role === "jobseeker" && Boolean(initialTopic))
+  const [message, setMessage] = useState("")
+  const [expanded, setExpanded] = useState(null)
   return (
     <>
       <h1 className="mb-4 font-display text-3xl text-primary">
         Training demand & planning
       </h1>
-      <p className="mb-6 max-w-3xl text-sm leading-7 text-muted-foreground">
-        {user.role === "jobseeker"
-          ? "This page shows only the topics you requested, not the full training catalog. A single request appears as a single topic here. Browse the catalog to discover other programs."
-          : "Compare the number of people interested in each topic before deciding which intake PESO and its partners can offer."}
-      </p>
-      <ol
-        aria-label="From training interest to enrollment"
-        className="mb-6 grid gap-5 border-y border-border py-5 sm:grid-cols-2 xl:grid-cols-4"
-      >
-        {[
-          [
-            "Request a topic",
-            "A jobseeker records a skill or course they want to learn.",
-          ],
-          [
-            "PESO reviews demand",
-            "Staff compare interest, partners, resources and availability.",
-          ],
-          [
-            "Publish a real intake",
-            "PESO records a provider, schedule and confirmed capacity.",
-          ],
-          [
-            "Apply or enroll",
-            "Jobseekers apply; PESO may enroll consenting walk-ins. Confirmed places fill the intake.",
-          ],
-        ].map(([title, text], i) => (
-          <li key={title}>
-            <h2 className="text-sm font-semibold">
-              {i + 1}. {title}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {text}
-            </p>
-          </li>
-        ))}
-      </ol>
-      <Notice>
-        An interest request does not enroll you, reserve a place or
-        automatically approve a program. PESO may also offer a training even
-        without prior requests.
-      </Notice>
-      {user.role === "jobseeker" && (
+      {user.role === "jobseeker" && !adding && (
         <button
           className={`${primaryStyle} my-5`}
           onClick={() => setAdding(true)}
@@ -183,20 +150,17 @@ export function TrainingDemandPage() {
           Request a training topic
         </button>
       )}
+      {message && <Notice>{message}</Notice>}
       {adding && (
-        <Editor
-          title="Request a training topic"
-          fields={[
-            {
-              name: "topic",
-              label: "Training / skill topic",
-              minLength: 3,
-              maxLength: 160,
-            },
-          ]}
+        <TrainingRequestWizard
+          initial={{
+            topic: initialTopic,
+            ...(sourceId && { source_program_id: Number(sourceId) }),
+          }}
           onClose={() => setAdding(false)}
-          onSave={async (v) => {
-            await api("/training-demands", "POST", v)
+          onSubmitted={async () => {
+            setAdding(false)
+            setMessage("Training topic request submitted.")
             await r.reload()
           }}
         />
@@ -213,10 +177,24 @@ export function TrainingDemandPage() {
             >
               <div className="min-w-0 flex-1">
                 <h2 className="font-semibold">{d.topic}</h2>
-                <p className="mt-2 text-xs leading-6 text-muted-foreground">
-                  Interest recorded for planning · enrollment has not started
-                  from this request.
-                </p>
+                {user.role === "jobseeker" && (
+                  <TrainingRequestDetails request={d} />
+                )}
+                {user.role !== "jobseeker" && (
+                  <button
+                    className={`${secondaryStyle} mt-3`}
+                    onClick={() =>
+                      setExpanded(expanded === d.topic_key ? null : d.topic_key)
+                    }
+                  >
+                    {expanded === d.topic_key
+                      ? "Hide requests"
+                      : "View requests"}
+                  </button>
+                )}
+                {expanded === d.topic_key && (
+                  <DemandRequests topic={d.topic_key} />
+                )}
                 <div className="mt-3 flex flex-wrap gap-3">
                   {d.source_program_id && (
                     <RecordLink
@@ -252,5 +230,23 @@ export function TrainingDemandPage() {
         </div>
       </ResourceState>
     </>
+  )
+}
+
+function DemandRequests({ topic }) {
+  const r = useResource(
+    `/training-demands?topic_key=${encodeURIComponent(topic)}`,
+  )
+  return (
+    <ResourceState resource={r} skeleton={<TableSkeleton columns={2} />}>
+      {r.data?.data?.map((row) => (
+        <section key={row.id} className="mt-4 border-t border-border pt-4">
+          <h3 className="text-sm font-semibold">
+            {row.name || "Archived account"}
+          </h3>
+          <TrainingRequestDetails request={row} />
+        </section>
+      ))}
+    </ResourceState>
   )
 }

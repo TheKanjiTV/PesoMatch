@@ -1,6 +1,6 @@
 import { RecordPages } from "./RecordPages.jsx"
 
-import { AiConsent } from "./AiWorkspace.jsx"
+import { VacancyMatchTools, VacancyMatchScore } from "./VacancyMatching.jsx"
 
 import { Modal } from "./Modal.jsx"
 
@@ -337,6 +337,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
     staff || (canManage && record.owner_id === user.id)
 
   const records = r.data?.data || []
+  const [matching, setMatching] = useState({ active: false, scores: {}, loading: false })
 
   const filtered = records
 
@@ -442,6 +443,12 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
   }
 
   async function action(row, save = false) {
+    if (training && row.external_enrollment && !save) {
+      onPreviewClose?.()
+      navigate(`/training-demand?${new URLSearchParams({ topic: row.title, source_program_id: row.id })}`)
+      return
+    }
+
     setBusy(true)
 
     setError("")
@@ -628,6 +635,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
           }}
         />
       )}
+      {!training && user.role === "jobseeker" && <VacancyMatchTools records={records} onChange={setMatching} />}
       {showSourceStatus && !id && (
         <PesoVacancySource training={training} onArea={setSearch} />
       )}
@@ -914,6 +922,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
             )}
             <Detail
               record={detail}
+              matching={matching}
               training={training}
               canManage={canManageRecord(detail)}
               role={user.role}
@@ -983,6 +992,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
                       {training && canManage && (
                         <Badge>{v.status.replaceAll("_", " ")}</Badge>
                       )}
+                      {!training && user.role === "jobseeker" && <VacancyMatchScore record={v} state={matching} />}
                       <Sample record={v} />
                       <Source record={v} />
                       <Verification record={v} />
@@ -1059,6 +1069,7 @@ export function CatalogPage({ kind = "vacancies", previewId, onPreviewClose }) {
 }
 
 export function Detail({
+  matching,
   record: v,
 
   training,
@@ -1083,6 +1094,7 @@ export function Detail({
         <div className="flex flex-wrap gap-2">
           <Badge>{training ? v.mode : v.employment_type}</Badge>
           {!training && <VacancyStatus record={v} />}
+          {!training && role === "jobseeker" && <VacancyMatchScore record={v} state={matching} />}
           <Sample record={v} />
           <Source record={v} />
           <Verification record={v} />
@@ -1337,344 +1349,6 @@ export function Detail({
         </p>
       </aside>
     </div>
-  )
-}
-
-export function MatchesPage() {
-  const baseline = useResource("/matches")
-
-  const aiStatus = useResource("/ai/status")
-
-  const settingsVersion = useRef(baseline.settingsVersion)
-
-  settingsVersion.current = baseline.settingsVersion
-
-  const [semantic, setSemantic] = useState(null)
-
-  const [semanticBusy, setSemanticBusy] = useState(false)
-
-  const [semanticError, setSemanticError] = useState("")
-
-  const [aiConsent, setAiConsent] = useState(false)
-
-  const [language, setLanguage] = useState("en")
-
-  useEffect(() => {
-    setSemantic(null)
-
-    setSemanticError("")
-  }, [baseline.settingsVersion])
-
-  async function semanticPage(page = 1) {
-    const requestSettingsVersion = settingsVersion.current
-
-    setSemanticBusy(true)
-
-    setSemanticError("")
-
-    try {
-      const data = await api("/ai/semantic-matches", "POST", {
-        consent: aiConsent,
-
-        notice_version: aiStatus.data?.notice_version,
-
-        language,
-
-        page,
-      })
-
-      if (requestSettingsVersion === settingsVersion.current) setSemantic(data)
-    } catch (e) {
-      setSemanticError(e.message)
-    } finally {
-      setSemanticBusy(false)
-    }
-  }
-
-  const r = semantic
-    ? {
-        data: semantic,
-
-        loading: semanticBusy,
-
-        error: "",
-
-        setPage: semanticPage,
-
-        reload: () => semanticPage(semantic.current_page),
-      }
-    : baseline
-
-  const [tab, setTab] = useState("jobs")
-
-  return (
-    <>
-      <Heading
-        title="Job Matching & Referral"
-        description="Understand how your profile connects to vacancies, and which training can help address skill gaps."
-      />
-      <Notice>
-        {semantic
-          ? `Semantic relevance from ${semantic.model}. Cosine similarity (-1 to 1) ranks meaning; it is not a probability of being hired. Explicit education, licenses and other qualifications require separate human review.`
-          : "TF-IDF comparison baseline: 75% declared skill coverage + 25% TF-IDF profile similarity. No pretrained AI model is used for these baseline results. Missing declared skills are not proof that a person lacks them."}
-      </Notice>
-      <AiConsent
-        status={aiStatus.data}
-        consent={aiConsent}
-        onConsent={(v) => {
-          setAiConsent(v)
-
-          if (!v) setSemantic(null)
-        }}
-        language={language}
-        onLanguage={setLanguage}
-        disabled={semanticBusy}
-        autoOpen
-      />
-      {aiStatus.error && <Notice error>{aiStatus.error}</Notice>}
-      <section
-        aria-label="Ranking method"
-        className="my-5 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card p-4 sm:p-5"
-      >
-        <div>
-          <h2 className="font-semibold">Ranking method</h2>
-          <p className="mt-1 text-xs leading-6 text-muted-foreground">
-            {semantic
-              ? "Semantic AI is active. Qualifications still need review."
-              : "TF-IDF baseline is active. External AI processing is optional."}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            aria-pressed={Boolean(semantic)}
-            className={semantic ? primaryStyle : secondaryStyle}
-            disabled={!aiConsent || !aiStatus.data?.configured || semanticBusy}
-            onClick={() => semanticPage(1)}
-          >
-            {semanticBusy ? "Ranking with model…" : "Rank with semantic AI"}
-          </button>
-          <button
-            aria-pressed={!semantic}
-            className={!semantic ? primaryStyle : secondaryStyle}
-            disabled={semanticBusy}
-            onClick={() => {
-              setSemantic(null)
-
-              setSemanticError("")
-            }}
-          >
-            Show TF-IDF baseline
-          </button>
-        </div>
-      </section>
-      {semanticError && (
-        <Notice error>
-          {semanticError}{" "}
-          {semantic
-            ? "The previous semantic ranking remains displayed."
-            : "The TF-IDF baseline below remains explicitly labeled."}
-        </Notice>
-      )}
-      <div
-        className="my-6 flex flex-wrap gap-x-6 border-b border-border"
-        aria-label="Recommendation views"
-      >
-        {[
-          ["jobs", "Recommended vacancies"],
-
-          ["training", "Skills development recommendations"],
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            aria-pressed={tab === id}
-            className={`min-h-12 border-b-2 px-1 py-3 text-sm font-semibold transition-colors ${
-              tab === id
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <ResourceState
-        resource={r}
-        paginate={tab === "jobs"}
-        skeleton={<MatchesSkeleton training={tab !== "jobs"} />}
-      >
-        {tab === "jobs" ? (
-          <div className="space-y-4">
-            {!r.data?.matches.length && (
-              <Empty title="No published vacancies to assess" />
-            )}
-            {r.data?.matches.map(({ vacancy: v, assessment: a, training }) => (
-              <article
-                key={v.id}
-                className="rounded-lg border border-border bg-card p-6"
-              >
-                <div className="flex flex-wrap justify-between gap-4">
-                  <div>
-                    <h2 className="text-lg font-semibold text-primary">
-                      {v.title}
-                    </h2>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {v.organization} · {v.location}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-semibold text-primary">
-                      {semantic
-                        ? a.semantic_similarity.toFixed(3)
-                        : `${a.score}%`}
-                    </span>
-                    <p className="text-xs text-muted-foreground">
-                      {semantic ? "semantic relevance" : "baseline alignment"}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-5 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
-                  <div>
-                    <h3 className="text-xs font-semibold text-primary">
-                      Declared skill overlap
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {a.matched_skills.join(", ") ||
-                        "No declared skill overlap yet"}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold text-accent">
-                      Required skills not declared
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {!v.skills.length
-                        ? "No skill requirements mapped · review the official listing"
-                        : a.missing_skills.join(", ") ||
-                          "All listed skills appear in your profile"}
-                    </p>
-                  </div>
-                </div>
-                {!!a.missing_skills.length && (
-                  <section
-                    className="mt-5 border-t border-border pt-5"
-                    aria-label="Training for this vacancy"
-                  >
-                    <h3 className="text-sm font-semibold text-primary">
-                      Build skills for this opportunity
-                    </h3>
-                    {training?.length ? (
-                      <ul className="mt-3 space-y-3">
-                        {training
-
-                          .slice(0, 4)
-
-                          .map(({ program: p, addresses }) => (
-                            <li key={p.id}>
-                              <Link
-                                to={`/training/${p.id}`}
-                                className="text-sm font-semibold text-primary underline underline-offset-4"
-                              >
-                                {p.title}
-                              </Link>
-                              <p className="mt-1 text-xs text-muted-foreground">
-                                Develops: {addresses.join(", ")} · {p.provider}
-                              </p>
-                            </li>
-                          ))}
-                      </ul>
-                    ) : (
-                      <p className="mt-3 text-sm text-muted-foreground">
-                        No catalog course currently covers these gaps. Ask PESO
-                        for a skills assessment or a suitable provider.
-                      </p>
-                    )}
-                    <p className="mt-3 text-xs leading-6 text-muted-foreground">
-                      These courses support skill development. Employers may
-                      require experience, qualifications or assessment beyond
-                      course completion.
-                    </p>
-                  </section>
-                )}
-                {a.profile_incomplete && (
-                  <p className="mt-3 text-xs">
-                    Complete your profile to improve these suggestions.
-                  </p>
-                )}
-                {semantic && (
-                  <p className="mt-4 text-xs leading-6 text-muted-foreground">
-                    Baseline comparison: {a.baseline_score}% alignment.
-                    Qualifications: not assessed. Review the vacancy
-                    requirements and your evidence with PESO.
-                  </p>
-                )}
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-                  <Link
-                    to={`/ai-workspace?vacancy=${v.id}`}
-                    className={secondaryStyle}
-                  >
-                    Career advice, résumé & interview
-                  </Link>
-                  <Sample record={v} />
-                  <Source record={v} />
-                  <ActionLink to={`/jobs/${v.id}`} secondary>
-                    {v.external_application
-                      ? "Review official opportunity"
-                      : "Review & request referral"}
-                  </ActionLink>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {r.data?.training_total > (r.data?.training?.length || 0) && (
-              <Notice>
-                Showing {r.data.training.length} suggestions from{" "}
-                {r.data.training_total.toLocaleString()} training records.{" "}
-                <Link to="/training" className="font-semibold underline">
-                  Browse and search the full training catalog.
-                </Link>
-              </Notice>
-            )}
-            {!r.data?.training.length && (
-              <Empty title="No published training programs yet" />
-            )}
-            <RecordPages rows={r.data?.training || []}>
-              {(rows) =>
-                rows.map(({ program: p, addresses, reason }) => (
-                  <article
-                    key={p.id}
-                    className="rounded-lg border border-border bg-card p-6"
-                  >
-                    <div className="flex flex-wrap justify-between gap-3">
-                      <h2 className="text-lg font-semibold text-primary">
-                        {p.title}
-                      </h2>
-                      <Sample record={p} />
-                    </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {p.provider}
-                    </p>
-                    <p className="mt-5 text-sm leading-6">{reason}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {addresses.length
-                        ? `Addresses: ${addresses.join(", ")}`
-                        : "General upskilling opportunity"}
-                    </p>
-                    <div className="mt-5">
-                      <ActionLink to={`/training/${p.id}`} secondary>
-                        Review program & availability
-                      </ActionLink>
-                    </div>
-                  </article>
-                ))
-              }
-            </RecordPages>
-          </div>
-        )}
-      </ResourceState>
-    </>
   )
 }
 

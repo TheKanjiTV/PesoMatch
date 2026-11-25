@@ -32,6 +32,7 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
     Route::post('/users', [Employment::class, 'createAccount'])->middleware('throttle:6,1');
     Route::prefix('ai')->middleware('throttle:8,1')->group(function () {
         Route::get('/status', [AiController::class, 'status']);
+        Route::post('/vacancy-matches', [AiController::class, 'vacancyMatches']);
         Route::post('/semantic-matches', [AiController::class, 'semantic']);
         Route::post('/adviser', [AiController::class, 'adviser']);
         Route::post('/resume-review', [AiController::class, 'resume']);
@@ -55,6 +56,7 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
     Route::post('/training/{program}/intakes', [Employment::class, 'createIntake']);
     Route::get('/matches', [Employment::class, 'matches']);
     Route::get('/referrals', [Employment::class, 'referrals']);
+    Route::patch('/referrals/{referral}/interview-outcome', [Employment::class, 'interviewOutcome']);
     Route::patch('/referrals/{referral}', [Employment::class, 'updateReferral']);
     Route::post('/referrals/{referral}/placement', [Employment::class, 'place']);
     Route::get('/enrollments', [Employment::class, 'enrollments']);

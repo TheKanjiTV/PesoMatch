@@ -52,7 +52,7 @@ export function OfficialHelp() {
         <p>
           For a saved account's privacy concern, use{" "}
           <Link className={linkStyle} to="/settings">
-            Account Settings → Your privacy requests
+            Account Settings
           </Link>
           . The platform's verified operator, support contact and privacy
           officer are still pending. If you cannot sign in, the platform's own

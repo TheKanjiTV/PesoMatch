@@ -59,14 +59,45 @@ class SemanticMatcher
         return $aa && $bb ? max(-1, min(1, $dot / sqrt($aa * $bb))) : 0;
     }
 
+    public function scores(User $user, $vacancies): array
+    {
+        abort_unless($this->ai->configured(), 503, 'AI matching is currently unavailable. Please retry later.');
+        $facts = $this->context->profile($user);
+        abort_unless(count($facts), 422, 'Add skills, education or work experience to your profile first.');
+        $text = json_encode($facts, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $cached = DB::table('ai_embeddings')->where('source_type', 'profile')->where('source_id', $user->id)->where('model', config('ai.embedding_model'))->first();
+        if (! $cached || $cached->content_hash !== $this->hash($text)) {
+            $vector = $this->ai->embedDocuments([$text], 'search_query')[0];
+            $this->save('profile', $user->id, $text, $vector);
+        } else {
+            $vector = json_decode(Crypt::decryptString($cached->vector), true, 2048, JSON_THROW_ON_ERROR);
+        }
+        $cache = DB::table('ai_embeddings')->where('source_type', 'vacancy')->where('model', config('ai.embedding_model'))->whereIn('source_id', $vacancies->pluck('id'))->get()->keyBy('source_id');
+        $changed = $vacancies->filter(fn ($v) => ! isset($cache[$v->id]) || $cache[$v->id]->content_hash !== $this->hash($this->text($v)))->values();
+        abort_if($changed->count() > 20, 503, 'Vacancy matching is being updated. Please retry later.');
+        if ($changed->isNotEmpty()) {
+            $vectors = $this->ai->embedDocuments($changed->map(fn ($v) => $this->text($v))->all(), 'search_document');
+            foreach ($changed as $i => $v) {
+                $this->save('vacancy', $v->id, $this->text($v), $vectors[$i]);
+                $cache[$v->id] = (object) ['vector' => Crypt::encryptString(json_encode($vectors[$i], JSON_THROW_ON_ERROR))];
+            }
+        }
+        $scores = [];
+        foreach ($vacancies as $v) {
+            $scores[$v->id] = (int) round(100 * max(0, self::cosine($vector, json_decode(Crypt::decryptString($cache[$v->id]->vector), true, 2048, JSON_THROW_ON_ERROR))));
+        }
+
+        return $scores;
+    }
+
     public function rank(User $user, int $page): array
     {
-        abort_unless($this->ai->configured(), 503, 'Semantic AI unavailable. Use the explicitly labeled TF-IDF baseline.');
+        abort_unless($this->ai->configured(), 503, 'AI matching is currently unavailable.');
         $vacancies = Vacancy::available()->where('is_sample', false)->orderBy('id')->get();
         $cache = DB::table('ai_embeddings')->where('source_type', 'vacancy')->where('model', config('ai.embedding_model'))->whereIn('source_id', $vacancies->pluck('id'))->get()->keyBy('source_id');
         $stale = $vacancies->filter(fn ($v) => ! isset($cache[$v->id]) || $cache[$v->id]->content_hash !== $this->hash($this->text($v)));
         // Never silently rank just the indexed subset of a changing catalog.
-        abort_if($stale->count(), 503, 'The semantic vacancy index needs updating. The operator must run php artisan peso:ai-index. Use the TF-IDF baseline meanwhile.');
+        abort_if($stale->count(), 503, 'Vacancy matching is being updated. Please retry later.');
         $facts = $this->context->profile($user);
         abort_unless(count($facts), 422, 'Add skills, education or experience to your profile first.');
         $text = json_encode($facts, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

@@ -60,7 +60,7 @@ async function dismissOptionalPrivacy(page) {
     name: "AI privacy & response preferences",
   })
   if (await notice.isVisible())
-    await notice.getByRole("button", { name: "Continue without AI" }).click()
+    await notice.getByRole("button", { name: "Done" }).click()
 }
 
 for (const [role, routes] of Object.entries(roleRoutes)) {

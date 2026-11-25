@@ -48,3 +48,14 @@ Dark-mode primary-colored headings and related text are now white (`#FFFFFF`) in
 
 
 Initial workspace/session loading uses matching sidebar icon/text/footer rows, mobile tabs and the full identity/action header skeleton. The header covers name/role, appearance, Install and Public home, with compact mobile visibility matching the actual controls. Once the shell is ready, it stays usable during module changes, searches and retries; only pending content uses its existing layout skeleton and 400 ms minimum. Initial errors restore navigation alongside recovery controls; mobile drawers retain Close. Training Enrollment keeps **Withdraw request** for active own requests and removes the redundant **Delete enrollment request** action; completed/terminal history remains visible.
+
+
+## November 25 workspace refinement
+
+Operate mode retains the civic visual identity. Vacancy Management includes matching percentages; the separate Job Matching and Labor Market Information modules are removed from navigation and old bookmarks redirect. Count-vector cosine supplies local relevance; explicit AI consent enables semantic embedding cosine scores. Provider/model identifiers are absent from product controls and results.
+
+Training topic requests use four actual form steps: Topic, Dates, Preferences, Review. Back retains entered values. The final submission persists the request and its preferred schedule, mode, location and goal. Catalog requests prefill this same wizard.
+
+Interview outcomes appear inside the associated referral only when staff enable the option after its interview time. Interview decisions do not create employment placements. Settings and Overview expose tutorial replay only to administrators; new users still receive the first-run guide.
+
+AI consent uses a compact 600px native dialog with readable sharing information, an explicit consent control, response language, privacy link and Done action. The profile shows saved work entries first and extracted résumé work evidence when no structured entries exist. Repeated explanatory source panels, privacy-request sections and the résumé experience/certificate add controls are retired.

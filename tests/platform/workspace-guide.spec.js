@@ -376,7 +376,7 @@ test("initial shell includes identity and actions, then navigation stays usable 
       .getByRole("navigation", { name: "Employment services", exact: true })
 
       .getByRole("link"),
-  ).toHaveCount(13)
+  ).toHaveCount(10)
 
   await expect(page.locator('[data-logo-loading="true"]')).toHaveCount(0)
 })
@@ -389,7 +389,7 @@ test("loaded shell stays stable across module navigation, searches and cancelled
   await page.emulateMedia({ reducedMotion: "reduce" })
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto("/jobs")
-  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(13)
+  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(10)
   await expect(
     page.locator('[data-skeleton-layout="vacancy-catalog"]'),
   ).toHaveCount(0)
@@ -431,7 +431,7 @@ test("loaded shell stays stable across module navigation, searches and cancelled
   await expect(
     page.getByRole("link", { name: "Public home", exact: true }),
   ).toBeVisible()
-  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(13)
+  await expect(page.locator("#service-drawer .sidebar-link")).toHaveCount(10)
   await page.screenshot({
     path: "artifacts/workspace-guide/content-only-desktop.png",
   })
@@ -501,7 +501,7 @@ test("guide counter follows Back and Previous while a destination request is sti
     await next.click()
     await expect(page).toHaveURL(/\/jobs$/)
     await expect(
-      dialog.getByText("Workspace guide · 3 of 14", { exact: true }),
+      dialog.getByText("Workspace guide · 3 of 12", { exact: true }),
     ).toBeVisible()
     await expect.poll(() => state.pending.length).toBeGreaterThan(0)
     await expect(next).toBeDisabled()
@@ -509,12 +509,12 @@ test("guide counter follows Back and Previous while a destination request is sti
     else await previous.click()
     await expect(page).toHaveURL(/\/jobseekers$/)
     await expect(
-      dialog.getByText("Workspace guide · 2 of 14", { exact: true }),
+      dialog.getByText("Workspace guide · 2 of 12", { exact: true }),
     ).toBeVisible()
     state.pending.splice(0).forEach((resolve) => resolve())
     await expect(next).toBeEnabled()
     await expect(
-      dialog.getByText("Workspace guide · 2 of 14", { exact: true }),
+      dialog.getByText("Workspace guide · 2 of 12", { exact: true }),
     ).toBeVisible()
   }
   expect(state.writes).toEqual([])
@@ -530,7 +530,6 @@ const seekerPaths = [
 
   "/jobs",
 
-  "/matches",
 
   "/referrals",
 
@@ -540,13 +539,11 @@ const seekerPaths = [
 
   "/placements",
 
-  "/outcomes",
 
   "/services",
 
   "/events",
 
-  "/labor-market",
 
   "/settings",
 ]
@@ -566,13 +563,11 @@ const adminPaths = [
 
   "/placements",
 
-  "/outcomes",
 
   "/services",
 
   "/events",
 
-  "/labor-market",
 
   "/users",
 
@@ -608,7 +603,6 @@ for (const [role, paths] of [
 
       "/events",
 
-      "/labor-market",
 
       "/settings",
     ],
@@ -628,7 +622,6 @@ for (const [role, paths] of [
 
       "/events",
 
-      "/labor-market",
 
       "/settings",
     ],
@@ -767,57 +760,34 @@ for (const [role, paths] of [
     await expect(page.getByRole("dialog")).toHaveCount(0)
 
     await page.goto("/settings")
+    const replay = page.getByRole("button", { name: "Replay workspace tutorial", exact: true })
+    if (role === "admin") {
+      await replay.click()
+      await expect(page).toHaveURL(/\/dashboard$/)
+      await expect(page.getByRole("dialog")).toBeVisible()
+      await page.getByRole("button", { name: "Close tutorial", exact: true }).click()
+      await expect(page.getByRole("dialog")).toHaveCount(0)
+    } else await expect(replay).toHaveCount(0)
 
-    await page
-
-      .getByRole("button", { name: "Replay workspace tutorial", exact: true })
-
-      .click()
-
-    await expect(page).toHaveURL(/\/dashboard$/)
-
-    await expect(page.getByRole("dialog")).toBeVisible()
-
-    await page
-
-      .getByRole("button", { name: "Close tutorial", exact: true })
-
-      .click()
-
-    await expect(page.getByRole("dialog")).toHaveCount(0)
   })
 }
 
-test("AI privacy waits for the active guide and opens without consent after it closes", async ({
-  context,
-  page,
-}) => {
+test("vacancy AI privacy opens only on request and never sends without consent", async ({ context, page }) => {
   const state = await workspace(context, { newUser: true })
   await page.goto("/dashboard")
   const guide = page.locator("dialog.workspace-walkthrough")
-  for (let step = 0; step < 3; step++) {
-    await expect(
-      guide.getByRole("button", { name: "Next", exact: true }),
-    ).toBeEnabled()
+  for (let step = 0; step < 2; step++) {
+    await expect(guide.getByRole("button", { name: "Next", exact: true })).toBeEnabled()
     await guide.getByRole("button", { name: "Next", exact: true }).click()
   }
-  await expect(page).toHaveURL(/\/matches$/)
-  const privacy = page.getByRole("dialog", {
-    name: "AI privacy & response preferences",
-  })
-  await expect(privacy).toHaveCount(0)
-  await expect(
-    guide.getByRole("button", { name: "Next", exact: true }),
-  ).toBeEnabled()
+  await expect(page).toHaveURL(/\/jobs$/)
   await guide.getByRole("button", { name: "Close tutorial" }).click()
-  await expect(privacy).toBeVisible()
-  await expect(
-    privacy.getByRole("checkbox", { name: "I consent", exact: false }),
-  ).not.toBeChecked()
-  await privacy.getByRole("button", { name: "Continue without AI" }).click()
-  expect(
-    state.writes.filter((row) => row.path.startsWith("/api/v1/platform/ai/")),
-  ).toEqual([])
+  const privacy = page.getByRole("dialog", { name: "AI privacy & response preferences" })
+  await expect(privacy).toHaveCount(0)
+  await page.getByRole("button", { name: "Privacy & consent", exact: true }).click()
+  await expect(privacy.getByRole("checkbox")).not.toBeChecked()
+  await privacy.getByRole("button", { name: "Done", exact: true }).click()
+  expect(state.writes.filter((row) => row.path.startsWith("/api/v1/platform/ai/"))).toEqual([])
 })
 
 test("training enrollment offers withdrawal without a duplicate delete action", async ({

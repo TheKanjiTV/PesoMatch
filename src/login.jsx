@@ -259,7 +259,7 @@ const router = createBrowserRouter([
               {
                 path: "/matches",
 
-                lazy: feature(catalog, "MatchesPage", {}, ["jobseeker"]),
+                element: <Navigate to="/jobs" replace />,
               },
 
               ...[
@@ -269,7 +269,6 @@ const router = createBrowserRouter([
 
                 "placements",
 
-                "outcomes",
 
                 "services",
               ].map((kind) => ({
@@ -290,12 +289,13 @@ const router = createBrowserRouter([
                 ),
               })),
 
+              { path: "/outcomes", element: <Navigate to="/referrals" replace /> },
               { path: "/events", lazy: feature(operations, "EventsPage") },
 
               {
                 path: "/labor-market",
 
-                lazy: feature(operations, "LaborMarketPage"),
+                element: <Navigate to="/dashboard" replace />,
               },
 
               {
@@ -386,7 +386,7 @@ const router = createBrowserRouter([
 
         ["/peso-assistance", "/services"],
 
-        ["/skill-analysis", "/matches"],
+        ["/skill-analysis", "/jobs"],
 
         ["/settings/*", "/settings"],
 

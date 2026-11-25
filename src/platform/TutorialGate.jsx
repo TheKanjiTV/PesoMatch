@@ -60,6 +60,7 @@ export function TutorialGate() {
 
   useEffect(() => {
     const replay = () => {
+      if (user.role !== "admin") return
       setRequested(true)
       setRun((value) => value + 1)
     }
@@ -67,10 +68,10 @@ export function TutorialGate() {
     window.addEventListener("peso:open-tour", replay)
 
     return () => window.removeEventListener("peso:open-tour", replay)
-  }, [])
+  }, [user.role])
 
   useEffect(() => {
-    if (!state?.replayTour) return
+    if (user.role !== "admin" || !state?.replayTour) return
 
     setRequested(true)
 

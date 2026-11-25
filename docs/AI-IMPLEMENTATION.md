@@ -1,5 +1,17 @@
 # Pretrained AI integration and workflow revision
 
+## Current workspace update - 25 November 2026
+
+Matching now belongs to Vacancy Management. Each jobseeker-visible vacancy includes a percentage from cosine similarity between profile/vacancy count vectors. Explicit session-only consent enables pretrained semantic embedding scores (`100 * max(0, cosine)`), using cached encrypted vectors and refreshing changed records in bounded batches. These percentages measure relevance, not hiring probability. The fixed 75/25 TF-IDF implementation has been replaced. The old matching route redirects to vacancies; compatible API aliases remain available.
+
+Provider and model branding is absent from the product interface. The compact AI preferences dialog still explains external sharing and requires explicit consent. Career advice caps requested questions at eight and retries once when a response violates the output contract. A real Hostinger inference probe reproduced an over-eight-question validation failure and verified the updated prompt successfully.
+
+Training topic requests now use four persisted form steps, including description, preferred dates/schedule, mode, location and goal. Old topic-only catalog API calls remain compatible and cannot clear previously completed details. Catalog UI actions open the prefilled wizard.
+
+The global Employment Outcomes and Labor Market Information screens are retired. Staff/admin can enable an interview outcome in its referral only after its scheduled interview time and within an eligible interview/offer/placement state. Accepted/not-accepted results do not create a placement. Tutorial replay is admin-only; first-time guides remain. Privacy-request sections and résumé work/certificate add controls are removed from the interface; existing records and compatible backend endpoints remain.
+
+The following November 19/20 sections describe the earlier release and its evaluation provenance; their baseline/screens are historical.
+
 19 November 2026. This revision implements real backend calls to pretrained models, authenticated routes and working frontend flows. **The four features are operational locally and on Hostinger using actual Cohere inference.** See [November 20 release evidence](RELEASE-2026-11-20.md). Both exact models were reached, 465 available vacancies were indexed, and authenticated live-model workflows completed in English and Filipino. Automated mocked checks remain separate from real inference. Independent PESO relevance, factual-grounding and language-quality evaluation is still pending; operational does not mean validated employment effectiveness. See [activation evidence](AI-ACTIVATION-2026-11-19.md).
 
 ## What works locally

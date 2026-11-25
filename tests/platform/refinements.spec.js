@@ -202,18 +202,8 @@ test("normal catalogs contain real sources and national statistics remain distin
     expect(rows.every((row) => !row.is_sample && row.source_url)).toBe(true)
   }
   await page.goto("/labor-market")
-  await expect(
-    page.getByRole("heading", {
-      name: "Philippine labor force indicators — August 2026",
-    }),
-  ).toBeVisible()
-  await expect(page.getByText("94.7%", { exact: true })).toBeVisible()
-  await expect(
-    page.getByText(/Preliminary PSA Labor Force Survey/),
-  ).toBeVisible()
-  await expect(
-    page.getByRole("link", { name: "View PSA source and definitions" }),
-  ).toHaveAttribute("href", /openstat\.psa\.gov\.ph/)
+  await expect(page).toHaveURL(/\/dashboard$/)
+  await expect(page.getByRole("link", { name: "Labor Market Information", exact: true })).toHaveCount(0)
   await page.goto("/events")
   await expect(
     page.getByRole("heading", { name: "PESO Maco Job Fair" }),

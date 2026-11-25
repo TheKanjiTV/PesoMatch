@@ -50,7 +50,7 @@ export const test = base.extend({
       await page.addLocatorHandler(
         page.getByRole("dialog", { name: "AI privacy & response preferences" }),
         async (dialog) =>
-          dialog.getByRole("button", { name: "Continue without AI" }).click(),
+          dialog.getByRole("button", { name: "Done" }).click(),
       )
     }
     await use(page)

@@ -16,7 +16,7 @@ Use pnpm install --frozen-lockfile, then pnpm dev. Check existing listeners befo
 - src/pages/onboarding/: validated persisted five-step profiling.
 - src/services/account.js: shared CSRF/session API client.
 - backend/app/Http/Controllers/EmploymentController.php: authorized catalog and domain workflow API.
-- backend/app/Services/EmploymentMatcher.php: explainable content-based TF-IDF baseline.
+- backend/app/Services/EmploymentMatcher.php: local count-vector cosine relevance; consented semantic scoring is in SemanticMatcher.
 - docs/: current requirements, design, API, responsibilities, implementation-aligned documentation and verification.
 
 ## Checks and constraints
@@ -25,7 +25,7 @@ Run pnpm build, pnpm test and backend/php artisan test as appropriate. Active br
 
 ## Employment workspace
 
-The October 10 user request explicitly authorizes real vacancy, referral, training enrollment, placement, outcome monitoring, PESO service and role-management backend scope. New active workflows use Laravel, not demo localStorage. Partner ownership and role restrictions must be enforced on the server. PESO verifies placement/outcomes; providers confirm enrollment; employers decide hiring. AI recommendations remain advisory.
+The October 10 user request explicitly authorizes real vacancy, referral, training enrollment, placement, outcome monitoring, PESO service and role-management backend scope. New active workflows use Laravel, not demo localStorage. Partner ownership and role restrictions must be enforced on the server. PESO verifies placement/outcomes; providers confirm enrollment; employers decide hiring. AI recommendations remain advisory. Vacancy Management contains matching percentages; do not restore separate Job Matching, Employment Outcomes or Labor Market Information navigation. Interview outcomes are optional within a referral and only PESO staff/admin may enable them after the interview. Tutorial replay is admin-only; first-time users still receive the guide.
 
 The new visual authority is docs/DESIGN.md and PRODUCT.md. The earlier blue social toolbar/feed reference is retired. Follow the user-authorized replacement direction. Impeccable source guidance was read; its launcher/context/concept-seed exited 1 without output, so no CLI verification is claimed.
 

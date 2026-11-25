@@ -8,6 +8,7 @@ export function Modal({
   title,
   onClose,
   busy = false,
+  size = "wide",
   initialFocusSelector,
   children,
 }) {
@@ -33,7 +34,7 @@ export function Modal({
     <dialog
       ref={ref}
       aria-labelledby={heading}
-      className="workspace-modal"
+      className={`workspace-modal ${size === "compact" ? "workspace-modal-compact" : ""}`}
       onCancel={(event) => {
         event.preventDefault()
         if (!busy) onClose()

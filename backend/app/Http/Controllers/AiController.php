@@ -37,7 +37,16 @@ class AiController extends Controller
     {
         $this->seeker($r);
 
-        return response()->json(['configured' => $ai->configured(), 'provider' => 'Cohere', 'embedding_model' => config('ai.embedding_model'), 'language_model' => config('ai.language_model'), 'notice_version' => config('ai.notice_version'), 'notice' => 'With your consent, the selected vacancy and minimized profile facts are sent to Cohere. Resume review sends the redacted extracted excerpt; interview practice sends your answers. Names, email, phone and address fields are omitted, but free text can contain identifiers: review it first. Do not include confidential information. Practice transcripts are encrypted and expire after 7 days. Suggestions are not verified qualifications or hiring decisions. Provider processing follows Cohere terms and privacy policy.', 'provider_privacy_url' => 'https://cohere.com/privacy']);
+        return response()->json(['configured' => $ai->configured(), 'notice_version' => config('ai.notice_version')]);
+    }
+
+    public function vacancyMatches(Request $r, SemanticMatcher $matcher)
+    {
+        $this->consent($r);
+        $data = $r->validate(['vacancy_ids' => 'required|array|min:1|max:100', 'vacancy_ids.*' => 'required|integer|min:1|distinct']);
+        $vacancies = Vacancy::available()->where('is_sample', false)->whereIn('id', $data['vacancy_ids'])->get();
+
+        return response()->json(['scores' => $matcher->scores($r->user(), $vacancies)]);
     }
 
     public function semantic(Request $r, SemanticMatcher $matcher)

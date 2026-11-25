@@ -78,3 +78,8 @@
 .workspace-modal-body { min-width: 0; padding: clamp(1rem, 2.5vw, 2rem); }
 .workspace-modal-body > :first-child { margin-top: 0; }
 .workspace-modal #record-editor { padding: 0; border: 0; margin-bottom: 0; }
+
+.workspace-modal.workspace-modal-compact { width: min(600px, calc(100vw - 2rem)); }
+.workspace-modal-compact .workspace-modal-header h2 { font-family: var(--font-sans); font-size: 1.25rem; line-height: 1.5; }
+
+.practice-actions > button { min-height: 50px; }

@@ -68,7 +68,7 @@ class AiEmploymentTest extends TestCase
         config(['ai.key' => null]);
         $this->postJson('/api/platform/ai/adviser', $this->payload($v))->assertStatus(503)->assertJsonMissingPath('data');
         Http::assertNothingSent();
-        $this->getJson('/api/platform/matches')->assertOk()->assertJsonPath('method', 'content-based-tfidf-v1');
+        $this->getJson('/api/platform/matches')->assertOk()->assertJsonPath('method', 'count-vector-cosine-v1');
     }
 
     public function test_adviser_validates_exact_evidence_and_existing_training_ids_in_both_languages(): void
@@ -143,7 +143,7 @@ class AiEmploymentTest extends TestCase
         $m->save('vacancy', $a->id, $m->text($a), $y);
         $m->save('vacancy', $b->id, $m->text($b), $x);
         Http::fake(['api.cohere.com/v2/embed' => fn ($r) => Http::response(['embeddings' => ['float' => array_fill(0, count($r['texts']), $x)]])]);
-        $this->actingAs($u)->postJson('/api/platform/ai/semantic-matches', $this->payload($a))->assertOk()->assertJsonPath('matches.0.vacancy.id', $b->id)->assertJsonPath('method', 'cohere-semantic-v1')->assertJsonStructure(['matches' => [['assessment' => ['baseline_score', 'semantic_similarity', 'qualification_status']]]]);
+        $this->actingAs($u)->postJson('/api/platform/ai/semantic-matches', $this->payload($a))->assertOk()->assertJsonPath('matches.0.vacancy.id', $b->id)->assertJsonPath('method', 'cohere-semantic-v1')->assertJsonStructure(['matches' => [['assessment' => ['score', 'semantic_similarity', 'qualification_status']]]]);
         $this->postJson('/api/platform/ai/semantic-matches', $this->payload($a))->assertOk();
         Http::assertSentCount(1);
         $u->jobseekerProfile->skills()->attach(Skill::create(['name' => 'Microsoft Excel']));

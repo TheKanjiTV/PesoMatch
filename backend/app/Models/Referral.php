@@ -12,7 +12,7 @@ class Referral extends Model
 
     protected function casts(): array
     {
-        return ['match_snapshot' => 'array', 'interview_at' => 'datetime'];
+        return ['match_snapshot' => 'array', 'interview_at' => 'datetime', 'outcome_enabled' => 'boolean', 'interview_result_at' => 'datetime'];
     }
 
     public function scopeForEmployer($query, int $ownerId)

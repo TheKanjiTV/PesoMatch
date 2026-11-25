@@ -41,7 +41,7 @@ export const legalNotices = {
       ],
       [
         "Changes and contact",
-        "Material changes must be explained and any new consent-based purpose must be offered separately. Questions can be recorded under Settings → Your privacy requests. Operator legal identity, postal address, privacy officer and external support contact: not configured; publication pending verification.",
+        "Material changes must be explained and any new consent-based purpose must be offered separately. Operator legal identity, postal address, privacy officer and external support contact: not configured; publication pending verification.",
       ],
     ],
   },

@@ -66,14 +66,6 @@ export function OverviewPage() {
 
           "/referrals",
         ],
-
-        [
-          "Follow up employment outcomes",
-
-          "Check reported status, verify evidence, and review due follow-ups.",
-
-          "/outcomes",
-        ],
       ]
     : user.role === "employer"
       ? [
@@ -133,7 +125,7 @@ export function OverviewPage() {
 
               "Review match explanations and ask PESO to facilitate a referral.",
 
-              "/matches",
+              "/jobs",
             ],
 
             [
@@ -142,14 +134,6 @@ export function OverviewPage() {
               "Explore training and request enrollment with a provider.",
 
               "/training",
-            ],
-
-            [
-              "Keep your employment status current",
-
-              "Report changes so PESO can provide useful follow-up support.",
-
-              "/outcomes",
             ],
           ]
 
@@ -182,7 +166,7 @@ export function OverviewPage() {
                   My profile & résumé
                 </Link>
               )}
-              <button
+              {user.role === "admin" && <button
                 type="button"
                 data-tour-launcher
                 className={secondaryStyle}
@@ -191,7 +175,7 @@ export function OverviewPage() {
                 }
               >
                 Replay workspace tutorial
-              </button>
+              </button>}
             </div>
           }
         />
@@ -207,7 +191,7 @@ export function OverviewPage() {
           </h2>
           <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">
             {staff
-              ? "Keep each referral, training enrollment and placement traceable. Verify outcomes and help jobseekers who need another pathway."
+              ? "Keep each referral, training enrollment and placement traceable. Follow interviews and help jobseekers who need another pathway."
               : employer
                 ? "Create, edit and delete your own vacancies. PESO reviews submissions for publication and verifies employment starts."
                 : partner
@@ -223,7 +207,7 @@ export function OverviewPage() {
                     ? user.role === "employer"
                       ? "/jobs"
                       : "/enrollments"
-                    : "/matches"
+                    : "/jobs"
               }
             >
               {staff
@@ -265,7 +249,7 @@ export function OverviewPage() {
 
               "Employment facilitation & placement",
 
-              "Employment outcome monitoring",
+
             ].map((s, i) => (
               <li key={s} className="flex items-start gap-3">
                 <span className="grid size-6 shrink-0 place-items-center rounded-full border border-[#b4c2a8] text-xs">
@@ -430,15 +414,6 @@ export function OverviewPage() {
           </ResourceState>
         </section>
       </div>
-      {!staff && !partner && (
-        <div className="mt-8">
-          <Notice>
-            Matching suggestions support your decisions. PESO officers review
-            referrals, training providers confirm enrollment, and employers
-            decide hiring.
-          </Notice>
-        </div>
-      )}
     </>
   )
 }

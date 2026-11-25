@@ -1,3 +1,4 @@
+import { useAiPreferences } from "./AiPreferences.jsx"
 import { useEffect, useRef, useState } from "react"
 import { Link, useSearchParams } from "react-router"
 import { api, useResource } from "./api.js"
@@ -57,16 +58,16 @@ export function AiConsent({
           <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold">
             <input
               role="switch"
-              aria-label="Allow Cohere AI"
+              aria-label="Enable AI assistance"
               type="checkbox"
               className="size-5 accent-primary"
               checked={consent}
-              disabled={disabled || !status}
+              disabled={disabled || !status?.configured}
               onChange={(e) =>
                 e.target.checked ? setOpen(true) : onConsent(false)
               }
             />
-            <span>Cohere AI {consent ? "on" : "off"}</span>
+            <span>AI assistance {consent ? "on" : "off"}</span>
           </label>
           <label className="flex items-center gap-2 text-sm">
             <span>Language</span>
@@ -95,39 +96,33 @@ export function AiConsent({
       {open && (
         <Modal
           title="AI privacy & response preferences"
+          size="compact"
           onClose={() => setOpen(false)}
           initialFocusSelector="input[type=checkbox]"
         >
-          <div className="mx-auto max-w-3xl space-y-6">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-1 shrink-0 text-primary" size={24} />
-              <p className="text-sm leading-7">
-                {status?.notice || "Loading external AI privacy notice…"}
+          <div className="space-y-5">
+            <div className="flex items-start gap-3 text-sm leading-6">
+              <ShieldCheck className="mt-0.5 shrink-0 text-primary" size={22} />
+              <p>
+                AI assistance sends relevant profile details and your selected
+                vacancy to an external AI service. Résumé review includes
+                extracted text; interview practice includes your answers. Review
+                free text before sharing.
               </p>
             </div>
-            <a
-              className="inline-block text-sm font-semibold underline"
-              href="https://cohere.com/privacy"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Cohere privacy policy
-            </a>
-            <label className="flex items-start gap-3 rounded-lg border border-border bg-muted p-4 text-sm leading-7">
+            <label className="flex cursor-pointer items-start gap-3 rounded-lg bg-muted p-4 text-sm leading-6">
               <input
-                className="mt-1 size-5 shrink-0 accent-primary"
                 type="checkbox"
+                className="mt-0.5 size-5 shrink-0 accent-primary"
                 checked={consent}
-                disabled={disabled || !status}
+                disabled={disabled || !status?.configured}
                 onChange={(e) => onConsent(e.target.checked)}
               />
               <span>
-                I consent to sending the described information to Cohere for
-                this AI feature. / Pumapayag akong ipadala ang nabanggit na
-                impormasyon para sa AI feature na ito.
+                I agree to share the relevant information for AI assistance.
               </span>
             </label>
-            <label className="block max-w-sm text-sm font-semibold">
+            <label className="block text-sm font-semibold">
               Response language
               <select
                 aria-label="Response language"
@@ -142,27 +137,27 @@ export function AiConsent({
             </label>
             {status && !status.configured && (
               <Notice>
-                AI model unavailable: provider access is not configured. The
-                clearly labeled TF-IDF baseline remains available.
+                AI assistance is currently unavailable. Please try again later.
               </Notice>
             )}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-5">
-              <p className="max-w-xl text-xs leading-6 text-muted-foreground">
-                You can turn AI off or reopen these preferences at any time.
-                Closing this notice never sends your profile to a model.
-              </p>
-              <button className={primaryStyle} onClick={() => setOpen(false)}>
-                Continue {consent ? "with AI enabled" : "without AI"}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+              <Link
+                to="/privacy"
+                target="_blank"
+                className="text-sm font-semibold underline"
+              >
+                Privacy notice
+              </Link>
+              <button
+                type="button"
+                className={primaryStyle}
+                onClick={() => setOpen(false)}
+              >
+                Done
               </button>
             </div>
           </div>
         </Modal>
-      )}
-      {status && !status.configured && (
-        <p role="status" className="mb-5 text-sm text-muted-foreground">
-          AI model unavailable: provider access is not configured. You can
-          continue with the TF-IDF baseline.
-        </p>
       )}
     </>
   )
@@ -193,8 +188,7 @@ export function AiWorkspace() {
   const vacancies = useResource("/vacancies")
   const [vacancyId, setVacancyId] = useState(params.get("vacancy") || "")
   const [tab, setTab] = useState("adviser")
-  const [language, setLanguage] = useState("en")
-  const [consent, setConsent] = useState(false)
+  const { consent, setConsent, language, setLanguage } = useAiPreferences()
   const [useResume, setUseResume] = useState(false)
   const [facts, setFacts] = useState("")
   const [outputOpen, setOutputOpen] = useState(false)
@@ -306,10 +300,7 @@ export function AiWorkspace() {
   }
   return (
     <>
-      <Heading
-        title="AI Career Workspace"
-        description="Explore a vacancy, improve your résumé, and practise a text interview. Model suggestions support your decisions; PESO and employers review qualifications."
-      />
+      <Heading title="AI Career Workspace" />
       <div className="flex flex-wrap gap-2" aria-label="AI tools">
         {[
           ["adviser", "Career & skills adviser"],
@@ -392,11 +383,6 @@ export function AiWorkspace() {
             ))}
           </select>
         </label>
-        {!!choices.length && (
-          <p className="text-xs text-muted-foreground">
-            Showing up to 100 matching records. Search to narrow the catalog.
-          </p>
-        )}
         {vacancies.error && <Notice error>{vacancies.error}</Notice>}
         {!vacancies.loading && !choices.length && (
           <Empty title="No vacancies found">
@@ -417,14 +403,6 @@ export function AiWorkspace() {
         )}
         {tab === "resume" && (
           <>
-            <p className="text-sm leading-7">
-              Reviews the readable excerpt from your{" "}
-              <Link to="/profile" className="font-semibold underline">
-                uploaded résumé
-              </Link>
-              . Review and remove identifiers before uploading. Accepted
-              revisions stay in this screen; your PDF is never replaced.
-            </p>
             <label className="block text-sm font-semibold">
               Additional facts / answers to follow-up questions
               <textarea
@@ -476,11 +454,6 @@ export function AiWorkspace() {
             </button>
           )}
         </div>
-        <p className="text-xs leading-6 text-muted-foreground">
-          Your focused review opens in a large dialog. Closing it keeps this
-          session's suggestions and interview answers available until you leave
-          or refresh the page.
-        </p>
       </section>
       {error && !outputOpen && (
         <div className="my-5">
@@ -512,7 +485,6 @@ export function AiWorkspace() {
           )}
           {result && (
             <section className="space-y-5" aria-live="polite">
-              <Badge>Model-generated suggestion · {result.model}</Badge>
               {tab === "adviser" ? (
                 <>
                   <h2 className="mt-5 text-xl font-semibold">
@@ -575,9 +547,6 @@ export function AiWorkspace() {
                 </>
               ) : (
                 <>
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    {result.scope}
-                  </p>
                   {["relevance", "clarity", "completeness"].map((key) => (
                     <section key={key} className="mt-5">
                       <h2 className="font-semibold capitalize">{key}</h2>
@@ -659,20 +628,10 @@ export function AiWorkspace() {
                   )}
                 </>
               )}
-              <p className="mt-6 text-xs leading-6 text-muted-foreground">
-                Review every suggestion against your facts. Missing evidence
-                does not mean you lack a skill. These suggestions do not
-                establish eligibility or guarantee employment.
-              </p>
             </section>
           )}
           {practice && tab === "interview" && (
             <section className="space-y-5" aria-live="polite">
-              <Badge>Interview practice only · {practice.model}</Badge>
-              <p className="text-sm">
-                Rubric: 1 needs detail · 2 developing · 3 clear evidence · 4
-                well supported.
-              </p>
               {practice.transcript.turns.map((turn, i) => (
                 <article
                   key={i}
@@ -730,7 +689,11 @@ export function AiWorkspace() {
                 </article>
               ))}
               {!practice.completed_at && (
-                <form onSubmit={sendAnswer} className="space-y-3">
+                <form
+                  id="practice-answer"
+                  onSubmit={sendAnswer}
+                  className="space-y-3"
+                >
                   <label className="block text-sm font-semibold">
                     Your answer
                     <textarea
@@ -744,23 +707,28 @@ export function AiWorkspace() {
                       onChange={(e) => setAnswer(e.target.value)}
                     />
                   </label>
-                  <button className={primaryStyle} disabled={!ready}>
-                    {busy ? "Reviewing answer…" : "Submit answer & continue"}
-                  </button>
                 </form>
               )}
-              <button
-                className={secondaryStyle}
-                disabled={busy}
-                onClick={erase}
-              >
-                Delete this practice
-              </button>
-              <p className="text-xs text-muted-foreground">
-                Practice transcripts expire after seven days. Refreshing the
-                page clears this screen; no answers are saved in browser
-                storage.
-              </p>
+              <div className="practice-actions flex flex-wrap items-stretch gap-3">
+                {!practice.completed_at && (
+                  <button
+                    type="submit"
+                    form="practice-answer"
+                    className={primaryStyle}
+                    disabled={!ready}
+                  >
+                    {busy ? "Reviewing answer…" : "Submit answer & continue"}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className={secondaryStyle}
+                  disabled={busy}
+                  onClick={erase}
+                >
+                  Delete this practice
+                </button>
+              </div>
             </section>
           )}
         </Modal>

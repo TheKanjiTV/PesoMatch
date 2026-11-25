@@ -13,10 +13,8 @@ import { withMinimumLoading } from "./loading.js"
 
 import { useWorkspaceActivity } from "./WorkspaceLoading.jsx"
 
-import { ResumeProfileReview } from "./ResumeProfileReview.jsx"
-import { CollectionNotice } from "./CollectionNotice.jsx"
 
-export function ResumePanel({ onApplied, onReviewed }) {
+export function ResumePanel({ onApplied, onLoaded }) {
   const [resume, setResume] = useState(null),
     [loading, setLoading] = useState(true),
     [selected, setSelected] = useState([]),
@@ -30,6 +28,7 @@ export function ResumePanel({ onApplied, onReviewed }) {
 
   function accept(row) {
     setResume(row)
+    onLoaded?.(row)
 
     setSelected(row?.detected.skills.map((s) => s.id) || [])
 
@@ -95,15 +94,8 @@ export function ResumePanel({ onApplied, onReviewed }) {
           <h2 id="resume-title" className="text-xl font-semibold text-primary">
             Build your profile from a résumé
           </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Upload a PDF, then review skills, work experience and certificates
-            separately before adding profile facts. Existing entries stay saved.
-          </p>
-        </div>
-      </div>
 
-      <div className="mt-4">
-        <CollectionNotice kind="resume" />
+        </div>
       </div>
       <label
         className="mt-5 block text-sm font-semibold"
@@ -121,10 +113,7 @@ export function ResumePanel({ onApplied, onReviewed }) {
         onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
 
-      <p className="mt-2 text-xs leading-6 text-muted-foreground">
-        Use selectable text. Image/scanned PDFs need OCR first. The first 20
-        pages are read privately on this server.
-      </p>
+
 
       <button
         type="button"
@@ -178,10 +167,7 @@ export function ResumePanel({ onApplied, onReviewed }) {
           </div>
 
           <h3 className="mt-5 font-semibold">Detected skills</h3>
-          <p className="mt-2 text-xs leading-6 text-muted-foreground">
-            A mention does not prove proficiency. Uncheck anything that does not
-            describe your skills.
-          </p>
+
 
           {!resume.detected.skills.length && (
             <p className="mt-4 text-sm">
@@ -244,20 +230,9 @@ export function ResumePanel({ onApplied, onReviewed }) {
               <p className="mt-3 whitespace-pre-wrap leading-7 text-muted-foreground">
                 {resume.detected.education_excerpt}
               </p>
-              <p className="mt-2 text-xs">
-                Review this evidence in the education form. Completion
-                certificates are shown separately below.
-              </p>
+
             </details>
           )}
-          <ResumeProfileReview
-            resume={resume}
-            onReviewed={async (kind, entry, message) => {
-              setMessage(message)
-              await onReviewed?.(kind, entry)
-              if (!onReviewed) await onApplied?.([])
-            }}
-          />
           <div className="mt-5 flex flex-wrap gap-3">
             <button
               type="button"
@@ -326,10 +301,6 @@ export function ResumePanel({ onApplied, onReviewed }) {
               Delete PDF
             </button>
           </div>
-
-          <p className="mt-4 text-xs leading-6 text-muted-foreground">
-            {resume.detected.note}
-          </p>
         </div>
       )}
     </section>

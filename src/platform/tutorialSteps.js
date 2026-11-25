@@ -37,12 +37,6 @@ export function tutorialSteps(role) {
         ? "Explore published work opportunities. Vacancy management and employer decisions remain restricted to their authorized roles."
         : "Search and filter vacancies, then open a detail page. Jobseekers apply through PESO by requesting a referral; the official source supports staff verification.",
   )
-  if (seeker)
-    add(
-      "/matches",
-      "Job Matching",
-      "Compare your declared skills with vacancy requirements and review relevant training suggestions. A match supports your decision; it does not guarantee eligibility or hiring.",
-    )
   if (!provider)
     add(
       "/referrals",
@@ -80,11 +74,6 @@ export function tutorialSteps(role) {
     )
   if (seeker || staff) {
     add(
-      "/outcomes",
-      "Employment outcomes and follow-up",
-      "Keep employment updates separate from verified results. PESO reviews supporting evidence and follows up on recorded placements.",
-    )
-    add(
       "/services",
       "PESO support services",
       "Request or coordinate counseling, orientation and other employment support. Use only the details needed for the service.",
@@ -94,11 +83,6 @@ export function tutorialSteps(role) {
     "/events",
     "Events & Employment Programs",
     "Review job fairs, programs, venue details and organizer links. Check current instructions before attending.",
-  )
-  add(
-    "/labor-market",
-    "Labor Market Information",
-    "Explore platform activity and attributed official reports. Platform totals are not municipal or national unemployment rates.",
   )
   if (role === "admin") {
     add(
@@ -114,8 +98,8 @@ export function tutorialSteps(role) {
   }
   add(
     "/settings",
-    "Account Settings and replay",
-    "Manage your account, appearance and privacy settings here. Replay workspace tutorial starts this full guide again. Choose Finish to return to your Overview.",
+    "Account Settings",
+    "Manage your account, password and appearance here. Choose Finish to return to your Overview.",
   )
   return steps
 }

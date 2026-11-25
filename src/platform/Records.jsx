@@ -1,3 +1,4 @@
+import { InterviewOutcome } from "./InterviewOutcome.jsx"
 import { RecordLink as Link } from "./RecordLink.jsx"
 import { useState } from "react"
 import { DeleteDialog } from "./DeleteDialog.jsx"
@@ -42,7 +43,7 @@ const notes = field("notes", "Notes / reason", "textarea", { minLength: 5 })
 
 const configs = {
   referrals: {
-    title: "Job Matching & Referral",
+    title: "Referrals",
 
     description:
       "PESO reviews requests, refers candidates, and follows employer interview and offer updates.",
@@ -589,15 +590,6 @@ export function RecordsPage({ kind }) {
           />
         </>
       )}
-      {kind === "enrollments" && (
-        <div className="mb-6">
-          <Notice>
-            An enrollment request does not reserve a place. The provider
-            confirms eligibility and capacity. Completion is recorded separately
-            from formal competency assessment or National Certification.
-          </Notice>
-        </div>
-      )}
       <label className="mb-6 block">
         <span className="sr-only">Search service records</span>
         <input
@@ -867,6 +859,7 @@ export function RecordsPage({ kind }) {
                       </button>
                     )}
                   </div>
+                  {kind === "referrals" && <InterviewOutcome referral={row} staff={staff} onChanged={r.reload} />}
                 </article>
               )
             })}

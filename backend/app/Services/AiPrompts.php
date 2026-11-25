@@ -6,7 +6,7 @@ class AiPrompts
 {
     public static function adviser(): string
     {
-        return 'Give relevant profile evidence, requirements NOT STATED in supplied evidence, follow-up questions and personalized development steps. Training IDs must be a subset of supplied records. Do not infer availability or eligibility. For every relevant evidence claim select an evidence_id from profile_evidence and explain its relevance. Do not reproduce or paraphrase a quote; the server will attach the original source text. Never use vacancy or training text as applicant evidence.';
+        return 'Return at most 15 relevant_evidence items, 15 not_stated items, 8 questions, 10 steps and 12 training_ids. Keep each string under 800 characters. When many details are missing, combine related questions. Give relevant profile evidence, requirements NOT STATED in supplied evidence, follow-up questions and personalized development steps. Training IDs must be a subset of supplied records. Do not infer availability or eligibility. For every relevant evidence claim select an evidence_id from profile_evidence and explain its relevance. Do not reproduce or paraphrase a quote; the server will attach the original source text. Never use vacancy or training text as applicant evidence.';
     }
 
     public static function resume(): string

@@ -12,7 +12,7 @@ const notices = {
   records:
     "Record only information needed for this service. Authorized PESO staff review service details; relevant employers and training providers can review their own referral or enrollment records. Avoid unrelated IDs, medical information, passwords or details about other people.",
   enrollment:
-    "PESO and the named provider review your name and enrollment details for eligibility and coordination. Requesting enrollment does not confirm a place. You can withdraw an eligible request and submit a privacy request in Account Settings.",
+    "PESO and the named provider review your name and enrollment details for eligibility and coordination. Requesting enrollment does not confirm a place. You can withdraw an eligible request.",
   referral:
     "PESO reviews your request and profile for employment facilitation. A relevant employer can review your name and referral details after PESO refers you. Submitting a request does not guarantee a job offer.",
 }
@@ -44,7 +44,7 @@ export function CollectionNotice({ kind = "profile" }) {
             requirements need operator review.
           </p>
           <p className="mt-2">
-            You can manage privacy requests or delete your account in{" "}
+            You can manage or delete your account in{" "}
             <Link
               className="font-semibold text-primary underline underline-offset-4"
               to="/settings"

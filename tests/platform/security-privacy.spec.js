@@ -66,67 +66,13 @@ publicTest(
   },
 )
 
-test("privacy requests stay scoped, render hostile text safely and support keyboard review", async ({
-  page,
-  account,
-}) => {
-  const errors = []
-  page.on("pageerror", (e) => errors.push(e.message))
+test("retired privacy-request controls are absent while settings remain accessible", async ({ page, account }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto("/settings")
-  await expect(
-    page.getByRole("heading", { name: "Your privacy requests", exact: true }),
-  ).toBeVisible()
-  const opener = page.getByRole("button", {
-    name: "Make a privacy request",
-    exact: true,
-  })
-  await opener.focus()
-  await page.keyboard.press("Enter")
-  await expect(page.getByLabel("Request type")).toBeFocused()
-  await page.getByLabel("Request type").selectOption("correction")
-  const hostile = '<img src=x onerror="window.__privacyXss=1">'
-  await page.getByLabel("Details (optional)").fill(hostile)
-  await page.getByRole("button", { name: "Save record" }).click()
-  await expect(page.getByText(hostile, { exact: true })).toBeVisible()
-  expect(await page.evaluate(() => window.__privacyXss)).toBeUndefined()
+  await expect(page.getByRole("heading", { name: "Account information", exact: true })).toBeVisible()
+  await expect(page.getByRole("button", { name: "Make a privacy request", exact: true })).toHaveCount(0)
   await accessible(page)
-  expect(
-    (
-      await apiCall(account.request, "/api/v1/privacy/requests?scope=all")
-    ).status(),
-  ).toBe(403)
-  provision(account.email, "admin")
-  // Role provisioning revokes sessions, requiring a fresh login.
-  expect(
-    (
-      await apiCall(account.request, "/api/v1/auth/login", "POST", {
-        email: account.email,
-        password: account.password,
-      })
-    ).status(),
-  ).toBe(200)
-  await page.context().clearCookies()
-  await page
-    .context()
-    .addCookies((await account.request.storageState()).cookies)
-  await page.goto("/users")
-  await expect(
-    page.getByRole("heading", { name: "Privacy request review", exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole("button", { name: "Review request", exact: true })
-    .click()
-  await page.getByLabel("Review status").selectOption("in_review")
-  await page
-    .getByLabel("Response and action taken")
-    .fill("Reviewing the requested correction; no deletion performed.")
-  await page.getByRole("button", { name: "Save record" }).click()
-  await expect(
-    page.getByText("Privacy response recorded.", { exact: true }),
-  ).toBeVisible()
-  await accessible(page)
-  expect(errors).toEqual([])
+  expect((await apiCall(account.request, "/api/v1/privacy/requests?scope=all")).status()).toBe(403)
 })
 
 publicTest(
