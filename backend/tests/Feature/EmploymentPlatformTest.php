@@ -334,7 +334,7 @@ class EmploymentPlatformTest extends TestCase
         $this->getJson('/api/platform/labor-market')->assertJsonCount(0, 'follow_ups');
     }
 
-    public function test_peso_can_close_historical_catalog_and_complete_past_event(): void
+    public function test_peso_can_close_historical_catalog_while_retired_events_remain_unchanged(): void
     {
         $this->actingAs($this->person('peso_staff'));
         $v = $this->vacancy(['deadline' => today()->subDay()->toDateString()]);
@@ -342,7 +342,8 @@ class EmploymentPlatformTest extends TestCase
         $p = $this->program(['starts_on' => today()->subWeek()->toDateString(), 'ends_on' => today()->subDay()->toDateString()]);
         $this->patchJson("/api/platform/training/{$p->id}", [...$p->toArray(), 'status' => 'closed'])->assertOk()->assertJsonPath('data.status', 'closed');
         $e = ServiceEvent::create(['title' => 'Past orientation', 'type' => 'Career guidance', 'location' => 'PESO office', 'starts_at' => now()->subDay(), 'description' => 'Past event', 'status' => 'published']);
-        $this->patchJson("/api/platform/events/{$e->id}", [...$e->toArray(), 'status' => 'completed'])->assertOk()->assertJsonPath('data.status', 'completed');
+        $this->patchJson("/api/platform/events/{$e->id}", [...$e->toArray(), 'status' => 'completed'])->assertNotFound();
+        $this->assertSame('published', $e->fresh()->status);
     }
 
     public function test_deleting_user_cascades_personal_placement_records_without_deleting_catalog(): void

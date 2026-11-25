@@ -28,8 +28,11 @@ class AppServiceProvider extends ServiceProvider
             return response()->json(['message' => 'Too many sign-in requests. Try again shortly.'], 429, $headers);
         }));
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+        $aiResponse = fn (Request $request, array $headers) => response()->json(['message' => 'Please wait '.($headers['Retry-After'] ?? 60).' seconds before using this AI tool again.', 'retry_after' => (int) ($headers['Retry-After'] ?? 60)], 429, $headers);
+        RateLimiter::for('ai-matching', fn (Request $request) => Limit::perMinute(60)->by('matching:'.$request->user()->id)->response($aiResponse));
+        RateLimiter::for('ai-generation', fn (Request $request) => Limit::perMinute(15)->by('generation:'.$request->user()->id)->response($aiResponse));
         RateLimiter::for('platform', fn (Request $request) => in_array($request->method(), ['GET', 'HEAD'], true)
-            ? Limit::perMinute(180)->by('read:'.$request->user()->id)
+            ? Limit::perMinute(360)->by('read:'.$request->user()->id)
             : Limit::perMinute(60)->by('write:'.$request->user()->id));
     }
 }

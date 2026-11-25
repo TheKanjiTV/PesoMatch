@@ -158,11 +158,22 @@ async function performAccountRequest(
         window.dispatchEvent(new Event("pesomatch:session-stale"))
     }
 
+    const retrySeconds = Math.max(
+      1,
+      Number(response.headers.get("Retry-After")) ||
+        Number(json?.retry_after) ||
+        60,
+    )
+    const failureMessage =
+      response.status === 429 &&
+      (!json?.message || /^too many attempts\.?$/i.test(json.message))
+        ? `Please wait ${retrySeconds} seconds before trying again. Your entries are still here.`
+        : json?.message
     if (!response.ok)
       throw new AccountError(
         (response.status >= 500
           ? "PesoMatch is temporarily unavailable. Please try again. Your entries are still here."
-          : json?.message) ||
+          : failureMessage) ||
           (response.status === 419
             ? "Your session expired. Sign in again to continue."
             : response.status === 429

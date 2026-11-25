@@ -269,7 +269,6 @@ const router = createBrowserRouter([
 
                 "placements",
 
-
                 "services",
               ].map((kind) => ({
                 path: "/" + kind,
@@ -289,8 +288,14 @@ const router = createBrowserRouter([
                 ),
               })),
 
-              { path: "/outcomes", element: <Navigate to="/referrals" replace /> },
-              { path: "/events", lazy: feature(operations, "EventsPage") },
+              {
+                path: "/outcomes",
+                element: <Navigate to="/referrals" replace />,
+              },
+              {
+                path: "/events",
+                element: <Navigate to="/dashboard" replace />,
+              },
 
               {
                 path: "/labor-market",

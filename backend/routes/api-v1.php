@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\ArchiveController;
+use App\Http\Controllers\ArchiveDeletionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmploymentController as Employment;
 use App\Http\Controllers\OnboardingController;
@@ -17,28 +18,32 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/public/health', fn () => response()->json(['application' => 'pesomatch', 'status' => 'ok'])->header('Cache-Control', 'no-store'));
 
-Route::get('/public/catalog', [Employment::class, 'publicCatalog'])->middleware('throttle:60,1');
-Route::get('/public/source-coverage', fn () => response()->json(json_decode(file_get_contents(database_path('data/catalog-source-coverage.json')), true, 512, JSON_THROW_ON_ERROR)))->middleware('throttle:60,1');
+Route::get('/public/catalog', [Employment::class, 'publicCatalog'])->middleware('throttle:60,1,get-public-catalog:');
+Route::get('/public/source-coverage', fn () => response()->json(json_decode(file_get_contents(database_path('data/catalog-source-coverage.json')), true, 512, JSON_THROW_ON_ERROR)))->middleware('throttle:60,1,get-public-source-coverage:');
 
 Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platform', ValidatePlatformQuery::class])->group(function () {
+    Route::post('/archive/delete-intents', [ArchiveDeletionController::class, 'intent']);
+    Route::delete('/archive/{type}/{id}', [ArchiveDeletionController::class, 'destroy'])->whereNumber('id');
     Route::get('/archive', [ArchiveController::class, 'index']);
     Route::post('/archive/{type}/{id}/restore', [ArchiveController::class, 'restore'])->whereNumber('id');
     Route::post('/delete-intents', [RemovalController::class, 'intent']);
     Route::delete('/remove/{type}/{id}', [RemovalController::class, 'destroy'])->whereNumber('id');
+    Route::post('/training-demands/archive-topic', [TrainingParticipationController::class, 'archiveTopic']);
+    Route::post('/training-demands/{id}/archive', [TrainingParticipationController::class, 'archiveDemand'])->whereNumber('id');
     Route::get('/training-demands', [TrainingParticipationController::class, 'demands']);
-    Route::post('/training-demands', [TrainingParticipationController::class, 'demand'])->middleware('throttle:10,1');
+    Route::post('/training-demands', [TrainingParticipationController::class, 'demand'])->middleware('throttle:20,1,post-training-demands:');
     Route::get('/training/{program}/participants', [TrainingParticipationController::class, 'roster']);
-    Route::post('/training/{program}/participants', [TrainingParticipationController::class, 'store'])->middleware('throttle:20,1');
-    Route::post('/users', [Employment::class, 'createAccount'])->middleware('throttle:6,1');
-    Route::prefix('ai')->middleware('throttle:8,1')->group(function () {
+    Route::post('/training/{program}/participants', [TrainingParticipationController::class, 'store'])->middleware('throttle:20,1,post-training-program-participants:');
+    Route::post('/users', [Employment::class, 'createAccount'])->middleware('throttle:6,1,post-users:');
+    Route::prefix('ai')->group(function () {
         Route::get('/status', [AiController::class, 'status']);
-        Route::post('/vacancy-matches', [AiController::class, 'vacancyMatches']);
-        Route::post('/semantic-matches', [AiController::class, 'semantic']);
-        Route::post('/adviser', [AiController::class, 'adviser']);
-        Route::post('/resume-review', [AiController::class, 'resume']);
-        Route::post('/interviews', [AiController::class, 'start']);
+        Route::post('/vacancy-matches', [AiController::class, 'vacancyMatches'])->middleware('throttle:ai-matching');
+        Route::post('/semantic-matches', [AiController::class, 'semantic'])->middleware('throttle:ai-matching');
+        Route::post('/adviser', [AiController::class, 'adviser'])->middleware('throttle:ai-generation');
+        Route::post('/resume-review', [AiController::class, 'resume'])->middleware('throttle:ai-generation');
+        Route::post('/interviews', [AiController::class, 'start'])->middleware('throttle:ai-generation');
         Route::get('/interviews/{practice}', [AiController::class, 'show']);
-        Route::post('/interviews/{practice}/answer', [AiController::class, 'answer']);
+        Route::post('/interviews/{practice}/answer', [AiController::class, 'answer'])->middleware('throttle:ai-generation');
         Route::delete('/interviews/{practice}', [AiController::class, 'destroy']);
     });
     Route::get('/summary', [Employment::class, 'summary']);
@@ -68,9 +73,6 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
     Route::get('/services', [Employment::class, 'services']);
     Route::post('/services', [Employment::class, 'requestService']);
     Route::patch('/services/{service}', [Employment::class, 'updateService']);
-    Route::get('/events', [Employment::class, 'events']);
-    Route::post('/events', [Employment::class, 'saveEvent']);
-    Route::patch('/events/{event}', [Employment::class, 'saveEvent']);
     Route::get('/jobseekers', [Employment::class, 'registry']);
     Route::get('/users', [Employment::class, 'users']);
     Route::patch('/users/{user}/role', [Employment::class, 'role']);
@@ -84,11 +86,11 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
 
 Route::middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platform'])->group(function () {
     Route::get('/privacy/requests', [PrivacyController::class, 'index'])->middleware(ValidatePlatformQuery::class);
-    Route::post('/privacy/requests', [PrivacyController::class, 'store'])->middleware('throttle:6,1');
-    Route::patch('/privacy/requests/{privacyRequest}', [PrivacyController::class, 'update'])->middleware('throttle:30,1');
-    Route::patch('/auth/account', [AccountController::class, 'update'])->middleware('throttle:6,1');
-    Route::patch('/auth/password', [AccountController::class, 'password'])->middleware('throttle:6,1');
-    Route::delete('/auth/account', [AccountController::class, 'destroy'])->middleware('throttle:6,1');
+    Route::post('/privacy/requests', [PrivacyController::class, 'store'])->middleware('throttle:6,1,post-privacy-requests:');
+    Route::patch('/privacy/requests/{privacyRequest}', [PrivacyController::class, 'update'])->middleware('throttle:30,1,patch-privacy-requests-privacyRequest:');
+    Route::patch('/auth/account', [AccountController::class, 'update'])->middleware('throttle:6,1,patch-auth-account:');
+    Route::patch('/auth/password', [AccountController::class, 'password'])->middleware('throttle:6,1,patch-auth-password:');
+    Route::delete('/auth/account', [AccountController::class, 'destroy'])->middleware('throttle:6,1,delete-auth-account:');
     Route::get('/auth/user', [AuthController::class, 'user']);
     Route::get('/auth/history', [AccountController::class, 'history'])->middleware(ValidatePlatformQuery::class);
     Route::patch('/auth/preferences', [AuthController::class, 'preferences']);
@@ -98,11 +100,11 @@ Route::middleware(['auth:sanctum', EnsureSessionIdentity::class, 'throttle:platf
         Route::patch('/onboarding/{section}', [OnboardingController::class, 'update'])->where('section', 'personal|education|skills|work-experience|preferences');
         Route::post('/onboarding/complete', [OnboardingController::class, 'complete']);
         Route::get('/resume', [ResumeController::class, 'show']);
-        Route::post('/resume', [ResumeController::class, 'upload'])->middleware('throttle:10,1');
+        Route::post('/resume', [ResumeController::class, 'upload'])->middleware('throttle:10,1,post-resume:');
         Route::post('/resume/apply', [ResumeController::class, 'apply']);
-        Route::post('/resume/reanalyze', [ResumeController::class, 'reanalyze'])->middleware('throttle:6,1');
-        Route::post('/resume/experience', [ResumeController::class, 'experience'])->middleware('throttle:10,1');
-        Route::post('/resume/certification', [ResumeController::class, 'certification'])->middleware('throttle:10,1');
+        Route::post('/resume/reanalyze', [ResumeController::class, 'reanalyze'])->middleware('throttle:6,1,post-resume-reanalyze:');
+        Route::post('/resume/experience', [ResumeController::class, 'experience'])->middleware('throttle:10,1,post-resume-experience:');
+        Route::post('/resume/certification', [ResumeController::class, 'certification'])->middleware('throttle:10,1,post-resume-certification:');
         Route::get('/resume/download', [ResumeController::class, 'download']);
         Route::delete('/resume', [ResumeController::class, 'destroy']);
         Route::get('/profile', [OnboardingController::class, 'show']);

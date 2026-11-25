@@ -79,11 +79,6 @@ export function tutorialSteps(role) {
       "Request or coordinate counseling, orientation and other employment support. Use only the details needed for the service.",
     )
   }
-  add(
-    "/events",
-    "Events & Employment Programs",
-    "Review job fairs, programs, venue details and organizer links. Check current instructions before attending.",
-  )
   if (role === "admin") {
     add(
       "/users",

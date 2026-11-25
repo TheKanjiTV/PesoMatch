@@ -86,7 +86,13 @@ for (const [role, routes] of Object.entries(roleRoutes)) {
           await page.goto(route)
           await page.waitForLoadState("networkidle")
           await dismissOptionalPrivacy(page)
-          const destination = { "/labor-market": "/dashboard", "/matches": "/jobs", "/outcomes": "/referrals" }[route] || route
+          const destination =
+            {
+              "/events": "/dashboard",
+              "/labor-market": "/dashboard",
+              "/matches": "/jobs",
+              "/outcomes": "/referrals",
+            }[route] || route
           await expect(page).toHaveURL(new RegExp(`${destination}$`))
           await expect(
             page.getByRole("heading", { name: "This page couldn't load" }),
@@ -147,17 +153,33 @@ test("training demand records a real topic, keeps it separate from enrollment, a
     .getByRole("button", { name: "Request a training topic", exact: true })
     .click()
   await page.getByLabel("Training / skill topic", { exact: true }).fill(topic)
-  await page.getByLabel("What would you like to learn?", { exact: true }).fill("Learn digital records for office work.")
+  await page
+    .getByLabel("What would you like to learn?", { exact: true })
+    .fill("Learn digital records for office work.")
   await page.getByRole("button", { name: "Next", exact: true }).click()
-  await page.getByLabel("Preferred start date", { exact: true }).fill(new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10))
-  await page.getByLabel("Preferred end date", { exact: true }).fill(new Date(Date.now() + 21 * 86400000).toISOString().slice(0, 10))
-  await page.getByLabel("Preferred days and time", { exact: true }).fill("Saturday mornings")
+  await page
+    .getByLabel("Preferred start date", { exact: true })
+    .fill(new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10))
+  await page
+    .getByLabel("Preferred end date", { exact: true })
+    .fill(new Date(Date.now() + 21 * 86400000).toISOString().slice(0, 10))
+  await page
+    .getByLabel("Preferred days and time", { exact: true })
+    .fill("Saturday mornings")
   await page.getByRole("button", { name: "Next", exact: true }).click()
-  await page.getByRole("combobox", { name: "Training mode", exact: true }).selectOption("Online")
-  await page.getByLabel("Preferred training location", { exact: true }).fill("Mansalay")
-  await page.getByLabel("How will this training help you?", { exact: true }).fill("Prepare for office support work.")
+  await page
+    .getByRole("combobox", { name: "Training mode", exact: true })
+    .selectOption("Online")
+  await page
+    .getByLabel("Preferred training location", { exact: true })
+    .fill("Mansalay")
+  await page
+    .getByLabel("How will this training help you?", { exact: true })
+    .fill("Prepare for office support work.")
   await page.getByRole("button", { name: "Next", exact: true }).click()
-  await page.getByRole("button", { name: "Submit training request", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Submit training request", exact: true })
+    .click()
   await expect(
     page.getByRole("heading", { name: topic, exact: true }),
   ).toBeVisible()

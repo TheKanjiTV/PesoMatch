@@ -58,7 +58,7 @@ class TableSettingsTest extends TestCase
         TableSetting::create(['id' => 1, 'rows_per_page' => 10]);
         $admin = User::factory()->create(['role' => 'admin']);
         $this->actingAs($admin);
-        foreach (['vacancies', 'employers', 'training', 'referrals', 'enrollments', 'placements', 'outcomes', 'services', 'events', 'jobseekers', 'users', 'audit', 'training-demands'] as $path) {
+        foreach (['vacancies', 'employers', 'training', 'referrals', 'enrollments', 'placements', 'outcomes', 'services', 'jobseekers', 'users', 'audit', 'training-demands'] as $path) {
             $this->getJson('/api/platform/'.$path)->assertOk()->assertJsonPath('per_page', 10);
         }
         $this->getJson('/api/privacy/requests')->assertOk()->assertJsonPath('per_page', 10);

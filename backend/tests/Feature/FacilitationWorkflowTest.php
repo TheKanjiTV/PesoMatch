@@ -194,13 +194,17 @@ class FacilitationWorkflowTest extends TestCase
         $this->asUser($u)->postJson('/api/platform/vacancies/'.$v->id.'/referrals')->assertNotFound();
     }
 
-    public function test_event_reference_links_require_a_name_and_safe_https_scheme(): void
+    public function test_events_are_retired_from_both_api_versions_and_public_catalog(): void
     {
         $staff = $this->person('peso_staff');
         $base = ['title' => 'Isolated event', 'type' => 'Job fair', 'location' => 'Bansud', 'starts_at' => now()->addWeek()->toIso8601String(), 'description' => 'Isolated test', 'status' => 'draft'];
-        $this->asUser($staff)->postJson('/api/platform/events', $base + ['reference_url' => 'https://ro11.dole.gov.ph/job-fair-schedules/'])->assertUnprocessable();
-        $this->postJson('/api/platform/events', $base + ['reference_name' => 'DOLE XI · 2026 Job Fair Schedules', 'reference_url' => 'javascript:alert(1)'])->assertUnprocessable();
-        $this->postJson('/api/platform/events', $base + ['reference_name' => 'DOLE XI · 2026 Job Fair Schedules', 'reference_url' => 'https://ro11.dole.gov.ph/job-fair-schedules/'])->assertOk()->assertJsonPath('data.reference_name', 'DOLE XI · 2026 Job Fair Schedules');
+        $this->asUser($staff);
+        foreach (['/api/platform', '/api/v1/platform'] as $prefix) {
+            $this->getJson($prefix.'/events')->assertNotFound();
+            $this->postJson($prefix.'/events', $base)->assertNotFound();
+            $this->patchJson($prefix.'/events/1', $base)->assertNotFound();
+        }
+        $this->getJson('/api/public/catalog')->assertOk()->assertJsonMissingPath('events');
     }
 
     public function test_withdrawing_a_referral_does_not_validate_or_require_an_interview_date(): void

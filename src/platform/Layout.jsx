@@ -114,8 +114,6 @@ const nav = [
     ["jobseeker", "peso_staff", "admin"],
   ],
 
-  ["Events & Programs", "/events", CalendarDays],
-
   ["Account Access", "/users", UsersRound, ["admin"]],
 
   ["Audit Records", "/audit", ShieldCheck, ["admin"]],

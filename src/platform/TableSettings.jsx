@@ -36,14 +36,6 @@ export function TableSettings() {
       <h2 id="table-settings" className="text-base font-semibold text-primary">
         Table settings
       </h2>
-      <p
-        id="table-settings-help"
-        className="mt-2 max-w-prose text-sm leading-6 text-muted-foreground"
-      >
-        Choose 1–20 records per page for all tables and record lists, across
-        every account. The default is 20. Page counts adjust automatically; all
-        records remain available on later pages.
-      </p>
       <div className="mt-5">
         <ResourceState
           resource={settings}
@@ -72,7 +64,6 @@ export function TableSettings() {
                   required
                   disabled={saving}
                   defaultValue={settings.data.rows_per_page}
-                  aria-describedby="table-settings-help"
                 />
               </label>
               {feedback && (

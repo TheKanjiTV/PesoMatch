@@ -17,11 +17,7 @@ import { useResource } from "./api.js"
 
 import { ResourceState } from "./ResourceState.jsx"
 
-import {
-  OverviewSkeleton,
-  StatsSkeleton,
-  EventsSkeleton,
-} from "./LoadingStates.jsx"
+import { OverviewSkeleton, StatsSkeleton } from "./LoadingStates.jsx"
 
 import {
   ActionLink,
@@ -43,8 +39,7 @@ export function OverviewPage() {
   const { user } = useAuth(),
     staff = staffRole(user.role)
 
-  const r = useResource("/summary"),
-    events = useResource("/events")
+  const r = useResource("/summary")
 
   const partner = ["employer", "training_provider"].includes(user.role)
   const employer = user.role === "employer"
@@ -110,14 +105,6 @@ export function OverviewPage() {
 
               "/enrollments",
             ],
-
-            [
-              "Coordinate community programs",
-
-              "View scheduled orientations, livelihood activities, and job fairs.",
-
-              "/events",
-            ],
           ]
         : [
             [
@@ -137,7 +124,7 @@ export function OverviewPage() {
             ],
           ]
 
-  if (r.loading || events.loading) return <OverviewSkeleton role={user.role} />
+  if (r.loading) return <OverviewSkeleton role={user.role} />
 
   return (
     <>
@@ -150,7 +137,7 @@ export function OverviewPage() {
           }
           description={
             staff
-              ? "A service desk for registration, referrals, upskilling, placement, and continued employment support."
+              ? ""
               : partner
                 ? "Coordinate with PESO and keep your organization’s service records up to date."
                 : ""
@@ -166,16 +153,18 @@ export function OverviewPage() {
                   My profile & résumé
                 </Link>
               )}
-              {user.role === "admin" && <button
-                type="button"
-                data-tour-launcher
-                className={secondaryStyle}
-                onClick={() =>
-                  window.dispatchEvent(new Event("peso:open-tour"))
-                }
-              >
-                Replay workspace tutorial
-              </button>}
+              {user.role === "admin" && (
+                <button
+                  type="button"
+                  data-tour-launcher
+                  className={secondaryStyle}
+                  onClick={() =>
+                    window.dispatchEvent(new Event("peso:open-tour"))
+                  }
+                >
+                  Replay workspace tutorial
+                </button>
+              )}
             </div>
           }
         />
@@ -248,8 +237,6 @@ export function OverviewPage() {
               "Training enrollment & upskilling",
 
               "Employment facilitation & placement",
-
-
             ].map((s, i) => (
               <li key={s} className="flex items-start gap-3">
                 <span className="grid size-6 shrink-0 place-items-center rounded-full border border-[#b4c2a8] text-xs">
@@ -341,7 +328,7 @@ export function OverviewPage() {
           </div>
         </ResourceState>
       )}
-      <div className="grid gap-10 xl:grid-cols-[1.3fr_1fr]">
+      <div className="grid gap-10">
         <section>
           <h2 className="mb-5 font-display text-2xl text-primary">
             What would you like to do?
@@ -364,54 +351,6 @@ export function OverviewPage() {
               </Link>
             ))}
           </div>
-        </section>
-        <section>
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="font-display text-2xl text-primary">
-              Events & programs
-            </h2>
-            <Link
-              to="/events"
-              aria-label="View all events and programs"
-              className="text-xs font-semibold text-primary underline"
-            >
-              View all
-            </Link>
-          </div>
-          <ResourceState
-            resource={events}
-            skeleton={<EventsSkeleton overview />}
-          >
-            {events.data?.data
-
-              .filter((e) => e.status === "published")
-
-              .slice(0, 3)
-
-              .map((e) => (
-                <article
-                  key={e.id}
-                  className="mb-3 rounded-lg border border-border bg-card p-5"
-                >
-                  <div className="flex flex-wrap gap-2">
-                    <Badge>{e.type}</Badge>
-                    <Sample record={e} />
-                  </div>
-                  <h3 className="mt-4 text-sm font-semibold text-primary">
-                    {e.title}
-                  </h3>
-                  <p className="mt-2 text-xs leading-6 text-muted-foreground">
-                    {date(e.event_date || e.starts_at)} · {e.location}
-                  </p>
-                  <div className="mt-3">
-                    <Source record={e} />
-                  </div>
-                </article>
-              ))}
-            {!events.data?.data.length && (
-              <Empty title="No scheduled events yet" />
-            )}
-          </ResourceState>
         </section>
       </div>
     </>

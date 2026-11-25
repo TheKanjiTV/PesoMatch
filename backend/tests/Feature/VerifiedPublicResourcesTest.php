@@ -40,7 +40,7 @@ class VerifiedPublicResourcesTest extends TestCase
         $sourceReport = json_decode(file_get_contents(database_path('data/verified-public-resources.json')), true)[0];
         $this->assertSame(CarbonImmutable::parse($sourceReport['checked_at'])->timestamp, PublicResource::first()->source_checked_at->timestamp);
         $event = ServiceEvent::first();
-        $this->patchJson('/api/platform/events/'.$event->id, ['title' => 'Unsupported change'])->assertUnprocessable();
+        $this->patchJson('/api/platform/events/'.$event->id, ['title' => 'Unsupported change'])->assertNotFound();
         $this->assertNotSame('Unsupported change', $event->fresh()->title);
     }
 
@@ -50,7 +50,8 @@ class VerifiedPublicResourcesTest extends TestCase
         $this->artisan('peso:import-verified-vacancies')->assertSuccessful();
         $this->artisan('peso:import-verified-training', ['--catalog' => 'online'])->assertSuccessful();
         $public = $this->getJson('/api/public/catalog')->assertOk()->json();
-        foreach (array_merge($public['vacancies'], $public['training'], $public['events']) as $record) {
+        $this->assertArrayNotHasKey('events', $public);
+        foreach (array_merge($public['vacancies'], $public['training']) as $record) {
             $this->assertFalse($record['is_sample']);
         }
         $user = User::factory()->create(['role' => 'jobseeker']);

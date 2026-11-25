@@ -30,7 +30,7 @@ The same append-only application events appear in `/api/v1/platform/audit`. Admi
 
 ### Archive and permanent deletion
 
-The administrator's **Archive & Restore** page is `/archive`, beside Audit Records and linked from Account Access. `GET /api/v1/platform/archive?kind=all|account|vacancy|training|enrollment&search=...&page=1` unifies recoverable records with global pagination. `POST /api/v1/platform/archive/{type}/{id}/restore` restores an archived record; account restoration requires the current administrator password.
+The administrator's **Archive & Restore** page is `/archive`, beside Audit Records and linked from Account Access. `GET /api/v1/platform/archive?kind=all|account|vacancy|training|enrollment|demand&search=...&page=1` unifies recoverable records with global pagination. `POST /api/v1/platform/archive/{type}/{id}/restore` restores an archived record; account restoration requires the current administrator password.
 
 Normal catalog/enrollment removal uses existing soft deletion. Administrator account removal now sets `users.archived_at`, revokes all sessions and remember tokens, and preserves the profile, private résumé, and linked records. Archived accounts cannot sign in or appear in active account lists. Restoring an account preserves its previous role and requires a fresh login. Account email uniqueness remains reserved during archival.
 
@@ -147,9 +147,18 @@ Private requests can send `X-Peso-User`. A mismatch with the authenticated sessi
 - `PATCH /api/v1/platform/referrals/{id}`: external transition to referred requires staff `source_confirmation` evidence (20–2000 characters); officer/time/evidence are retained in the match snapshot.
 - `POST /api/v1/platform/delete-intents`: `{type: vacancy|training|enrollment|account, id}` returns encrypted `token` and `wait_seconds: 5`. Requires a stateful authenticated session and target permission.
 - `DELETE /api/v1/platform/remove/{type}/{id}`: `{confirmation_token}`; account erasure also requires the acting administrator's `current_password`. Intent is session/actor/target-bound, unlocks in five seconds, expires in five minutes and is consumed. Catalog/request removal uses soft deletion; active own enrollment requests become withdrawn first. Completed enrollment removal is rejected. Account Access cannot delete the current account or last administrator.
-- Event mutations accept optional paired `reference_name` (160 chars) and `reference_url` (HTTPS, 700 chars, no embedded credentials). These are user-entered references, not fabricated official-source verification.
+- Events & Programs is retired. Both API aliases return 404 for event reads and mutations; the former `/events` workspace URL redirects to Overview. Existing historical database records are retained and public catalog JSON no longer includes events.
 
 Existing role/ownership, notice, workflow, password, audit and privacy checks remain. See [November 7 update](WORKSPACE-UPDATE-2026-11-07.md).
 
 
 Current Training Enrollment UI uses the existing withdrawal PATCH transition only; its duplicate delete-request action/dialog has been removed. The generic guarded removal API is unchanged for compatibility. The full workspace guide performs page reads and saves only the existing tutorial preference; it never submits referral/enrollment/placement mutations or changes a role.
+
+
+## November 25 archive management and request limits
+
+Training Demand supports `POST /training-demands/{id}/archive` for an owning jobseeker or PESO staff/admin, and `POST /training-demands/archive-topic` with an exact `topic_key` for PESO staff/admin. Topic archival affects only active requests for that topic, preserves catalog programs/enrollments, and appends one `demand.archived` audit per request. Active lists and interest totals exclude archived requests. Administrators restore them from the general Archive page; an explicit repeat request also reactivates the original unique person/topic row.
+
+Admin-only `POST /archive/delete-intents` takes `{type: account|vacancy|training|enrollment|demand, id}` for an already archived record and returns a five-second session-bound token, exact label and linked-record counts. `DELETE /archive/{type}/{id}` requires that token, an exact `confirmation_name`, and the acting administrator's `current_password`. It expires after five minutes, is consumed once, refuses restored records and rejects changed linked totals with 409. Account deletion removes private résumé/profile and personal service records but keeps owned catalog listings and audit history. Vacancy deletion removes bookmarks, interview practices, referrals and placements; independent employment reports keep their data with cleared placement links. Training deletion removes linked enrollments but preserves separate source intakes/topic requests with cleared source links. Each permanent deletion appends a business audit event.
+
+Numeric request limits use distinct operation prefixes shared by legacy/v1 aliases. AI status/read/delete requests no longer consume the generation quota; matching permits 60/minute, generation 15/minute, per account. The general platform limit is 360 reads/minute and 60 writes/minute. Existing staged sign-in lockouts and the login IP limit remain enforced. Generic 429 messages display the server's retry interval and preserve form entries; mutations are never automatically replayed.

@@ -1,6 +1,5 @@
 import { DeleteDialog } from "./DeleteDialog.jsx"
 
-
 import { RecordPages } from "./RecordPages.jsx"
 
 import { TableSettings } from "./TableSettings.jsx"
@@ -24,7 +23,6 @@ import { searchSuggestions } from "./search.js"
 import { ResourceState } from "./ResourceState.jsx"
 
 import {
-  EventsSkeleton,
   LaborMarketSkeleton,
   RegistrySkeleton,
   TableSkeleton,
@@ -52,265 +50,6 @@ import {
   staffRole,
 } from "./ui.jsx"
 
-export function EventsPage() {
-  const { user } = useAuth(),
-    staff = staffRole(user.role),
-    r = useResource("/events")
-
-  const [editor, setEditor] = useState(null),
-    [message, setMessage] = useState("")
-
-  const fields = [
-    { name: "title", label: "Event / program title" },
-
-    {
-      name: "type",
-
-      label: "Service type",
-
-      options: [
-        "Job fair",
-
-        "Career guidance",
-
-        "Pre-employment orientation",
-
-        "Livelihood",
-
-        "SPES / GIP / JobStart",
-
-        "Reintegration",
-      ],
-    },
-
-    { name: "location", label: "Venue / location" },
-
-    {
-      name: "reference_name",
-
-      label: "Organizer / link display name",
-
-      required: false,
-
-      maxLength: 160,
-    },
-
-    {
-      name: "reference_url",
-
-      label: "Organizer / program link (HTTPS)",
-
-      type: "url",
-
-      required: false,
-
-      maxLength: 700,
-    },
-
-    {
-      name: "starts_at",
-
-      label: "Start time (Philippine time)",
-
-      type: "datetime-local",
-    },
-
-    {
-      name: "status",
-
-      label: "Publication status",
-
-      options: ["draft", "published", "cancelled", "completed"],
-    },
-
-    {
-      name: "description",
-
-      label: "Program details & coordination instructions",
-
-      type: "textarea",
-    },
-  ]
-
-  async function save(v) {
-    const body = Object.fromEntries(fields.map((f) => [f.name, v[f.name]]))
-
-    body.starts_at += ":00+08:00"
-
-    await api(
-      `/events${editor.id ? `/${editor.id}` : ""}`,
-
-      editor.id ? "PATCH" : "POST",
-
-      body,
-    )
-
-    setMessage("Event saved.")
-
-    await r.reload()
-  }
-
-  return (
-    <>
-      <Heading
-        title="Events & Employment Programs"
-        description=""
-        action={
-          staff && (
-            <button
-              className={addStyle}
-              onClick={() => setEditor({ status: "draft" })}
-            >
-              Add event / program
-            </button>
-          )
-        }
-      />
-      {message && (
-        <div className="mb-5">
-          <Notice>{message}</Notice>
-        </div>
-      )}
-      {editor && (
-        <Editor
-          key={editor.id || "new"}
-          title={editor.id ? "Edit event" : "Add event / program"}
-          fields={fields}
-          initial={editor}
-          onClose={() => setEditor(null)}
-          onSave={save}
-        />
-      )}
-      <ResourceState resource={r} skeleton={<EventsSkeleton />}>
-        {!r.data?.data.length ? (
-          <Empty title="No events published yet" />
-        ) : (
-          <div className="space-y-4">
-            {r.data?.data.map((e) => (
-              <article
-                key={e.id}
-                className="rounded-lg border border-border bg-card p-6"
-              >
-                <div className="flex flex-wrap gap-2">
-                  <Badge>{e.type}</Badge>
-                  <Badge>{human(e.status)}</Badge>
-                  <Sample record={e} />
-                </div>
-                <h2 className="mt-4 font-display text-2xl text-primary">
-                  {e.title}
-                </h2>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {date(e.event_date || e.starts_at)} · {e.location}
-                </p>
-                {e.reference_url && (
-                  <a
-                    href={e.reference_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex min-h-11 items-center font-bold text-primary underline underline-offset-4"
-                  >
-                    {e.reference_name}
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
-                )}
-                {e.source_url && (
-                  <div className="mt-3">
-                    <Source record={e} />
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Official calendar · opening time not published. Confirm
-                      arrangements with the organizer.
-                    </p>
-                  </div>
-                )}
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-                  {e.description}
-                </p>
-                <div className="mt-5">
-                  {staff && !e.source_url ? (
-                    <button
-                      className={secondaryStyle}
-                      onClick={() =>
-                        setEditor({
-                          ...e,
-
-                          starts_at: new Date(
-                            new Date(e.starts_at).getTime() + 8 * 3600000,
-                          )
-
-                            .toISOString()
-
-                            .slice(0, 16),
-                        })
-                      }
-                    >
-                      Edit event
-                    </button>
-                  ) : e.source_url ? (
-                    <a
-                      className={`${secondaryStyle} action-view`}
-                      href={e.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View organizer schedule
-                    </a>
-                  ) : (
-                    user.role === "jobseeker" && (
-                      <Link to="/services" className={secondaryStyle}>
-                        Ask PESO about this program
-                      </Link>
-                    )
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </ResourceState>
-    </>
-  )
-}
-
-function exportCsv(name, headers, rows) {
-  const safe = (v) => {
-    let s = String(v ?? "")
-
-    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s
-
-    return '"' + s.replaceAll('"', '""') + '"'
-  }
-
-  const csv = [headers, ...rows]
-
-    .map((row) => row.map(safe).join(","))
-
-    .join("\r\n")
-
-  if (
-    window.PesoDownloads?.saveCsv &&
-    navigator.userAgent.includes("PESOAndroid")
-  ) {
-    window.PesoDownloads.saveCsv("\uFEFF" + csv, name)
-
-    return
-  }
-
-  const url = URL.createObjectURL(
-    new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }),
-  )
-
-  const a = document.createElement("a")
-
-  a.href = url
-
-  a.download = name
-
-  a.click()
-
-  URL.revokeObjectURL(url)
-}
-
-
 export function RegistryPage() {
   const [search, setSearch] = useState(""),
     [expanded, setExpanded] = useState(null)
@@ -323,10 +62,7 @@ export function RegistryPage() {
 
   return (
     <>
-      <Heading
-        title="Jobseeker Registration & Profiling"
-        description="Review registered profiles, declared skills, employment preferences, and profile completion for PESO facilitation."
-      />
+      <Heading title="Jobseeker Registration & Profiling" description="" />
       <div className="mb-6 max-w-xl">
         <SearchInput
           label="Search jobseekers"
@@ -498,7 +234,7 @@ export function AccessPage() {
           </div>
         }
         title="Account Access & Responsibilities"
-        description="Public accounts begin as jobseekers. Only administrators can provision staff and partner access."
+        description=""
       />
       {adding && (
         <Editor
@@ -564,36 +300,6 @@ export function AccessPage() {
       )}
       <TableSettings />
       <LoginAttemptSettings />
-      <div className="mb-7 grid gap-3 sm:grid-cols-2">
-        {Object.entries(roles).map(([role, label]) => (
-          <div
-            key={role}
-            className="rounded-md border border-border bg-card p-4"
-          >
-            <h2 className="text-sm font-semibold text-primary">{label}</h2>
-            <p className="mt-2 text-xs leading-6 text-muted-foreground">
-              {
-                {
-                  jobseeker:
-                    "Own profile, matching, referrals, training enrollment, assistance, and employment reporting.",
-
-                  employer:
-                    "Own vacancy submissions and coordination of PESO-referred applicants.",
-
-                  training_provider:
-                    "Own program submissions, enrollment confirmation, progress, and completion.",
-
-                  peso_staff:
-                    "Registry, catalog review, referrals, placement verification, counseling, and interview follow-up.",
-
-                  admin:
-                    "PESO operations plus role provisioning and access to the audit log.",
-                }[role]
-              }
-            </p>
-          </div>
-        ))}
-      </div>
       {message && (
         <div className="mb-5">
           <Notice>{message}</Notice>
@@ -693,10 +399,7 @@ export function AuditPage() {
 
   return (
     <>
-      <Heading
-        title="Audit Records"
-        description="Review business changes and authentication events, including registration, login, lockout, password changes, session expiry, and access revocation."
-      />
+      <Heading title="Audit Records" description="" />
       <label className="mb-6 block max-w-sm text-sm font-semibold">
         Activity category
         <select

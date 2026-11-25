@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Listeners\AuthenticationActivity;
 use App\Models\Enrollment;
 use App\Models\TableSetting;
+use App\Models\TrainingDemand;
 use App\Models\TrainingProgram;
 use App\Models\User;
 use App\Models\Vacancy;
@@ -15,7 +16,7 @@ use Illuminate\Validation\Rule;
 
 class ArchiveController extends Controller
 {
-    private const TYPES = ['account', 'vacancy', 'training', 'enrollment'];
+    private const TYPES = ['account', 'vacancy', 'training', 'enrollment', 'demand'];
 
     public function index(Request $request)
     {
@@ -27,6 +28,7 @@ class ArchiveController extends Controller
             DB::table('training_programs')->whereNotNull('deleted_at')->selectRaw("id, 'training' as type, title as label, provider as context, status, deleted_at as archived_at"),
             DB::table('enrollments')->join('training_programs', 'training_programs.id', '=', 'enrollments.training_program_id')->leftJoin('users', 'users.id', '=', 'enrollments.user_id')->whereNotNull('enrollments.deleted_at')->selectRaw("enrollments.id, 'enrollment' as type, training_programs.title as label, COALESCE(users.name, enrollments.walk_in_name) as context, enrollments.status, enrollments.deleted_at as archived_at"),
         ];
+        $queries[] = DB::table('training_demands')->leftJoin('users', 'users.id', '=', 'training_demands.user_id')->whereNotNull('training_demands.deleted_at')->selectRaw("training_demands.id, 'demand' as type, training_demands.topic as label, users.name as context, 'requested' as status, training_demands.deleted_at as archived_at");
         $union = array_shift($queries);
         foreach ($queries as $query) {
             $union->unionAll($query);
@@ -61,7 +63,7 @@ class ArchiveController extends Controller
                 $row->forceFill(['archived_at' => null, 'remember_token' => null])->save();
                 app(AuthenticationActivity::class)->record($row, 'auth.account_restored', ['performed_by' => $request->user()->id]);
             } else {
-                $class = ['vacancy' => Vacancy::class, 'training' => TrainingProgram::class, 'enrollment' => Enrollment::class][$type];
+                $class = ['vacancy' => Vacancy::class, 'training' => TrainingProgram::class, 'enrollment' => Enrollment::class, 'demand' => TrainingDemand::class][$type];
                 if ($type === 'enrollment') {
                     $candidate = Enrollment::onlyTrashed()->findOrFail($id);
                     // Match enrollment mutations' parent-before-child lock order.
@@ -71,15 +73,17 @@ class ArchiveController extends Controller
                 $row = $class::onlyTrashed()->lockForUpdate()->findOrFail($id);
                 if ($type === 'enrollment') {
                     abort_unless(in_array($row->status, ['withdrawn', 'rejected'], true), 422, 'Only withdrawn or rejected enrollment history can be restored.');
+                } elseif ($type === 'demand') {
+                    abort_unless(User::whereKey($row->user_id)->exists(), 422, 'Restore the linked account first.');
                 } else {
                     // Restoration never republishes an expired or unreviewed listing.
                     $row->status = 'draft';
                 }
                 $row->restore();
             }
-            DB::table('audit_events')->insert(['actor_id' => $request->user()->id, 'action' => $type.'.restored', 'entity' => $row->getTable(), 'entity_id' => $id, 'changes' => json_encode(['status' => $row->status ?? $row->role, 'restored' => true]), 'created_at' => now()]);
+            DB::table('audit_events')->insert(['actor_id' => $request->user()->id, 'action' => $type.'.restored', 'entity' => $row->getTable(), 'entity_id' => $id, 'changes' => json_encode(['status' => $row->status ?? $row->role ?? 'requested', 'restored' => true]), 'created_at' => now()]);
 
-            return response()->json(['message' => $type === 'account' ? 'Account restored. A new sign-in is required.' : ($type === 'enrollment' ? 'Enrollment history restored. Its terminal status is unchanged.' : 'Record restored as a draft. Review before publishing.')]);
+            return response()->json(['message' => $type === 'account' ? 'Account restored. A new sign-in is required.' : ($type === 'demand' ? 'Training request restored.' : ($type === 'enrollment' ? 'Enrollment history restored. Its terminal status is unchanged.' : 'Record restored as a draft. Review before publishing.'))]);
         });
     }
 }

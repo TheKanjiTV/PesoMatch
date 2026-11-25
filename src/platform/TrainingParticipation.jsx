@@ -1,3 +1,4 @@
+import { Modal } from "./Modal.jsx"
 import {
   TrainingRequestWizard,
   TrainingRequestDetails,
@@ -9,7 +10,14 @@ import { useAuth } from "../context/AuthContext.jsx"
 import { RecordLink } from "./RecordLink.jsx"
 import { ResourceState } from "./ResourceState.jsx"
 import { TableSkeleton } from "./LoadingStates.jsx"
-import { Badge, Editor, Notice, primaryStyle, secondaryStyle } from "./ui.jsx"
+import {
+  Badge,
+  Editor,
+  Notice,
+  primaryStyle,
+  secondaryStyle,
+  dangerStyle,
+} from "./ui.jsx"
 
 export function TrainingParticipants({ program, onChanged }) {
   const r = useResource(`/training/${program.id}/participants`)
@@ -134,9 +142,36 @@ export function TrainingDemandPage() {
   const sourceId = params.get("source_program_id") || ""
   const { user } = useAuth()
   const r = useResource("/training-demands")
-  const [adding, setAdding] = useState(user.role === "jobseeker" && Boolean(initialTopic))
+  const [adding, setAdding] = useState(
+    user.role === "jobseeker" && Boolean(initialTopic),
+  )
   const [message, setMessage] = useState("")
   const [expanded, setExpanded] = useState(null)
+  const [archiving, setArchiving] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState("")
+  async function archive() {
+    if (busy) return
+    setBusy(true)
+    setError("")
+    try {
+      const result = await api(
+        user.role === "jobseeker"
+          ? `/training-demands/${archiving.id}/archive`
+          : "/training-demands/archive-topic",
+        "POST",
+        user.role === "jobseeker" ? {} : { topic_key: archiving.topic_key },
+      )
+      setMessage(result.message)
+      setArchiving(null)
+      setExpanded(null)
+      await r.reload()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
     <>
       <h1 className="mb-4 font-display text-3xl text-primary">
@@ -151,6 +186,36 @@ export function TrainingDemandPage() {
         </button>
       )}
       {message && <Notice>{message}</Notice>}
+      {archiving && (
+        <Modal
+          title={`Archive ${archiving.topic}?`}
+          size="compact"
+          busy={busy}
+          onClose={() => setArchiving(null)}
+          initialFocusSelector="[data-cancel]"
+        >
+          <p className="mb-5 text-sm leading-6">
+            {user.role === "jobseeker"
+              ? "Archive this training request?"
+              : `Archive ${archiving.interested_jobseekers} active request(s) for this topic?`}{" "}
+            An administrator can restore requests from Archive & Restore.
+          </p>
+          {error && <Notice error>{error}</Notice>}
+          <div className="flex flex-wrap justify-end gap-3">
+            <button
+              data-cancel
+              className={secondaryStyle}
+              disabled={busy}
+              onClick={() => setArchiving(null)}
+            >
+              Cancel
+            </button>
+            <button className={dangerStyle} disabled={busy} onClick={archive}>
+              {busy ? "Archiving…" : "Archive request"}
+            </button>
+          </div>
+        </Modal>
+      )}
       {adding && (
         <TrainingRequestWizard
           initial={{
@@ -214,9 +279,22 @@ export function TrainingDemandPage() {
                   )}
                 </div>
               </div>
-              {user.role !== "jobseeker" && (
-                <span>{d.interested_jobseekers} interested jobseeker(s)</span>
-              )}
+              <div className="flex flex-wrap items-center gap-3">
+                {user.role !== "jobseeker" && (
+                  <span>{d.interested_jobseekers} interested jobseeker(s)</span>
+                )}
+                <button
+                  className={secondaryStyle}
+                  onClick={() => {
+                    setError("")
+                    setArchiving(d)
+                  }}
+                >
+                  {user.role === "jobseeker"
+                    ? "Archive request"
+                    : "Archive topic"}
+                </button>
+              </div>
             </div>
           ))}
         </div>

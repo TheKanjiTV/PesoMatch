@@ -352,7 +352,6 @@ export function PageSkeleton({ pathname = "/dashboard", role = "jobseeker" }) {
         <RegistrySkeleton />
       </>
     )
-  else if (page === "events") content = <EventsSkeleton />
   else if (page === "labor-market")
     content = (
       <LaborMarketSkeleton staff={["admin", "peso_staff"].includes(role)} />
@@ -463,7 +462,7 @@ export function OverviewSkeleton({ role = "jobseeker" }) {
         </div>
       </div>
       {role !== "training_provider" && <Stats employer={role === "employer"} />}
-      <div className="grid gap-10 xl:grid-cols-[1.3fr_1fr]">
+      <div className="grid gap-10">
         <section>
           <Bar className="mb-5 h-7 w-3/5" />
           <div className="divide-y divide-border rounded-lg border border-border bg-card px-6">
@@ -479,13 +478,6 @@ export function OverviewSkeleton({ role = "jobseeker" }) {
               </div>
             ))}
           </div>
-        </section>
-        <section>
-          <div className="mb-5 flex items-center justify-between">
-            <Bar className="h-7 w-1/2" />
-            <Bar className="h-3 w-16" />
-          </div>
-          <EventCards overview />
         </section>
       </div>
     </Frame>

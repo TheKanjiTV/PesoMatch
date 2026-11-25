@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
 use App\Models\TableSetting;
+use App\Models\TrainingDemand;
 use App\Models\TrainingProgram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,16 +62,16 @@ class TrainingParticipationController extends Controller
     {
         abort_unless(in_array($r->user()->role, ['jobseeker', 'peso_staff', 'admin'], true), 403);
         if ($r->user()->role === 'jobseeker') {
-            return DB::table('training_demands')->where('user_id', $r->user()->id)->orderBy('topic')->orderBy('id')->paginate(TableSetting::perPage());
+            return DB::table('training_demands')->whereNull('deleted_at')->where('user_id', $r->user()->id)->orderBy('topic')->orderBy('id')->paginate(TableSetting::perPage());
         }
 
         if ($r->filled('topic_key')) {
             $key = $r->validate(['topic_key' => 'required|string|max:160'])['topic_key'];
 
-            return DB::table('training_demands')->leftJoin('users', 'users.id', '=', 'training_demands.user_id')->where('topic_key', $key)->select('training_demands.*', 'users.name')->orderByDesc('training_demands.updated_at')->paginate(TableSetting::perPage());
+            return DB::table('training_demands')->leftJoin('users', 'users.id', '=', 'training_demands.user_id')->whereNull('training_demands.deleted_at')->where('topic_key', $key)->select('training_demands.*', 'users.name')->orderByDesc('training_demands.updated_at')->paginate(TableSetting::perPage());
         }
 
-        return response()->json(DB::table('training_demands')->select('topic_key')->selectRaw('MIN(topic) as topic, COUNT(DISTINCT user_id) as interested_jobseekers')->groupBy('topic_key')->orderByDesc('interested_jobseekers')->orderBy('topic_key')->paginate(TableSetting::perPage())->toArray() + ['note' => 'Planning demand only. Counts do not create or approve a training intake.']);
+        return response()->json(DB::table('training_demands')->whereNull('deleted_at')->select('topic_key')->selectRaw('MIN(topic) as topic, COUNT(DISTINCT user_id) as interested_jobseekers')->groupBy('topic_key')->orderByDesc('interested_jobseekers')->orderBy('topic_key')->paginate(TableSetting::perPage())->toArray() + ['note' => 'Planning demand only. Counts do not create or approve a training intake.']);
     }
 
     public function demand(Request $r)
@@ -96,11 +97,44 @@ class TrainingParticipationController extends Controller
                 $details[$field] = $data[$field] ?? $existing->$field;
             }
         }
-        DB::table('training_demands')->upsert([array_merge($details, ['user_id' => $r->user()->id, 'topic' => trim($data['topic']), 'topic_key' => $key, 'source_program_id' => $data['source_program_id'] ?? null, 'created_at' => now(), 'updated_at' => now()])], ['user_id', 'topic_key'], ['updated_at', 'description', 'preferred_start', 'preferred_end', 'preferred_schedule', 'mode', 'location', 'goal']);
+        DB::table('training_demands')->upsert([array_merge($details, ['user_id' => $r->user()->id, 'topic' => trim($data['topic']), 'topic_key' => $key, 'source_program_id' => $data['source_program_id'] ?? null, 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => null])], ['user_id', 'topic_key'], ['updated_at', 'deleted_at', 'description', 'preferred_start', 'preferred_end', 'preferred_schedule', 'mode', 'location', 'goal']);
 
         $id = DB::table('training_demands')->where('user_id', $r->user()->id)->where('topic_key', $key)->value('id');
         DB::table('audit_events')->insert(['actor_id' => $r->user()->id, 'action' => 'training.topic_requested', 'entity' => 'training_demands', 'entity_id' => $id, 'changes' => json_encode(['changed_fields' => array_keys($data)]), 'created_at' => now()]);
 
         return response()->json(['message' => 'Training topic request submitted.'], 201);
+    }
+
+    public function archiveDemand(Request $r, int $id)
+    {
+        abort_unless(in_array($r->user()->role, ['jobseeker', 'peso_staff', 'admin'], true), 403);
+
+        return DB::transaction(function () use ($r, $id) {
+            $row = TrainingDemand::lockForUpdate()->findOrFail($id);
+            abort_unless($r->user()->role !== 'jobseeker' || $row->user_id === $r->user()->id, 403);
+            $this->archiveRows($r, collect([$row]));
+
+            return response()->json(['message' => 'Training request archived.']);
+        });
+    }
+
+    public function archiveTopic(Request $r)
+    {
+        abort_unless(in_array($r->user()->role, ['peso_staff', 'admin'], true), 403);
+        $key = $r->validate(['topic_key' => 'required|string|max:160'])['topic_key'];
+
+        return DB::transaction(function () use ($r, $key) {
+            $rows = TrainingDemand::where('topic_key', $key)->lockForUpdate()->get();
+            abort_if($rows->isEmpty(), 404, 'No active requests remain for this topic.');
+            $this->archiveRows($r, $rows);
+
+            return response()->json(['message' => $rows->count().' training request(s) archived.']);
+        });
+    }
+
+    private function archiveRows(Request $r, $rows): void
+    {
+        TrainingDemand::whereIn('id', $rows->pluck('id'))->update(['deleted_at' => now(), 'updated_at' => now()]);
+        DB::table('audit_events')->insert($rows->map(fn ($row) => ['actor_id' => $r->user()->id, 'action' => 'demand.archived', 'entity' => 'training_demands', 'entity_id' => $row->id, 'changes' => json_encode(['archived' => true]), 'created_at' => now()])->all());
     }
 }

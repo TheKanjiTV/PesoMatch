@@ -82,7 +82,7 @@ class EmploymentController extends Controller
 
     public function publicCatalog()
     {
-        return response()->json(['vacancies' => Vacancy::available()->where('is_sample', false)->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest()->orderByDesc('id')->limit(6)->get(), 'training' => TrainingProgram::available()->where('is_sample', false)->orderBy('starts_on')->orderBy('title')->orderBy('id')->limit(6)->get(), 'events' => ServiceEvent::where('is_sample', false)->where('status', 'published')->where(fn ($q) => $q->where('starts_at', '>=', now())->orWhereDate('event_date', '>=', today()))->orderBy('event_date')->orderBy('starts_at')->limit(6)->get(), 'services' => self::SERVICES]);
+        return response()->json(['vacancies' => Vacancy::available()->where('is_sample', false)->orderByRaw('COALESCE(source_posted_on, DATE(created_at)) DESC')->latest()->orderByDesc('id')->limit(6)->get(), 'training' => TrainingProgram::available()->where('is_sample', false)->orderBy('starts_on')->orderBy('title')->orderBy('id')->limit(6)->get(), 'services' => self::SERVICES]);
     }
 
     public function vacancies(Request $r)

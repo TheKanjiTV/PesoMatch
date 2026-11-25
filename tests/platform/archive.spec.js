@@ -3,6 +3,68 @@ import { execFileSync } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { test, expect, apiCall, provisionAndSignIn } from "./helpers.js"
 
+test("training request archives into the general list and administrator permanently deletes it", async ({
+  page,
+  account,
+}) => {
+  test.setTimeout(120000)
+  const topic = `Synthetic demand archive ${account.user.id}`
+  expect(
+    (
+      await apiCall(
+        account.request,
+        "/api/v1/platform/training-demands",
+        "POST",
+        { topic },
+      )
+    ).status(),
+  ).toBe(201)
+  await provisionAndSignIn(account, page, "admin")
+  await page.goto("/training-demand")
+  await page
+    .locator("div.flex.flex-wrap.justify-between")
+    .filter({ has: page.getByRole("heading", { name: topic, exact: true }) })
+    .getByRole("button", { name: "Archive topic", exact: true })
+    .click()
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Archive request", exact: true })
+    .click()
+  await expect(page.getByRole("dialog")).toHaveCount(0)
+  await page.goto("/archive")
+  await page.getByLabel("Record type", { exact: true }).selectOption("demand")
+  await page.getByLabel("Search archived records", { exact: true }).fill(topic)
+  const row = page.locator("tbody tr").filter({ hasText: topic })
+  await expect(row.getByRole("button", { name: /^Restore/ })).toBeVisible()
+  await row.getByRole("button", { name: /^Permanently delete/ }).click()
+  const dialog = page.getByRole("dialog")
+  await dialog.getByLabel("Type the complete record name").fill(topic)
+  await dialog
+    .getByLabel("Your current administrator password")
+    .fill(account.password)
+  await dialog
+    .getByRole("button", { name: "Delete permanently", exact: true })
+    .click()
+  await expect(dialog).toHaveCount(0)
+  await expect(
+    page.getByText("Record permanently deleted.", { exact: true }),
+  ).toBeVisible()
+  const archived = await (
+    await apiCall(
+      account.request,
+      `/api/v1/platform/archive?kind=demand&search=${encodeURIComponent(topic)}`,
+    )
+  ).json()
+  expect(archived.total).toBe(0)
+  await page.goto("/audit")
+  await expect(
+    page
+      .locator("tbody tr")
+      .filter({ hasText: "demand.permanently_deleted" })
+      .first(),
+  ).toBeVisible()
+})
+
 test("administrator archives and restores vacancy drafts and terminal enrollment history", async ({
   page,
   account,
@@ -68,7 +130,15 @@ test("administrator archives and restores vacancy drafts and terminal enrollment
     .getByLabel("Activity category", { exact: true })
     .selectOption("business")
   await expect(
-    page.locator("tbody tr").filter({ hasText: "vacancy.restored" }).filter({ has: page.getByRole("cell", { name: `vacancies #${workflowCatalog.vacancy.id}`, exact: true }) }),
+    page
+      .locator("tbody tr")
+      .filter({ hasText: "vacancy.restored" })
+      .filter({
+        has: page.getByRole("cell", {
+          name: `vacancies #${workflowCatalog.vacancy.id}`,
+          exact: true,
+        }),
+      }),
   ).toBeVisible()
   expect(paths.length).toBeGreaterThan(4)
   expect(paths.every((path) => path.startsWith("/api/v1/"))).toBe(true)
