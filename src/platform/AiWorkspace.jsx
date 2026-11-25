@@ -355,7 +355,7 @@ export function AiWorkspace() {
       >
         <form
           onSubmit={findVacancies}
-          className="flex flex-wrap items-end gap-3"
+          className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
         >
           <label className="min-w-0 flex-1 text-sm font-semibold">
             Find a vacancy
