@@ -96,7 +96,8 @@ class ArchiveDeletionController extends Controller
             abort(422, 'Reopen the permanent deletion confirmation.');
         }
         abort_unless(($intent['actor'] ?? null) === $request->user()->id && ($intent['type'] ?? null) === $type && ($intent['id'] ?? null) === $id && ($intent['nonce'] ?? null) === $request->session()->get('permanent_removal_intent'), 422, 'Reopen the permanent deletion confirmation.');
-        abort_unless(now()->timestamp >= $intent['ready'] && now()->timestamp <= $intent['expires'], 422, 'Wait five seconds before confirming permanent deletion.');
+        abort_if(now()->timestamp > $intent['expires'], 422, 'Confirmation expired. Review the deletion confirmation again.');
+        abort_unless(now()->timestamp >= $intent['ready'], 422, 'Wait five seconds before confirming permanent deletion.');
 
         return DB::transaction(function () use ($request, $type, $id, $data, $intent) {
             $row = $this->row($request, $type, $id);

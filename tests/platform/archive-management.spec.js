@@ -46,7 +46,7 @@ async function workspace(context, role = "admin") {
       json = {
         token: "synthetic-intent",
         wait_seconds: 5,
-        label: "Digital records",
+        label: "(Micro Credential Course) Preparing Computer Aided Drawings Using AutoCAD",
         impact: {},
       }
     else if (path.endsWith("/archive/demand/990230")) {
@@ -69,7 +69,7 @@ async function workspace(context, role = "admin") {
               {
                 type: "demand",
                 id: 990230,
-                label: "Digital records",
+                label: "(Micro Credential Course) Preparing Computer Aided Drawings Using AutoCAD",
                 context: "Synthetic person",
                 status: "requested",
                 archived_at: "2026-11-25T01:00:00Z",
@@ -77,27 +77,34 @@ async function workspace(context, role = "admin") {
             ],
         total: deleted ? 0 : 1,
       }
-    else if (
-      path.endsWith("/training-demands/archive-topic") ||
-      /training-demands\/\d+\/archive$/.test(path)
-    ) {
+    else if (/training-demands\/\d+\/archive$/.test(path)) {
       archived = true
       json = { message: "Training request archived." }
-    } else if (path.endsWith("/training-demands"))
-      json = {
-        ...json,
-        data: archived
+    } else if (path.endsWith("/training-demands")) {
+      const detailed = new URL(request.url()).searchParams.has("topic_key")
+      const people = [
+        {
+          id: 990230,
+          name: "Synthetic person",
+          topic: "Digital records",
+          topic_key: "digital records",
+        },
+        {
+          id: 990232,
+          name: "Second person",
+          topic: "Digital records",
+          topic_key: "digital records",
+        },
+      ]
+      const data = detailed
+        ? archived
+          ? people.slice(1)
+          : people
+        : role === "jobseeker" && archived
           ? []
-          : [
-              {
-                id: 990230,
-                topic: "Digital records",
-                topic_key: "digital records",
-                interested_jobseekers: 2,
-              },
-            ],
-        total: archived ? 0 : 1,
-      }
+          : [{ ...people[0], interested_jobseekers: archived ? 1 : 2 }]
+      json = { ...json, data, total: data.length }
+    }
     await r.fulfill({ json })
   })
   return calls
@@ -121,12 +128,17 @@ test("Restore and Delete stay adjacent; deletion waits, preserves input on 429, 
   await expect(
     dialog.getByRole("button", { name: /^Delete permanently/ }),
   ).toBeDisabled()
+  await expect(dialog.locator('input[type="text"]')).toHaveCount(0)
   await dialog
-    .getByLabel("Type the complete record name")
-    .fill("Digital records")
+    .getByRole("checkbox", {
+      name: "I understand this deletion cannot be undone.",
+    })
+    .check()
   await dialog
     .getByLabel("Your current administrator password")
-    .fill("Synthetic password")
+    .evaluate((input) => {
+      input.value = "Synthetic password"
+    })
   await fs.mkdir("artifacts/archive-management", { recursive: true })
   for (const [width, theme] of [
     [1440, "hc1"],
@@ -157,9 +169,11 @@ test("Restore and Delete stay adjacent; deletion waits, preserves input on 429, 
       { exact: true },
     ),
   ).toBeVisible()
-  await expect(dialog.getByLabel("Type the complete record name")).toHaveValue(
-    "Digital records",
-  )
+  await expect(
+    dialog.getByRole("checkbox", {
+      name: "I understand this deletion cannot be undone.",
+    }),
+  ).toBeChecked()
   await expect(
     dialog.getByLabel("Your current administrator password"),
   ).toHaveValue("Synthetic password")
@@ -173,6 +187,42 @@ test("Restore and Delete stay adjacent; deletion waits, preserves input on 429, 
   expect(errors).toEqual([])
 })
 
+test("expired confirmation can be renewed without closing the deletion dialog", async ({
+  page,
+  context,
+}) => {
+  await workspace(context)
+  await page.clock.install()
+  await page.goto("/archive")
+  await page.getByRole("button", { name: /^Permanently delete/ }).click()
+  const dialog = page.getByRole("dialog")
+  await dialog.getByRole("checkbox").check()
+  await dialog
+    .getByLabel("Your current administrator password")
+    .fill("Synthetic password")
+  await page.clock.fastForward(301000)
+  await expect(
+    dialog.getByText("Confirmation expired. Review it again to continue.", {
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    dialog.getByRole("button", { name: "Delete permanently", exact: true }),
+  ).toBeDisabled()
+  await dialog
+    .getByRole("button", { name: "Review confirmation again", exact: true })
+    .click()
+  await expect(dialog.getByRole("checkbox")).not.toBeChecked()
+  await expect(
+    dialog.getByLabel("Your current administrator password"),
+  ).toHaveValue("Synthetic password")
+  await dialog.getByRole("checkbox").check()
+  await page.clock.fastForward(6000)
+  await expect(
+    dialog.getByRole("button", { name: "Delete permanently", exact: true }),
+  ).toBeEnabled()
+})
+
 for (const role of ["jobseeker", "peso_staff", "admin"]) {
   test(`${role}: request archive is confirmed and scoped to the proper operation`, async ({
     page,
@@ -180,12 +230,23 @@ for (const role of ["jobseeker", "peso_staff", "admin"]) {
   }) => {
     const calls = await workspace(context, role)
     await page.goto("/training-demand")
-    await page
-      .getByRole("button", {
-        name: role === "jobseeker" ? "Archive request" : "Archive topic",
-        exact: true,
-      })
-      .click()
+    await expect(
+      page.getByRole("button", { name: "Archive topic", exact: true }),
+    ).toHaveCount(0)
+    if (role !== "jobseeker") {
+      await page
+        .getByRole("button", { name: "View requests", exact: true })
+        .click()
+      await page
+        .getByRole("button", {
+          name: "Archive request from Synthetic person",
+          exact: true,
+        })
+        .click()
+    } else
+      await page
+        .getByRole("button", { name: "Archive request", exact: true })
+        .click()
     const dialog = page.getByRole("dialog")
     await expect(
       dialog.getByRole("button", { name: "Cancel", exact: true }),
@@ -202,19 +263,35 @@ for (const role of ["jobseeker", "peso_staff", "admin"]) {
       )
       .toBe(1)
     await expect(dialog).toHaveCount(0)
-    await expect(
-      page.getByText("No training interest recorded yet.", { exact: true }),
-    ).toBeVisible()
+    if (role === "jobseeker")
+      await expect(
+        page.getByText("No training interest recorded yet.", { exact: true }),
+      ).toBeVisible()
+    else {
+      await expect(
+        page.getByText("1 interested jobseeker(s)", { exact: true }),
+      ).toBeVisible()
+      await expect(
+        page.getByRole("region", {
+          name: "Training request from Second person",
+          exact: true,
+        }),
+      ).toBeVisible()
+      await expect(
+        page.getByRole("region", {
+          name: "Training request from Synthetic person",
+          exact: true,
+        }),
+      ).toHaveCount(0)
+    }
     const request = calls.find(
       (c) => c.method === "POST" && c.path.includes("training-demands"),
     )
     expect(request.path).toBe(
-      `/api/v1/platform/training-demands/${
-        role === "jobseeker" ? "990230/archive" : "archive-topic"
-      }`,
+      "/api/v1/platform/training-demands/990230/archive",
     )
-    if (role !== "jobseeker")
-      expect(request.body).toEqual({ topic_key: "digital records" })
+    expect(request.body).toEqual({})
+    expect(calls.some((c) => c.path.endsWith("/archive-topic"))).toBe(false)
   })
 }
 

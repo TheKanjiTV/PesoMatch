@@ -176,6 +176,58 @@ test("training modal has connected completion states, retains values and restore
   await expect(opener).toBeFocused()
 })
 
+test("AI setup explains disabled actions and supports consent on desktop and mobile", async ({
+  page,
+  context,
+}) => {
+  await mock(context)
+  const errors = []
+  page.on("pageerror", (error) => errors.push(error.message))
+  await page.goto("/ai-workspace")
+  const generate = page.getByRole("button", {
+    name: "Generate career advice",
+    exact: true,
+  })
+  await expect(generate).toBeDisabled()
+  await expect(
+    page.getByText("Turn on AI assistance above to continue.", { exact: true }),
+  ).toBeVisible()
+  await page.getByText("AI assistance off", { exact: true }).click()
+  const preferences = page.getByRole("dialog", {
+    name: "AI privacy & response preferences",
+  })
+  await preferences.getByRole("checkbox").check()
+  await preferences.getByRole("button", { name: "Done", exact: true }).click()
+  await expect(
+    page.getByText("Choose a vacancy to continue.", { exact: true }),
+  ).toBeVisible()
+  await page
+    .getByRole("combobox", { name: "Selected vacancy", exact: true })
+    .selectOption(String(vacancy.id))
+  await expect(generate).toBeEnabled()
+  for (const [width, theme] of [
+    [1440, "hc1"],
+    [390, "hc2"],
+  ]) {
+    await page.setViewportSize({ width, height: 950 })
+    await page.evaluate(
+      (theme) => (document.documentElement.dataset.contrast = theme),
+      theme,
+    )
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBe(true)
+    await page.screenshot({
+      path: `artifacts/presentation-refinement/ai-setup-${width}-${theme}.png`,
+    })
+  }
+  await page.getByText("AI assistance on", { exact: true }).click()
+  await expect(generate).toBeDisabled()
+  expect(errors).toEqual([])
+})
+
 test("privacy opens over AI preferences, preserves its parent and supports direct links", async ({
   page,
   context,
@@ -269,18 +321,31 @@ test("Reload app and Later use styled controls without covering mobile navigatio
   await expect(notice).toHaveCount(0)
 })
 
-
-test("reading privacy preserves registration entries and never checks consent", async ({ page, context }) => {
+test("reading privacy preserves registration entries and never checks consent", async ({
+  page,
+  context,
+}) => {
   await mock(context)
-  await context.route("**/api/v1/auth/user", r => r.fulfill({ json: { user: null, onboarding: null } }))
+  await context.route("**/api/v1/auth/user", (r) =>
+    r.fulfill({ json: { user: null, onboarding: null } }),
+  )
   await page.goto("/register")
-  await page.getByRole("textbox", { name: "First Name", exact: true }).fill("Synthetic")
+  await page
+    .getByRole("textbox", { name: "First Name", exact: true })
+    .fill("Synthetic")
   const agreement = page.getByRole("checkbox", { name: /I agree/ })
   await expect(agreement).not.toBeChecked()
-  await page.getByRole("link", { name: "Privacy Policy", exact: true }).first().click()
-  await expect(page.getByRole("dialog", { name: "Privacy & Your Information" })).toBeVisible()
+  await page
+    .getByRole("link", { name: "Privacy Policy", exact: true })
+    .first()
+    .click()
+  await expect(
+    page.getByRole("dialog", { name: "Privacy & Your Information" }),
+  ).toBeVisible()
   await page.keyboard.press("Escape")
-  await expect(page.getByRole("textbox", { name: "First Name", exact: true })).toHaveValue("Synthetic")
+  await expect(
+    page.getByRole("textbox", { name: "First Name", exact: true }),
+  ).toHaveValue("Synthetic")
   await expect(agreement).not.toBeChecked()
   await expect(page).toHaveURL(/\/register$/)
 })

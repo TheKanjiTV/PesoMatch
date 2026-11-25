@@ -156,15 +156,12 @@ export function TrainingDemandPage() {
     setError("")
     try {
       const result = await api(
-        user.role === "jobseeker"
-          ? `/training-demands/${archiving.id}/archive`
-          : "/training-demands/archive-topic",
+        `/training-demands/${archiving.id}/archive`,
         "POST",
-        user.role === "jobseeker" ? {} : { topic_key: archiving.topic_key },
+        {},
       )
       setMessage(result.message)
       setArchiving(null)
-      setExpanded(null)
       await r.reload()
     } catch (e) {
       setError(e.message)
@@ -188,17 +185,17 @@ export function TrainingDemandPage() {
       {message && <Notice>{message}</Notice>}
       {archiving && (
         <Modal
-          title={`Archive ${archiving.topic}?`}
+          title="Archive training request?"
           size="compact"
           busy={busy}
           onClose={() => setArchiving(null)}
           initialFocusSelector="[data-cancel]"
         >
           <p className="mb-5 text-sm leading-6">
-            {user.role === "jobseeker"
-              ? "Archive this training request?"
-              : `Archive ${archiving.interested_jobseekers} active request(s) for this topic?`}{" "}
-            An administrator can restore requests from Archive & Restore.
+            Archive the request from{" "}
+            <strong>{archiving.name || user.name}</strong> for{" "}
+            <strong>{archiving.topic}</strong>? An administrator can restore
+            this request from Archive & Restore.
           </p>
           {error && <Notice error>{error}</Notice>}
           <div className="flex flex-wrap justify-end gap-3">
@@ -236,66 +233,64 @@ export function TrainingDemandPage() {
             <p className="py-5">No training interest recorded yet.</p>
           )}
           {r.data?.data?.map((d) => (
-            <div
-              key={d.topic_key}
-              className="flex flex-wrap justify-between gap-3 py-5"
-            >
-              <div className="min-w-0 flex-1">
-                <h2 className="font-semibold">{d.topic}</h2>
-                {user.role === "jobseeker" && (
-                  <TrainingRequestDetails request={d} />
-                )}
-                {user.role !== "jobseeker" && (
-                  <button
-                    className={`${secondaryStyle} mt-3`}
-                    onClick={() =>
-                      setExpanded(expanded === d.topic_key ? null : d.topic_key)
-                    }
-                  >
-                    {expanded === d.topic_key
-                      ? "Hide requests"
-                      : "View requests"}
-                  </button>
-                )}
-                {expanded === d.topic_key && (
-                  <DemandRequests topic={d.topic_key} />
-                )}
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {d.source_program_id && (
-                    <RecordLink
-                      to={`/training/${d.source_program_id}`}
-                      className="text-sm font-semibold underline"
-                    >
-                      View source listing
-                    </RecordLink>
-                  )}
+            <section key={d.topic_key} className="py-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <h2 className="break-words font-semibold">{d.topic}</h2>
                   {user.role !== "jobseeker" && (
-                    <Link
-                      className="text-sm font-semibold underline"
-                      to={`/training?create=training&topic=${encodeURIComponent(d.topic)}`}
-                    >
-                      Plan a training intake
-                    </Link>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {d.interested_jobseekers} interested jobseeker(s)
+                    </p>
                   )}
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                {user.role !== "jobseeker" && (
-                  <span>{d.interested_jobseekers} interested jobseeker(s)</span>
-                )}
                 <button
                   className={secondaryStyle}
                   onClick={() => {
-                    setError("")
-                    setArchiving(d)
+                    if (user.role === "jobseeker") {
+                      setError("")
+                      setArchiving({ ...d, name: user.name })
+                    } else
+                      setExpanded(expanded === d.topic_key ? null : d.topic_key)
                   }}
                 >
                   {user.role === "jobseeker"
                     ? "Archive request"
-                    : "Archive topic"}
+                    : expanded === d.topic_key
+                      ? "Hide requests"
+                      : "View requests"}
                 </button>
               </div>
-            </div>
+              {user.role === "jobseeker" && (
+                <TrainingRequestDetails request={d} />
+              )}
+              {expanded === d.topic_key && (
+                <DemandRequests
+                  topic={d.topic_key}
+                  onArchive={(row) => {
+                    setError("")
+                    setArchiving(row)
+                  }}
+                />
+              )}
+              <div className="mt-4 flex flex-wrap gap-3">
+                {d.source_program_id && (
+                  <RecordLink
+                    to={`/training/${d.source_program_id}`}
+                    className="text-sm font-semibold underline"
+                  >
+                    View source listing
+                  </RecordLink>
+                )}
+                {user.role !== "jobseeker" && (
+                  <Link
+                    className="text-sm font-semibold underline"
+                    to={`/training?create=training&topic=${encodeURIComponent(d.topic)}`}
+                  >
+                    Plan a training intake
+                  </Link>
+                )}
+              </div>
+            </section>
           ))}
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
@@ -311,17 +306,31 @@ export function TrainingDemandPage() {
   )
 }
 
-function DemandRequests({ topic }) {
+function DemandRequests({ topic, onArchive }) {
   const r = useResource(
     `/training-demands?topic_key=${encodeURIComponent(topic)}`,
   )
   return (
     <ResourceState resource={r} skeleton={<TableSkeleton columns={2} />}>
       {r.data?.data?.map((row) => (
-        <section key={row.id} className="mt-4 border-t border-border pt-4">
-          <h3 className="text-sm font-semibold">
-            {row.name || "Archived account"}
-          </h3>
+        <section
+          key={row.id}
+          aria-label={`Training request from ${row.name || "archived account"}`}
+          className="mt-4 border-t border-border pt-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="min-w-0 break-words text-sm font-semibold">
+              {row.name || "Archived account"}
+            </h3>
+            <button
+              type="button"
+              className={secondaryStyle}
+              aria-label={`Archive request from ${row.name || "archived account"}`}
+              onClick={() => onArchive(row)}
+            >
+              Archive request
+            </button>
+          </div>
           <TrainingRequestDetails request={row} />
         </section>
       ))}

@@ -21,10 +21,14 @@ test("training request archives into the general list and administrator permanen
   ).toBe(201)
   await provisionAndSignIn(account, page, "admin")
   await page.goto("/training-demand")
-  await page
-    .locator("div.flex.flex-wrap.justify-between")
+  const topicSection = page
+    .locator("section")
     .filter({ has: page.getByRole("heading", { name: topic, exact: true }) })
-    .getByRole("button", { name: "Archive topic", exact: true })
+  await topicSection
+    .getByRole("button", { name: "View requests", exact: true })
+    .click()
+  await topicSection
+    .getByRole("button", { name: /^Archive request from/ })
     .click()
   await page
     .getByRole("dialog")
@@ -38,7 +42,11 @@ test("training request archives into the general list and administrator permanen
   await expect(row.getByRole("button", { name: /^Restore/ })).toBeVisible()
   await row.getByRole("button", { name: /^Permanently delete/ }).click()
   const dialog = page.getByRole("dialog")
-  await dialog.getByLabel("Type the complete record name").fill(topic)
+  await dialog
+    .getByRole("checkbox", {
+      name: "I understand this deletion cannot be undone.",
+    })
+    .check()
   await dialog
     .getByLabel("Your current administrator password")
     .fill(account.password)

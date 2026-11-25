@@ -118,20 +118,6 @@ class TrainingParticipationController extends Controller
         });
     }
 
-    public function archiveTopic(Request $r)
-    {
-        abort_unless(in_array($r->user()->role, ['peso_staff', 'admin'], true), 403);
-        $key = $r->validate(['topic_key' => 'required|string|max:160'])['topic_key'];
-
-        return DB::transaction(function () use ($r, $key) {
-            $rows = TrainingDemand::where('topic_key', $key)->lockForUpdate()->get();
-            abort_if($rows->isEmpty(), 404, 'No active requests remain for this topic.');
-            $this->archiveRows($r, $rows);
-
-            return response()->json(['message' => $rows->count().' training request(s) archived.']);
-        });
-    }
-
     private function archiveRows(Request $r, $rows): void
     {
         TrainingDemand::whereIn('id', $rows->pluck('id'))->update(['deleted_at' => now(), 'updated_at' => now()]);

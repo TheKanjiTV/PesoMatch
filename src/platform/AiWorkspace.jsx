@@ -53,28 +53,40 @@ export function AiConsent({
     <>
       <section
         aria-label="AI privacy preferences"
-        className="my-5 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card p-4 sm:px-5"
+        className="my-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-y border-border py-4"
       >
         <div className="flex min-w-0 flex-wrap items-center gap-4">
-          <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold">
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-semibold">
             <input
               role="switch"
               aria-label="Enable AI assistance"
               type="checkbox"
-              className="size-5 accent-primary"
+              className="peer sr-only"
               checked={consent}
               disabled={disabled || !status?.configured}
               onChange={(e) =>
                 e.target.checked ? setOpen(true) : onConsent(false)
               }
             />
+            <span
+              aria-hidden="true"
+              className={`relative h-6 w-11 shrink-0 rounded-full border border-border transition-colors peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-primary peer-disabled:opacity-50 ${
+                consent ? "bg-primary" : "bg-muted-foreground"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 size-[18px] rounded-full bg-card transition-transform ${
+                  consent ? "translate-x-[22px]" : "translate-x-0.5"
+                }`}
+              />
+            </span>
             <span>AI assistance {consent ? "on" : "off"}</span>
           </label>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex min-h-11 items-center gap-3 text-sm">
             <span>Language</span>
             <select
               aria-label="AI response language"
-              className={`${inputStyle} w-auto`}
+              className={`${inputStyle} !w-auto`}
               value={language}
               disabled={disabled}
               onChange={(e) => onLanguage(e.target.value)}
@@ -300,7 +312,7 @@ export function AiWorkspace() {
     setError("")
   }
   return (
-    <>
+    <div className="max-w-5xl">
       <Heading title="AI Career Workspace" />
       <div className="flex flex-wrap gap-2" aria-label="AI tools">
         {[
@@ -337,7 +349,10 @@ export function AiWorkspace() {
           disabled={busy}
         />
       </ResourceState>
-      <section className="space-y-4 rounded-lg border border-border bg-card p-5">
+      <section
+        aria-label="AI tool setup"
+        className="space-y-5 rounded-lg border border-border bg-card p-5 sm:p-7"
+      >
         <form
           onSubmit={findVacancies}
           className="flex flex-wrap items-end gap-3"
@@ -347,6 +362,7 @@ export function AiWorkspace() {
             <input
               className={`${inputStyle} mt-2`}
               value={search}
+              placeholder="Job title or employer"
               maxLength={200}
               disabled={busy || Boolean(practice)}
               onChange={(e) => setSearch(e.target.value)}
@@ -364,14 +380,18 @@ export function AiWorkspace() {
           <select
             className={`${inputStyle} mt-2`}
             value={vacancyId}
-            disabled={busy || Boolean(practice)}
+            disabled={vacancies.loading || busy || Boolean(practice)}
             onChange={(e) => {
               setVacancyId(e.target.value)
               setResult(null)
               setDecisions({})
             }}
           >
-            <option value="">Choose a published vacancy</option>
+            <option value="">
+              {vacancies.loading
+                ? "Loading vacancies…"
+                : "Choose a published vacancy"}
+            </option>
             {vacancyId && !choices.some((v) => String(v.id) === vacancyId) && (
               <option value={vacancyId}>
                 Selected vacancy #{vacancyId} (server checks availability)
@@ -399,7 +419,7 @@ export function AiWorkspace() {
               disabled={busy}
               onChange={(e) => setUseResume(e.target.checked)}
             />
-            Also send my redacted extracted résumé excerpt
+            Include my redacted résumé excerpt
           </label>
         )}
         {tab === "resume" && (
@@ -417,43 +437,60 @@ export function AiWorkspace() {
             </label>
           </>
         )}
-        <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5">
-          {vacancyId && (
-            <RecordLink to={`/jobs/${vacancyId}`} className={secondaryStyle}>
-              Review vacancy details
-            </RecordLink>
-          )}
-          {practice && tab === "interview" ? (
-            <button
-              className={primaryStyle}
-              disabled={busy}
-              onClick={() => setOutputOpen(true)}
-            >
-              Continue interview practice
-            </button>
-          ) : (
-            <button
-              className={primaryStyle}
-              disabled={!ready}
-              onClick={() => run(tab)}
-            >
-              {busy
-                ? "Waiting for model…"
-                : tab === "adviser"
-                  ? "Generate career advice"
-                  : tab === "resume"
-                    ? "Review résumé for this vacancy"
-                    : "Start five-question practice"}
-            </button>
-          )}
-          {result && !outputOpen && (
-            <button
-              className={secondaryStyle}
-              onClick={() => setOutputOpen(true)}
-            >
-              Open latest {tab === "resume" ? "résumé review" : "career advice"}
-            </button>
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-5">
+          <div
+            id="ai-setup-status"
+            role="status"
+            className="text-sm leading-6 text-muted-foreground"
+          >
+            {!status.loading && !status.data?.configured
+              ? "AI assistance is currently unavailable."
+              : !consent
+                ? "Turn on AI assistance above to continue."
+                : !vacancyId
+                  ? "Choose a vacancy to continue."
+                  : "Ready for your selected vacancy."}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {vacancyId && (
+              <RecordLink to={`/jobs/${vacancyId}`} className={secondaryStyle}>
+                Review vacancy details
+              </RecordLink>
+            )}
+            {practice && tab === "interview" ? (
+              <button
+                className={primaryStyle}
+                disabled={busy}
+                onClick={() => setOutputOpen(true)}
+              >
+                Continue interview practice
+              </button>
+            ) : (
+              <button
+                className={primaryStyle}
+                disabled={!ready}
+                aria-describedby="ai-setup-status"
+                onClick={() => run(tab)}
+              >
+                {busy
+                  ? "Waiting for model…"
+                  : tab === "adviser"
+                    ? "Generate career advice"
+                    : tab === "resume"
+                      ? "Review résumé for this vacancy"
+                      : "Start five-question practice"}
+              </button>
+            )}
+            {result && !outputOpen && (
+              <button
+                className={secondaryStyle}
+                onClick={() => setOutputOpen(true)}
+              >
+                Open latest{" "}
+                {tab === "resume" ? "résumé review" : "career advice"}
+              </button>
+            )}
+          </div>
         </div>
       </section>
       {error && !outputOpen && (
@@ -734,6 +771,6 @@ export function AiWorkspace() {
           )}
         </Modal>
       )}
-    </>
+    </div>
   )
 }

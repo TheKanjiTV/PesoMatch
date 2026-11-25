@@ -28,7 +28,6 @@ Route::prefix('platform')->middleware(['auth:sanctum', EnsureSessionIdentity::cl
     Route::post('/archive/{type}/{id}/restore', [ArchiveController::class, 'restore'])->whereNumber('id');
     Route::post('/delete-intents', [RemovalController::class, 'intent']);
     Route::delete('/remove/{type}/{id}', [RemovalController::class, 'destroy'])->whereNumber('id');
-    Route::post('/training-demands/archive-topic', [TrainingParticipationController::class, 'archiveTopic']);
     Route::post('/training-demands/{id}/archive', [TrainingParticipationController::class, 'archiveDemand'])->whereNumber('id');
     Route::get('/training-demands', [TrainingParticipationController::class, 'demands']);
     Route::post('/training-demands', [TrainingParticipationController::class, 'demand'])->middleware('throttle:20,1,post-training-demands:');

@@ -67,7 +67,7 @@ class DemandArchiveAndPermanentDeletionTest extends TestCase
         return ['confirmation_token' => $intent['token'], 'confirmation_name' => $intent['label'], 'current_password' => 'password'];
     }
 
-    public function test_demand_owner_and_group_archive_restore_and_explicit_rerequest_preserve_catalog(): void
+    public function test_demand_archival_is_per_person_and_restore_and_rerequest_preserve_catalog(): void
     {
         $a = $this->person();
         $b = $this->person();
@@ -76,11 +76,11 @@ class DemandArchiveAndPermanentDeletionTest extends TestCase
         $other = $this->demand($a, 'Bookkeeping');
         $program = $this->program();
         $this->actingAs($a)->postJson('/api/v1/platform/training-demands/'.$two->id.'/archive')->assertForbidden();
-        $this->postJson('/api/v1/platform/training-demands/archive-topic', ['topic_key' => $one->topic_key])->assertForbidden();
+        $this->postJson('/api/v1/platform/training-demands/archive-topic', ['topic_key' => $one->topic_key])->assertNotFound();
         $this->postJson('/api/v1/platform/training-demands/'.$one->id.'/archive')->assertOk();
         $this->getJson('/api/v1/platform/training-demands')->assertJsonPath('total', 1);
         $this->actingAs($this->person('peso_staff'))->getJson('/api/v1/platform/training-demands')->assertOk()->assertJsonPath('data.1.interested_jobseekers', 1);
-        $this->postJson('/api/v1/platform/training-demands/archive-topic', ['topic_key' => $one->topic_key])->assertOk();
+        $this->postJson('/api/v1/platform/training-demands/'.$two->id.'/archive')->assertOk();
         $this->getJson('/api/v1/platform/training-demands?topic_key=computer%20literacy')->assertJsonPath('total', 0);
         $this->admin();
         $this->getJson('/api/v1/platform/archive?kind=demand')->assertJsonPath('total', 2);
@@ -95,6 +95,36 @@ class DemandArchiveAndPermanentDeletionTest extends TestCase
         $this->assertDatabaseCount('enrollments', 0);
         $this->assertSame(2, DB::table('audit_events')->where('action', 'demand.archived')->count());
         $this->assertDatabaseHas('audit_events', ['action' => 'demand.restored']);
+    }
+
+    public function test_staff_archive_one_person_keeps_the_other_request_for_the_same_topic(): void
+    {
+        $one = $this->demand($this->person());
+        $two = $this->demand($this->person());
+        $this->actingAs($this->person('peso_staff'));
+        $this->postJson('/api/v1/platform/training-demands/'.$one->id.'/archive')->assertOk();
+        $this->getJson('/api/v1/platform/training-demands')->assertOk()->assertJsonPath('total', 1)->assertJsonPath('data.0.interested_jobseekers', 1);
+        $this->getJson('/api/v1/platform/training-demands?topic_key=computer%20literacy')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $two->id);
+        $this->assertTrue($one->fresh()->trashed());
+        $this->assertFalse($two->fresh()->trashed());
+        $this->assertSame(1, DB::table('audit_events')->where('action', 'demand.archived')->count());
+        foreach (['/api/platform', '/api/v1/platform'] as $prefix) {
+            $this->postJson($prefix.'/training-demands/archive-topic', ['topic_key' => $one->topic_key])->assertNotFound();
+        }
+    }
+
+    public function test_expired_permanent_deletion_intent_explains_how_to_recover_and_leaves_record_archived(): void
+    {
+        $row = $this->demand($this->person());
+        $row->delete();
+        $this->admin();
+        $payload = $this->deletion('demand', $row->id);
+        $this->travel(6)->minutes();
+        $this->deleteJson('/api/v1/platform/archive/demand/'.$row->id, $payload)->assertUnprocessable()->assertJsonPath('message', 'Confirmation expired. Review the deletion confirmation again.');
+        $this->assertTrue($row->fresh()->trashed());
+        $fresh = $this->deletion('demand', $row->id);
+        $this->travel(6)->seconds();
+        $this->deleteJson('/api/v1/platform/archive/demand/'.$row->id, $fresh)->assertOk();
     }
 
     public function test_permanent_delete_requires_admin_archived_record_password_name_wait_and_one_use_token(): void

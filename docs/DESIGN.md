@@ -68,3 +68,10 @@ Vacancy cards and details place a large, borderless match percentage at the righ
 Training topic requests open an 880px native modal with four connected progress markers. Completed steps show checks; the current step has an outlined marker; each step retains Topic, Dates, Details and Review content and validation. Back preserves entered values and closing restores focus to the opener. Privacy links open the full notice in a reading dialog without navigating away or changing registration consent. Direct privacy URLs also open the dialog. Nested Escape closes only the top dialog.
 
 Update notifications use a quiet card with a refresh icon, a short heading and distinct Later / Reload app controls above the mobile navigation. Requested module descriptions and account-history explanations are removed without changing their underlying workflows or records.
+
+
+## November 25 archive usability follow-up
+
+Permanent deletion uses a short dialog heading, the full record title and requester as a readable summary, a required acknowledgement checkbox, administrator password and server-enforced five-second wait. The disabled action has a nearby explanation for the current missing requirement. Expired confirmations can be reviewed in place. The former long title-entry field is removed to prevent password managers from filling it as a username.
+
+Staff Training Demand retains topic grouping and counts, with full-width expanded requests. Archive request belongs to each person's row; archiving one person keeps the other requests visible and updates the interest count. No bulk topic archive control or API remains. AI Career setup keeps the existing tool controls within a readable 1024px measure, uses an explicit assistance switch, and explains whether consent or a vacancy is needed before generation.
